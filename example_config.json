@@ -1,0 +1,22 @@
+{
+    "token" : "discord bot token"
+
+    "cgg" : {
+        "token" : "championgg api token",
+        "url" : "http://api.champion.gg/"
+    },
+
+    "reddit" : {
+        "secret" : "reddit secret",
+        "password" : "reddit password",
+        "id" : "reddit id",
+        "username" : "reddit username"
+    },
+
+    "channels": {
+        "bot-logging" : "channel_id",
+        "bot-testing" : "channel_id",
+        "afk" : "channel_id",
+        "nsfw" : "channel_id"
+    }
+}
