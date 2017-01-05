@@ -16,7 +16,7 @@ startup_extensions = [
     "cogs.stats",
     "cogs.admin",
     "cogs.reddit",
-    "cogs.logging"
+    "cogs.logging",
     "cogs.music"
 ]
 
