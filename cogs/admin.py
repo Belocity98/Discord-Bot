@@ -16,7 +16,8 @@ class Admin():
             "cogs.stats",
             "cogs.admin",
             "cogs.reddit",
-            "cogs.logging"
+            "cogs.logging",
+            "cogs.music"
         ]
 
     @commands.command(hidden=True, pass_context=True)

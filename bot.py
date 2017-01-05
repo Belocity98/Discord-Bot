@@ -17,6 +17,7 @@ startup_extensions = [
     "cogs.admin",
     "cogs.reddit",
     "cogs.logging"
+    "cogs.music"
 ]
 
 bot = commands.Bot(command_prefix='>', description=description)
