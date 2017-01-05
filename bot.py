@@ -19,7 +19,7 @@ startup_extensions = [
     "cogs.logging"
 ]
 
-bot = commands.Bot(command_prefix='?', description=description)
+bot = commands.Bot(command_prefix='>', description=description)
 
 app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 config_file = os.path.join(app_path, 'config.json')
