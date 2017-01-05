@@ -23,7 +23,8 @@ class Reddit():
             subs = []
             submissions = self.reddit.subreddit(subreddit).top(time)
             for submission in submissions:
-                if (submission.domain == "i.imgur.com") or (submission.domain == "i.redd.it") or (submission.domain == "gfycat.com"):
+                domains = ["i.imgur.com", "i.redd.it", "gfycat.com"]
+                if submission.domain in domains:
                     subs.append(submission.url)
             if len(subs) == 0:
                 await self.bot.say("```\nFound 0 submissions.\n```")
