@@ -26,7 +26,7 @@ class Mod():
         else:
             await self.ban_func(server, user, reason=reason, length=length)
         llog = "{} banned {} for {} seconds.".format(str(ctx.message.author), str(user), str(length))
-        await self.bot.get_cog("Logging").do_logging(llog)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
@@ -39,7 +39,7 @@ class Mod():
         server = ctx.message.server
         await self.bot.purge_from(channel, limit=limit)
         llog = "{} pruned {} messages from {}.".format(str(ctx.message.author), str(limit), str(channel.name))
-        await self.bot.get_cog("Logging").do_logging(llog)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -58,7 +58,7 @@ class Mod():
             for member in lines:
                 await self.bot.move_member(member, author.voice_channel)
         llog = "{} mass moved everyone to {}.".format(str(author), author.voice_channel.name)
-        await self.bot.get_cog("Logging").do_logging(llog)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -73,7 +73,7 @@ class Mod():
                     lines.append(member)
         elif destination == "server":
             for member in members:
-                if (member.voice_channel != None) and (member.voice_channel != self.bot.get_channel(self.bot.config["channels"]["afk"]) ):
+                if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
                     lines.append(member)
         else:
             await self.bot.say("```\nDestination not recognized. Expected channel/server.\n```")
@@ -88,7 +88,7 @@ class Mod():
             await self.bot.say("```\nVoicestate not recognized. Expected mute/unmute.\n```")
             return
         llog = "{} {}d all members in the {}".format(str(ctx.message.author), voicestate, destination)
-        await self.bot.get_cog("Logging").do_logging(llog)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]

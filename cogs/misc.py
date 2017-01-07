@@ -28,7 +28,7 @@ class Misc():
             self.strikes[user] = 1
             await self.bot.say(str(user) + " now has {} strike.".format(self.strikes[user]))
         llog = "{} striked {}.".format(str(ctx.message.author), str(user))
-        await self.bot.get_cog("Logging").do_logging(llog)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
 def setup(bot):
     bot.add_cog(Misc(bot))

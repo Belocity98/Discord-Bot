@@ -103,7 +103,7 @@ class Music:
         else:
             await self.bot.say('Ready to play audio in ' + channel.name)
             llog = "Music bot joined {}.".format(channel.name)
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, channel.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
@@ -119,7 +119,7 @@ class Music:
         else:
             await state.voice.move_to(summoned_channel)
             llog = "Music bot summoned to {}.".format(str(summoned_channel))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
         return True
 
@@ -154,7 +154,7 @@ class Music:
             await self.bot.say('Enqueued ' + str(entry))
             await state.songs.put(entry)
             llog = "{} queued {}.".format(str(ctx.message.author), str(entry))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
@@ -166,7 +166,7 @@ class Music:
             player.volume = value / 100
             await self.bot.say('Set the volume to {:.0%}'.format(player.volume))
             llog = "{} set the volume to {}%".format(str(ctx.message.author), player.volume)
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def pause(self, ctx):
@@ -176,7 +176,7 @@ class Music:
             player = state.player
             player.pause()
             llog = "{} paused the music bot.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx):
@@ -186,7 +186,7 @@ class Music:
             player = state.player
             player.resume()
             llog = "{} resumed the music bot.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
@@ -200,7 +200,7 @@ class Music:
             player = state.player
             player.stop()
             llog = "{} stopped the music bot.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
         try:
             state.audio_player.cancel()
@@ -225,7 +225,7 @@ class Music:
             await self.bot.say('Requester requested skipping song...')
             state.skip()
             llog = "{} skipped the current song.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         elif voter.id not in state.skip_votes:
             state.skip_votes.add(voter.id)
             total_votes = len(state.skip_votes)
@@ -237,7 +237,7 @@ class Music:
             else:
                 await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
                 llog = "{} voted to skip the current song.".format(str(voter))
-                await self.bot.get_cog("Logging").do_logging(llog)
+                await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         else:
             await self.bot.say('You have already voted to skip this song.')
 
@@ -251,7 +251,7 @@ class Music:
             state.skip()
             await self.bot.say("Skipping song...")
             llog = "{} used a masterskip to skip the current song.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):

@@ -29,7 +29,7 @@ class Admin():
         with open(config_file) as fp:
             self.bot.config = json.load(fp)
         llog = "Configuration reloaded."
-        await self.bot.get_cog("Logging").do_logging(llog, channel=ctx.message.channel)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(name='reload', hidden=True, pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -43,7 +43,7 @@ class Admin():
                 except (AttributeError, ImportError) as e:
                     await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             llog = "All cogs reloaded."
-            await self.bot.get_cog("Logging").do_logging(llog, channel=ctx.message.channel)
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
             return
         try:
             self.bot.unload_extension(extension_name)
@@ -52,7 +52,7 @@ class Admin():
             await self.bot.say("Cog not found.")
             return
         llog = "{} reloaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, channel=ctx.message.channel)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -64,16 +64,15 @@ class Admin():
             await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
         llog = "{} loaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, channel=ctx.message.channel)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
     @commands.has_permissions(administrator=True)
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
-        await self.bot.say("{} unloaded.".format(extension_name))
         llog = "{} unloaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, channel=ctx.message.channel)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)

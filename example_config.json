@@ -11,12 +11,5 @@
         "password" : "reddit password",
         "id" : "reddit id",
         "username" : "reddit username"
-    },
-
-    "channels": {
-        "bot-logging" : "channel_id",
-        "bot-testing" : "channel_id",
-        "afk" : "channel_id",
-        "nsfw" : "channel_id"
     }
 }
