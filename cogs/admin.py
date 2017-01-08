@@ -74,5 +74,11 @@ class Admin():
         llog = "{} unloaded.".format(extension_name)
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
+    @commands.command(hidden=True)
+    @commands.has_permissions(administrator=True)
+    async def logout(self):
+        """Turns off the bot."""
+        await self.bot.logout()
+
 def setup(bot):
     bot.add_cog(Admin(bot))
