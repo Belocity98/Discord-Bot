@@ -149,7 +149,7 @@ class Music:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
         else:
-            player.volume = 0.6
+            player.volume = 0.05
             entry = VoiceEntry(ctx.message, player)
             await self.bot.say('Enqueued ' + str(entry))
             await state.songs.put(entry)
@@ -157,6 +157,7 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(administrator=True)
     async def volume(self, ctx, value : int):
         """Sets the volume of the currently playing song."""
 
