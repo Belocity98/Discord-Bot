@@ -24,7 +24,7 @@ class Mod():
         if reason == None:
             await self.ban_func(server, user, length=length)
         else:
-            await self.ban_func(server, user, reason=reason, length=length)
+            await self.ban_func(server, user, length=length, message=reason)
         llog = "{} banned {} for {} seconds.".format(str(ctx.message.author), str(user), str(length))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
