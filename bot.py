@@ -8,6 +8,8 @@ import asyncio
 
 description = "A general bot for personal use."
 
+# Yes, I took RoboDanny's file structure.
+
 # this specifies what extensions to load when the bot starts up
 startup_extensions = [
     "cogs.games",
