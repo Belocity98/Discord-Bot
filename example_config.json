@@ -1,5 +1,7 @@
 {
-    "token" : "discord bot token"
+    "your_user_id" : "user id here",
+
+    "token" : "discord bot token",
 
     "cgg" : {
         "token" : "championgg api token",
