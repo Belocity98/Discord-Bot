@@ -31,6 +31,8 @@ class Logging():
             return
         if before.author == before.server.me:
             return
+        if before.content == after.content:
+            return
         else:
             lines = []
             lines.append("**Message Edited**")
