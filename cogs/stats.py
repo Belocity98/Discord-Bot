@@ -7,7 +7,7 @@ class Stats():
 
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent': 'TheTrain2000'})
+        self.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent': 'TheTrain2000-i<3uFUYU'})
         self.cggurl = self.bot.config["cgg"]["url"]
         self.cggkey = self.bot.config["cgg"]["token"]
 
