@@ -94,6 +94,9 @@ class Music:
     @commands.command(pass_context=True, no_pm=True)
     async def join(self, ctx, *, channel : discord.Channel):
         """Joins a voice channel."""
+        if channel == ctx.message.server.afk_channel:
+            await bot.say('You cannot move the bot to the AFK channel.')
+            return
         try:
             await self.create_voice_client(channel)
         except discord.ClientException:
@@ -112,6 +115,9 @@ class Music:
         if summoned_channel is None:
             await self.bot.say('You are not in a voice channel.')
             return False
+        if summoned_channel == ctx.message.server.afk_channel:
+            await self.bot.say('You cannot summon the bot to the AFK channel.')
+            return
 
         state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
