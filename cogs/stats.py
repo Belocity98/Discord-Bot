@@ -50,7 +50,7 @@ class Stats():
         lines.append("Gold Medals - {0[game_stats][medals_gold]}")
         lines.append('```')
         message = '\n'.join(lines)
-        llog = "{} found {}'s Overwatch stats.'".format(str(ctx.message.author), battletag)
+        llog = "{} found {}'s Overwatch stats.".format(str(ctx.message.author), battletag)
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         if mode == "competitive":
             await self.bot.say(message.format(data["us"]["stats"]["competitive"]))
