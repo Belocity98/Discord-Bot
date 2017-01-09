@@ -118,7 +118,6 @@ class Music:
         if summoned_channel == ctx.message.server.afk_channel:
             await self.bot.say('You cannot summon the bot to the AFK channel.')
             return
-
         state = self.get_voice_state(ctx.message.server)
         if state.voice is None:
             state.voice = await self.bot.join_voice_channel(summoned_channel)
@@ -155,9 +154,13 @@ class Music:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
         else:
+
             player.volume = 0.05
             entry = VoiceEntry(ctx.message, player)
-            await self.bot.say('Enqueued ' + str(entry))
+            embed = self.embed(ctx.message, player)
+            #await self.bot.say('Enqueued ' + str(entry))
+            print(embed.to_dict())
+            await self.bot.send_message(ctx.message.channel, content=None, embed=embed)
             await state.songs.put(entry)
             llog = "{} queued {}.".format(str(ctx.message.author), str(entry))
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
@@ -272,6 +275,22 @@ class Music:
         else:
             skip_count = len(state.skip_votes)
             await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+
+    def embed(self, message, player):
+        requester = message.author
+        channel = message.channel
+        embed = discord.Embed(description='Uploaded by: {}'.format(str(player.uploader)))
+        embed.title = str(player.title)
+        #embed.url = player.download_url
+        embed.colour = 0x27cbe8 # light blue
+        embed.set_author(name=str(requester.display_name), icon_url=requester.avatar_url)
+        embed.add_field(name='Views', value=player.views)
+        embed.add_field(name='Likes', value=player.likes)
+        embed.add_field(name='Dislikes', value=player.dislikes)
+        embed.add_field(name='Length', value='{0[0]}m {0[1]}s'.format(divmod(player.duration, 60)))
+        embed.set_footer(text='Uploaded: {}'.format(player.upload_date), icon_url=embed.Empty)
+        return embed
+
 
 def setup(bot):
     bot.add_cog(Music(bot))
