@@ -26,16 +26,17 @@ class Admin():
     @checks.is_owner()
     async def _reload(self, ctx, *, extension_name : str):
         """Reloads an extension."""
-        #if extension_name == "all":
-            #for cog in self.all_cogs:
-                #try:
-                    #self.bot.unload_extension(cog)
-                    #self.bot.load_extension(cog)
-                #except (AttributeError, ImportError) as e:
-                    #await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
-            #llog = "All cogs reloaded."
-            #await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
-            #return
+        if extension_name == "all":
+            for cog in list(self.bot.cogs.keys()):
+                try:
+                    cog = "cogs." + cog.lower()
+                    self.bot.unload_extension(cog)
+                    self.bot.load_extension(cog)
+                except (AttributeError, ImportError) as e:
+                    await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+            llog = "All cogs reloaded."
+            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
+            return
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
