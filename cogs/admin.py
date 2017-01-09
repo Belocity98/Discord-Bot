@@ -4,16 +4,15 @@ import os
 import sys
 import json
 
+from .utils import checks
+
 class Admin():
 
     def __init__(self, bot):
         self.bot = bot
 
-    def check_if_bot_owner(ctx):
-        return ctx.message.author.id == ctx.bot.config["your_user_id"]
-
     @commands.command(hidden=True, pass_context=True)
-    @commands.check(check_if_bot_owner)
+    @checks.is_owner()
     async def reloadconfig(self, ctx):
         """Reloads the configuration."""
         app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -24,7 +23,7 @@ class Admin():
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(name='reload', hidden=True, pass_context=True)
-    @commands.check(check_if_bot_owner)
+    @checks.is_owner()
     async def _reload(self, ctx, *, extension_name : str):
         """Reloads an extension."""
         #if extension_name == "all":
@@ -47,7 +46,7 @@ class Admin():
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
-    @commands.check(check_if_bot_owner)
+    @checks.is_owner()
     async def load(self, ctx, *, extension_name : str):
         """Loads an extension."""
         try:
@@ -59,7 +58,7 @@ class Admin():
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
-    @commands.check(check_if_bot_owner)
+    @checks.is_owner()
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
@@ -67,7 +66,7 @@ class Admin():
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True)
-    @commands.check(check_if_bot_owner)
+    @checks.is_owner()
     async def logout(self):
         """Turns off the bot."""
         await self.bot.logout()
