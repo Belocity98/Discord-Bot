@@ -166,7 +166,7 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_permissions(administrator=True)
+    @commands.has_permissions(manage_messages=True)
     async def volume(self, ctx, value : int):
         """Sets the volume of the currently playing song."""
 
@@ -179,6 +179,7 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_messages=True)
     async def pause(self, ctx):
         """Pauses the currently played song."""
         state = self.get_voice_state(ctx.message.server)
@@ -189,6 +190,7 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_messages=True)
     async def resume(self, ctx):
         """Resumes the currently played song."""
         state = self.get_voice_state(ctx.message.server)
@@ -199,6 +201,7 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_messages=True)
     async def stop(self, ctx):
         """Stops playing audio and leaves the voice channel.
         This also clears the queue.
@@ -241,9 +244,9 @@ class Music:
             total_votes = len(state.skip_votes)
             if total_votes >= 3:
                 await self.bot.say('Skip vote passed, skipping song...')
+                state.skip()
                 llog = "Skip vote passed, song skipped."
                 await self.bot.get_cog("Logging").do_logging(llog)
-                state.skip()
             else:
                 await self.bot.say('Skip vote added, currently at [{}/3]'.format(total_votes))
                 llog = "{} voted to skip the current song.".format(str(voter))
