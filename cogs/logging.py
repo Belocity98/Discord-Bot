@@ -12,6 +12,8 @@ class Logging():
         logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
         if logging_channel == None:
             print("Logging channel not found.")
+            print("Creating logging channel...")
+            await self.bot.create_channel(server, 'bot-logging')
             return
         if message.author == message.server.me:
             return
