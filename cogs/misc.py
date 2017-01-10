@@ -51,7 +51,7 @@ class Misc():
         else:
             self.strikes[user] = amount
             await self.bot.say(str(user) + " now has {} strikes.".format(self.strikes[user]))
-        llog = "{} striked {} {} times..".format(str(ctx.message.author), str(user), amount)
+        llog = "{} striked {} {} times.".format(str(ctx.message.author), str(user), amount)
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
 def setup(bot):
