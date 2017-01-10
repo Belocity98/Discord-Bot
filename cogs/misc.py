@@ -10,6 +10,23 @@ class Misc():
         self.bot = bot
         self.strikes = {}
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.cooldown(1, 10, commands.BucketType.server)
+    async def lying(self, ctx, user : discord.Member):
+        """Keep record of a lie that someone says."""
+        server = ctx.message.server
+        lie_channel = discord.utils.find(lambda c: c.name == 'lie-channel', server.channels)
+        if lie_channel == None:
+            print("Lie channel not found. Returning.")
+            return
+        await self.bot.say("{} is lying? What are they lying about?\nReply with their lie.".format(str(user)))
+        lie = await self.bot.wait_for_message(timeout=60, author=ctx.message.author, channel=ctx.message.channel)
+        lines = ['```']
+        lines.append('{} was caught lying!'.format(str(user)))
+        lines.append('Lie: {}\n```'.format(lie.content))
+        await self.bot.send_message(lie_channel, '\n'.join(lines))
+        await self.bot.say("Lie logged!")
+
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     @commands.cooldown(1, 5.1, commands.BucketType.user)
     async def strike(self, ctx, user : discord.Member):
