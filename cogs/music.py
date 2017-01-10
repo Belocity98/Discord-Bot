@@ -158,8 +158,6 @@ class Music:
             player.volume = 0.05
             entry = VoiceEntry(ctx.message, player)
             embed = self.embed(ctx.message, player)
-            #await self.bot.say('Enqueued ' + str(entry))
-            print(embed.to_dict())
             await self.bot.send_message(ctx.message.channel, content=None, embed=embed)
             await state.songs.put(entry)
             llog = "{} queued {}.".format(str(ctx.message.author), str(entry))
