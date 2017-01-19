@@ -72,5 +72,13 @@ class Admin():
         """Turns off the bot."""
         await self.bot.logout()
 
+    @commands.command(hidden=True, pass_context=True)
+    @checks.is_owner()
+    async def editprofile(self, ctx, element : str, setting : str):
+        if element == "name":
+            await self.bot.edit_profile(username=setting)
+        else:
+            return
+
 def setup(bot):
     bot.add_cog(Admin(bot))
