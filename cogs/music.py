@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord.ext import commands
 import youtube_dl
+import os, sys
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -138,9 +139,21 @@ class Music:
         https://rg3.github.io/youtube-dl/supportedsites.html
         """
         state = self.get_voice_state(ctx.message.server)
+        cd = str(os.path.dirname(os.path.realpath(__file__)))
+        cache_loc = cd + '\\cache'
         opts = {
+            'extractaudio' : True,
+            'cachedir' : cache_loc,
+            'format' : 'bestaudio/best',
+            'audioformat' : 'mp3',
             'default_search': 'auto',
+            'noplaylist': True,
+            'nocheckcertificate': True,
+            'ignoreerrors': True,
+            'logtostderr': True,
             'quiet': True,
+            'no_warnings': True,
+            'outtmpl': '%(extractor)s-%(id)s-%(title)s'
         }
 
         if state.voice is None:
