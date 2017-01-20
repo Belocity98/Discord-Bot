@@ -93,16 +93,23 @@ class Mod():
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]
         self.bot.tmp_banned_cache[user] = buserroles
-        lines = []
         invite = await self.bot.create_invite(server, max_uses=1)
-        lines.append("--------------------")
-        lines.append("**You have been banned!**")
-        lines.append("For: {}".format(message))
-        lines.append("Length: {} seconds.".format(str(length)))
-        lines.append("After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
-        lines.append("This invite will say expired when your ban time is up, but it is not expired!")
-        lines.append("--------------------")
-        await self.bot.send_message(user, '\n'.join(lines))
+        embed = discord.Embed(description='**You have been banned!**')
+        embed.add_field(name='Reason', value=message)
+        embed.add_field(name='Length', value='{} seconds'.format(str(length)))
+        embed.add_field(name='Invite', value="After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
+        embed.set_footer(text='Banned', icon_url='http://i.imgur.com/wBkQqOp.png')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.send_message(user, embed=embed)
+        #lines = []
+        #lines.append("--------------------")
+        #lines.append("**You have been banned!**")
+        #lines.append("For: {}".format(message))
+        #lines.append("Length: {} seconds.".format(str(length)))
+        #lines.append("After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
+        #lines.append("This invite will say expired when your ban time is up, but it is not expired!")
+        #lines.append("--------------------")
+        #await self.bot.send_message(user, '\n'.join(lines))
         await self.bot.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
         await self.bot.unban(server, user)
