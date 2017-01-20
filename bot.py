@@ -25,9 +25,14 @@ startup_extensions = [
 bot = commands.Bot(command_prefix='>', description=description)
 
 app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-config_file = os.path.join(app_path, 'config.json')
-with open(config_file) as fp:
-    bot.config = json.load(fp)
+try:
+    config_file = os.path.join(app_path, 'config.json')
+    with open(config_file) as fp:
+        bot.config = json.load(fp)
+except:
+    config_file = os.path.join(app_path, 'example_config.json')
+    with open(config_file) as fp:
+        bot.config = json.load(fp)
 
 bot.tmp_banned_cache = {}
 
