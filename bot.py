@@ -63,4 +63,7 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-    bot.run(bot.config["token"])
+    if "discord bot token" in bot.config["token"]:
+        return
+    else:
+        bot.run(bot.config["token"])
