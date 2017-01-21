@@ -278,17 +278,21 @@ class Music:
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def playing(self, ctx):
-        """Shows info about the currently played song."""
-
-        llog = "{} retrieved current playing song.".format(str(ctx.message.author))
-        await self.bot.get_cog("Logging").do_logging(llog)
+    async def queue(self, ctx):
+        """Shows songs in the queue."""
         state = self.get_voice_state(ctx.message.server)
-        if state.current is None:
-            await self.bot.say('Not playing anything.')
-        else:
-            skip_count = len(state.skip_votes)
-            await self.bot.say('Now playing {} [skips: {}/3]'.format(state.current, skip_count))
+        if len(state.songs._queue) == 0:
+            await self.bot.say('There are no songs in the queue.')
+            return
+        embed = discord.Embed(description='----------')
+        embed.title = 'Song Queue'
+        embed.colour = 0x1BE118 # lucio green
+        embed.add_field(name='Now playing', value=state.current)
+        song_number = 1
+        for item in state.songs._queue:
+            embed.add_field(name=str(song_number), value=str(item))
+            song_number += 1
+        await self.bot.say(embed=embed)
 
     def embed(self, message, player):
         requester = message.author
@@ -296,7 +300,7 @@ class Music:
         embed = discord.Embed(description='Uploaded by: {}'.format(str(player.uploader)))
         embed.title = str(player.title)
         #embed.url = player.download_url
-        embed.colour = 0x27cbe8 # light blue
+        embed.colour = 0x1BE118 # lucio green
         embed.set_author(name=str(requester.display_name), icon_url=requester.avatar_url)
         embed.add_field(name='Views', value=player.views)
         embed.add_field(name='Likes', value=player.likes)
