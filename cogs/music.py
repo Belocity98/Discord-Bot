@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import youtube_dl
 import os, sys
+from random import choice
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -156,8 +157,20 @@ class Music:
             'outtmpl': '%(extractor)s-%(id)s-%(title)s'
         }
 
+        music_quotes = [
+            "Oh, this is my jam!",
+            "Oh, turn it up.",
+            "Pump up the volume.",
+            "Rasin' the volume!",
+            "Woo, you feel that?",
+            "Ooh, you hear that?",
+            "Oh, let's break it down!",
+            "Let's up the tempo"
+        ]
+
         if state.voice is None:
             success = await ctx.invoke(self.summon)
+            await self.bot.say(choice(music_quotes))
             if not success:
                 return
 
