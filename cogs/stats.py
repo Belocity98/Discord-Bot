@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import json
 import aiohttp
+import os
 
 class Stats():
 
@@ -140,6 +141,33 @@ class Stats():
                 loc += 1
             lines.append("```")
             await self.bot.say("\n".join(lines))
+
+    @commands.command(aliases=['stats'])
+    async def about(self):
+        """Tells you information about the bot itself."""
+
+        embed = discord.Embed()
+        embed.title = 'Official Bot Server Invite'
+        embed.url = 'https://discord.gg/Whf6UUk'
+        embed.colour = 0x1BE118 # lucio green
+
+        owner = await self.bot.get_user_info(self.bot.config['your_user_id'])
+
+        embed.set_author(name=str(owner), icon_url=owner.avatar_url)
+
+        # statistics
+        total_members = sum(len(s.members) for s in self.bot.servers)
+        total_online  = sum(1 for m in self.bot.get_all_members() if m.status != discord.Status.offline)
+        unique_members = set(self.bot.get_all_members())
+        unique_online = sum(1 for m in unique_members if m.status != discord.Status.offline)
+
+        members = '%s total\n%s online\n%s unique\n%s unique online' % (total_members, total_online, len(unique_members), unique_online)
+        embed.add_field(name='Members', value=members)
+        embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
+
+        embed.add_field(name='Servers', value=len(self.bot.servers))
+
+        await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Stats(bot))
