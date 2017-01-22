@@ -113,7 +113,9 @@ class Mod():
         await self.bot.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
         await self.bot.unban(server, user)
-        await self.bot.say("```\n{} has been unbanned.\n```".format(str(user)))
+        embed = discord.Embed(description="{} has been unbanned.".format(str(user)))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     async def on_member_join(self, member):
         if member in self.bot.tmp_banned_cache:
