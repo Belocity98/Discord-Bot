@@ -70,8 +70,26 @@ class Music:
     def __init__(self, bot):
         self.bot = bot
         self.voice_states = {}
-        #self.disconnect_timer = bot.loop.create_task(self.dc_timer())
-
+        #self.pause_checker = bot.loop.create_task(self.check_for_people())
+"""
+    async def check_for_people(self):
+        while True:
+            do_for_loop = True
+            if len(self.voice_states) == 0:
+                print("no states")
+                do_for_loop = False
+            if do_for_loop:
+                for server in self.voice_states:
+                    state = self.get_voice_state(server)
+                    #if not any([x for x in server.members if x.voice.voice_channel == bot.voice_client_in(server).channel ]):
+                    if len(self.bot.voice_members) == 1:
+                        state.player.pause()
+                        print("paused")
+                    else:
+                        state.player.resume()
+                        print("resumed")
+            await asyncio.sleep(1)
+"""
     def check_if_done(self, ctx):
         state = self.get_voice_state(ctx.message.server)
         player = state.player
