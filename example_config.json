@@ -3,6 +3,11 @@
 
     "token" : "discord bot token",
 
+    "strikes" : {
+        "amount" : "25",
+        "ban_length" : "10"
+    },
+
     "cgg" : {
         "token" : "championgg api token",
         "url" : "http://api.champion.gg/"

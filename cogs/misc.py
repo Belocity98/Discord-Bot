@@ -10,6 +10,18 @@ class Misc():
         self.bot = bot
         self.strikes = {}
 
+    async def check_strikes(self, server, user):
+        strikeamt = int(self.bot.config["strikes"]["amount"])
+        banlength = int(self.bot.config["strikes"]["ban_length"])
+        if self.strikes[user] >= strikeamt:
+            embed = discord.Embed(description='{} reached the max strike limit!'.format(str(user)))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            self.strikes[user] = 0
+            await self.bot.get_cog("Mod").ban_func(server, user, message="Reaching {} strikes.".format(strikeamt), length=banlength)
+            return True
+        return False
+
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.server)
     async def lying(self, ctx, user : discord.Member):
@@ -33,19 +45,24 @@ class Misc():
         """Strike somebody. 25 strikes bans for 10 seconds."""
         server = ctx.message.server
         if user == server.me:
-            await self.bot.say("Don't try to strike me you cunt.")
+            embed = discord.Embed(description="Don't try to strike me!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         if user in self.strikes:
             self.strikes[user] += 1
-            if self.strikes[user] >= 25:
-                await self.bot.say("```\n{} reached the max strike limit!\n```".format(str(user)))
-                self.strikes[user] = 0
-                await self.bot.get_cog("Mod").ban_func(server, user, message="Reaching 25 strikes.")
-            else:
-                await self.bot.say(str(user) + " now has {} strikes.".format(self.strikes[user]))
+            strike_check = await self.check_strikes(server, user)
+            if strike_check == False:
+                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+                if self.strikes[user] == 1:
+                    embed = discord.Embed(description='{} now has 1 strike.'.format(str(user)))
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.say(embed=embed)
         else:
             self.strikes[user] = 1
-            await self.bot.say(str(user) + " now has {} strike.".format(self.strikes[user]))
+            embed = discord.Embed(description='{} now has {} strike.'.format(str(user), self.strikes[user]))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
         llog = "{} striked {}.".format(str(ctx.message.author), str(user))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
@@ -55,19 +72,24 @@ class Misc():
         """Add strikes to a user."""
         server = ctx.message.server
         if user == server.me:
-            await self.bot.say("Don't try to strike me you cunt.")
+            embed = discord.Embed(description="Don't try to strike me!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         if user in self.strikes:
             self.strikes[user] += amount
-            if self.strikes[user] >= 25:
-                await self.bot.say("```\n{} reached the max strike limit!\n```".format(str(user)))
-                self.strikes[user] = 0
-                await self.bot.get_cog("Mod").ban_func(server, user, message="Reaching 25 strikes.")
-            else:
-                await self.bot.say(str(user) + " now has {} strikes.".format(self.strikes[user]))
+            strike_check = await self.check_strikes(server, user)
+            if strike_check == False:
+                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+                if self.strikes[user] == 1:
+                    embed = discord.Embed(description='{} now has 1 strike.'.format(str(user)))
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.say(embed=embed)
         else:
             self.strikes[user] = amount
-            await self.bot.say(str(user) + " now has {} strikes.".format(self.strikes[user]))
+            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
         llog = "{} added {} strikes to {}.".format(str(ctx.message.author), amount, str(user))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
@@ -77,16 +99,21 @@ class Misc():
         """Remove strikes from a user."""
         server = ctx.message.server
         if user == server.me:
-            await self.bot.say("Don't try to strike me you cunt.")
-            return
+            embed = discord.Embed(description="Don't try to strike me!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
         if self.strikes[user] == 0:
-            await self.bot.say("That user has no strikes.")
+            embed = discord.Embed(description='That user has no strikes.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         if user in self.strikes:
             self.strikes[user] -= amount
             if self.strikes[user] < 0:
                 self.strikes[user] = 0
-            await self.bot.say(str(user) + " now has {} strikes.".format(self.strikes[user]))
+            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
         llog = "{} removed {} strikes from {}.".format(str(ctx.message.author), amount, str(user))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
