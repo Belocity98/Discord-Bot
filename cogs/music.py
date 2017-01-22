@@ -70,6 +70,31 @@ class Music:
     def __init__(self, bot):
         self.bot = bot
         self.voice_states = {}
+        #self.disconnect_timer = bot.loop.create_task(self.dc_timer())
+
+    def check_if_done(self, ctx):
+        state = self.get_voice_state(ctx.message.server)
+        player = state.player
+        if len(state.songs._queue) == 0 and state.is_playing() == False:
+            embed = discord.Embed(description='Queue finished. Disconnecting.')
+            embed.colour = 0x1BE118 # lucio green
+            coro = self.bot.send_message(ctx.message.channel, embed=embed)
+            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+            try:
+                fut.result()
+            except:
+                pass
+            del self.voice_states[ctx.message.server.id]
+            coro = state.voice.disconnect()
+            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+            try:
+                fut.result()
+            except:
+                pass
+            return
+        else:
+            state.toggle_next()
+            return
 
     def get_voice_state(self, server):
         state = self.voice_states.get(server.id)
@@ -170,12 +195,15 @@ class Music:
 
         if state.voice is None:
             success = await ctx.invoke(self.summon)
-            await self.bot.say(choice(music_quotes))
             if not success:
                 return
 
+        if not state.is_playing():
+            await self.bot.say(choice(music_quotes))
+
         try:
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+            #player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=lambda: self.check_if_done(ctx))
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
@@ -186,6 +214,7 @@ class Music:
             embed = self.embed(ctx.message, player)
             await self.bot.send_message(ctx.message.channel, content=None, embed=embed)
             await state.songs.put(entry)
+
             llog = "{} queued {}.".format(str(ctx.message.author), str(entry))
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
@@ -295,7 +324,9 @@ class Music:
         """Shows songs in the queue."""
         state = self.get_voice_state(ctx.message.server)
         if len(state.songs._queue) == 0:
-            await self.bot.say('There are no songs in the queue.')
+            embed = discord.Embed(description='There are no songs in the queue.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         embed = discord.Embed(description='----------')
         embed.title = 'Song Queue'
@@ -322,6 +353,6 @@ class Music:
         embed.set_footer(text='Uploaded: {}'.format(player.upload_date), icon_url=embed.Empty)
         return embed
 
-
 def setup(bot):
-    bot.add_cog(Music(bot))
+    cog_instance = Music(bot)
+    bot.add_cog(cog_instance)
