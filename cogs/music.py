@@ -165,7 +165,7 @@ class Music:
             "Woo, you feel that?",
             "Ooh, you hear that?",
             "Oh, let's break it down!",
-            "Let's up the tempo"
+            "Let's up the tempo."
         ]
 
         if state.voice is None:
