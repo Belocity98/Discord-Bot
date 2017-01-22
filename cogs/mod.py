@@ -14,13 +14,11 @@ class Mod():
         """Temp ban a user for a specified amount of time."""
         server = ctx.message.server
         author = ctx.message.author
-        lines = ['```']
-        lines.append("{} has been banned.".format(str(user)))
-        lines.append("By: {}".format(str(author)))
-        lines.append("For: {} seconds".format(length))
-        lines.append("```")
-        message = '\n'.join(lines)
-        await self.bot.say(message)
+        embed = discord.Embed(title="{} has been banned.".format(str(user)))
+        embed.colour = 0x1BE118 # lucio green
+        embed.add_field(name="By", value=str(author))
+        embed.add_field(name="For", value=str(length) + " seconds")
+        await self.bot.say(embed=embed)
         if reason == None:
             await self.ban_func(server, user, length=length)
         else:
@@ -30,15 +28,18 @@ class Mod():
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
-    async def purge(self,ctx, limit : int):
+    async def purge(self, ctx, limit : int):
         """Remove a specified amount of messages from the chat."""
-        if limit > 50:
-            await self.bot.say("Only up to 50 messages can be deleted at a time.")
+        delete_limit = int(self.bot.config["mod"]["purge_limit"])
+        if limit > delete_limit:
+            embed = discord.Embed(description="Only up to {} messages can be deleted at a time.".format(str(delete_limit)))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         channel = ctx.message.channel
         server = ctx.message.server
         await self.bot.purge_from(channel, limit=limit)
-        llog = "{} pruned {} messages from {}.".format(str(ctx.message.author), str(limit), str(channel.name))
+        llog = "{} purged {} messages from {}.".format(str(ctx.message.author), str(limit), str(channel.name))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
@@ -76,7 +77,9 @@ class Mod():
                 if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
                     lines.append(member)
         else:
-            await self.bot.say("```\nDestination not recognized. Expected channel/server.\n```")
+            embed = discord.Embed(description="Destination not recognized. Expected channel/server.")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         if voicestate == "mute":
             for member in lines:
@@ -85,7 +88,9 @@ class Mod():
             for member in lines:
                 await self.bot.server_voice_state(member, mute=False)
         else:
-            await self.bot.say("```\nVoicestate not recognized. Expected mute/unmute.\n```")
+            embed = discord.Embed(description="Voicestate not recognized. Expected mute/unmute.")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
         llog = "{} {}d all members in the {}".format(str(ctx.message.author), voicestate, destination)
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
