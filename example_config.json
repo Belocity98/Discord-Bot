@@ -8,6 +8,10 @@
         "ban_length" : "10"
     },
 
+    "mod" : {
+        "purge_limit" : "50"
+    },
+
     "cgg" : {
         "token" : "championgg api token",
         "url" : "http://api.champion.gg/"
