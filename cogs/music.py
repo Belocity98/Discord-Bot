@@ -81,11 +81,10 @@ class Music:
             if do_for_loop:
                 for server in self.voice_states:
                     state = self.get_voice_state(server)
-                    #if not any([x for x in server.members if x.voice.voice_channel == bot.voice_client_in(server).channel ]):
-                    if len(self.bot.voice_members) == 1:
+                    if state.voice != None and len(state.voice.voice_channel.voice_members) == 1:
                         state.player.pause()
                         print("paused")
-                    else:
+                    elif state.voice != None and len(state.voice.voice_channel.voice_members) > 1:
                         state.player.resume()
                         print("resumed")
             await asyncio.sleep(1)
