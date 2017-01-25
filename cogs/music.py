@@ -71,24 +71,24 @@ class Music:
         self.bot = bot
         self.voice_states = {}
         #self.pause_checker = bot.loop.create_task(self.check_for_people())
-"""
-    async def check_for_people(self):
-        while True:
-            do_for_loop = True
-            if len(self.voice_states) == 0:
-                print("no states")
-                do_for_loop = False
-            if do_for_loop:
-                for server in self.voice_states:
-                    state = self.get_voice_state(server)
-                    if state.voice != None and len(state.voice.voice_channel.voice_members) == 1:
-                        state.player.pause()
-                        print("paused")
-                    elif state.voice != None and len(state.voice.voice_channel.voice_members) > 1:
-                        state.player.resume()
-                        print("resumed")
-            await asyncio.sleep(1)
-"""
+
+#    async def check_for_people(self):
+#        while True:
+#            do_for_loop = True
+#            if len(self.voice_states) == 0:
+#                print("no states")
+#                do_for_loop = False
+#            if do_for_loop:
+#                for server in self.voice_states:
+#                    state = self.get_voice_state(server)
+#                    if state.voice != None and len(state.voice.voice_channel.voice_members) == 1:
+#                        state.player.pause()
+#                        print("paused")
+#                    elif state.voice != None and len(state.voice.voice_channel.voice_members) > 1:
+#                        state.player.resume()
+#                        print("resumed")
+#            await asyncio.sleep(1)
+
     def check_if_done(self, ctx):
         state = self.get_voice_state(ctx.message.server)
         player = state.player
@@ -298,6 +298,7 @@ class Music:
         3 skip votes are needed for the song to be skipped.
         """
 
+        """
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
             await self.bot.say('Not playing any music right now...')
@@ -323,18 +324,27 @@ class Music:
                 await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         else:
             await self.bot.say('You have already voted to skip this song.')
+        """
+        embed = discord.Embed(description='Skipping is currently disabled until further notice. Sorry!')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
     @commands.has_permissions(administrator=True)
     async def masterskip(self, ctx):
-            state = self.get_voice_state(ctx.message.server)
-            if not state.is_playing():
-                await self.bot.say("Not playing any music right now...")
-                return
-            state.skip()
-            await self.bot.say("Skipping song...")
-            llog = "{} used a masterskip to skip the current song.".format(str(ctx.message.author))
-            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
+        """
+        state = self.get_voice_state(ctx.message.server)
+        if not state.is_playing():
+            await self.bot.say("Not playing any music right now...")
+            return
+        state.skip()
+        await self.bot.say("Skipping song...")
+        llog = "{} used a masterskip to skip the current song.".format(str(ctx.message.author))
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
+        """
+        embed = discord.Embed(description='Skipping is currently disabled until further notice. Sorry!')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True)
     async def queue(self, ctx):
