@@ -6,6 +6,8 @@ import sys
 import json
 import asyncio
 
+from cogs.utils.cjson import open_json
+
 description = "A general bot for personal use."
 
 # Yes, I took RoboDanny's file structure.
@@ -24,15 +26,10 @@ startup_extensions = [
 
 bot = commands.Bot(command_prefix='>', description=description)
 
-app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 try:
-    config_file = os.path.join(app_path, 'config.json')
-    with open(config_file) as fp:
-        bot.config = json.load(fp)
+    bot.config = open_json("load", 'config.json')
 except:
-    config_file = os.path.join(app_path, 'example_config.json')
-    with open(config_file) as fp:
-        bot.config = json.load(fp)
+    bot.config = open_json("load", 'example_config.json')
 
 bot.tmp_banned_cache = {}
 

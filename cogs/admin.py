@@ -2,9 +2,8 @@ from discord.ext import commands
 import discord
 import os
 import sys
-import json
 
-from .utils import checks
+from .utils import checks, cjson
 
 class Admin():
 
@@ -15,10 +14,7 @@ class Admin():
     @checks.is_owner()
     async def reloadconfig(self, ctx):
         """Reloads the configuration."""
-        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-        config_file = os.path.join(app_path, 'config.json')
-        with open(config_file) as fp:
-            self.bot.config = json.load(fp)
+        self.bot.config = cjson.open_json("load", 'config.json')
         llog = "Configuration reloaded."
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
