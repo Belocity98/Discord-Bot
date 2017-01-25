@@ -1,12 +1,19 @@
 from discord.ext import commands
+from .utils import config
+
 import discord
 import asyncio
 import json
+import os
+import sys
 
 class Mod():
 
     def __init__(self, bot):
         self.bot = bot
+        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        cfgfile = os.path.join(app_path, 'mod.json')
+        self.config = config.Config(cfgfile, loop=bot.loop)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(ban_members=True)
@@ -95,6 +102,102 @@ class Mod():
         llog = "{} {}d all members in the {}".format(str(ctx.message.author), voicestate, destination)
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def banchat(self, ctx, *, msg : str):
+        """Ban a word or phrase from being entered into the current server."""
+
+        banned_chat = self.config.get('banned_chat', {})
+        server_id = ctx.message.server.id
+        db = banned_chat.get(server_id, [])
+
+        if msg in db:
+            embed = discord.Embed(description='Message already banned.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        db.append(msg)
+        banned_chat[server_id] = db
+        await self.config.put('banned_chat', banned_chat)
+        embed = discord.Embed(description='Message banned.')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def unbanchat(self, ctx, *, msg : str):
+        """Unban a word or phrase from being entered into the current server."""
+
+        banned_chat = self.config.get('banned_chat', {})
+        server_id = ctx.message.server.id
+        db = banned_chat.get(server_id, [])
+
+        if msg == 'all':
+            db = []
+            banned_chat[server_id] = db
+            await self.config.put('banned_chat', banned_chat)
+
+            embed = discord.Embed(description='Unbanned all messages.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if msg not in db:
+            embed = discord.Embed(description='Message not found in banned messages list.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        db.remove(msg)
+        banned_chat[server_id] = db
+        await self.config.put('banned_chat', banned_chat)
+        embed = discord.Embed(description='Message unbanned.')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(manage_messages=True)
+    async def bannedchat(self, ctx):
+        """View list of banned messages on the current server."""
+
+        banned_chat = self.config.get('banned_chat', {})
+        server_id = ctx.message.server.id
+        db = banned_chat.get(server_id, [])
+
+        embed = discord.Embed(description='This server currently has {} banned messages.'.format(len(db)))
+        embed.title = 'Banned Messages'
+        msgnumber = 1
+        for item in db:
+            embed.add_field(name='Message {}'.format(msgnumber), value=item)
+            msgnumber += 1
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(manage_server=True)
+    async def plonk(self, ctx, *, member: discord.Member):
+        """Bans a user from using the bot.
+        This bans a person from using the bot in the current server.
+        There is no concept of a global ban. This ban can be bypassed
+        by having the Manage Server permission.
+        To use this command you must have the Manage Server permission
+        or have a Bot Admin role.
+        """
+
+        plonks = self.config.get('plonks', {})
+        guild_id = ctx.message.server.id
+        db = plonks.get(guild_id, [])
+
+        if member.id in db:
+            await self.bot.say('That user is already bot banned in this server.')
+            return
+
+        db.append(member.id)
+        plonks[guild_id] = db
+        await self.config.put('plonks', plonks)
+        await self.bot.say('%s has been banned from using the bot in this server.' % member)
+
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]
         self.bot.tmp_banned_cache[user] = buserroles
@@ -129,6 +232,18 @@ class Mod():
                 del self.bot.tmp_banned_cache[member]
             except KeyError:
                 pass
+
+    async def on_message(self, message):
+
+        banned_chat = self.config.get('banned_chat', {})
+        server_id = message.server.id
+        banned_chat_list = banned_chat.get(server_id, [])
+
+        if any(word in message.content.lower() for word in banned_chat_list):
+            embed = discord.Embed(description='You used a word or phrase that is banned in this server!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.send_message(message.author, embed=embed)
+            await self.bot.delete_message(message)
 
 def setup(bot):
     bot.add_cog(Mod(bot))
