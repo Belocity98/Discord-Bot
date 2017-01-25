@@ -117,7 +117,7 @@ class Mod():
             await self.bot.say(embed=embed)
             return
 
-        db.append(msg)
+        db.append(msg.lower())
         banned_chat[server_id] = db
         await self.config.put('banned_chat', banned_chat)
         embed = discord.Embed(description='Message banned.')
@@ -149,7 +149,7 @@ class Mod():
             await self.bot.say(embed=embed)
             return
 
-        db.remove(msg)
+        db.remove(msg.lower())
         banned_chat[server_id] = db
         await self.config.put('banned_chat', banned_chat)
         embed = discord.Embed(description='Message unbanned.')
