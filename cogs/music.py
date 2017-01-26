@@ -276,6 +276,7 @@ class Music:
         """Stops playing audio and leaves the voice channel.
         This also clears the queue.
         """
+        """
         server = ctx.message.server
         state = self.get_voice_state(server)
 
@@ -291,6 +292,10 @@ class Music:
             await state.voice.disconnect()
         except:
             pass
+        """
+        embed = discord.Embed(description='Stopping is currently disabled until further notice. Sorry!')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
