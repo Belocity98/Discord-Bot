@@ -203,7 +203,7 @@ class Music:
             "Oh, this is my jam!",
             "Oh, turn it up.",
             "Pump up the volume.",
-            "Rasin' the volume!",
+            "Raisin' the volume!",
             "Woo, you feel that?",
             "Ooh, you hear that?",
             "Oh, let's break it down!",
