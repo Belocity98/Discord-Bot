@@ -1,4 +1,3 @@
-![https://travis-ci.org/TheTrain2000/Discord-Bot](https://travis-ci.org/TheTrain2000/Discord-Bot.svg?branch=master)
 # Discord Bot
 ---
 This is a general purpose Discord bot. I made this because I am stubborn and I dislike using other people's creations.
