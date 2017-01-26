@@ -1,23 +1,31 @@
 from discord.ext import commands
 import discord
 import asyncio
+import sys, os
 
-from .utils import checks
+from .utils import checks, config
 
 class Misc():
 
     def __init__(self, bot):
         self.bot = bot
-        self.strikes = {}
+        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        cfgfile = os.path.join(app_path, 'misc.json')
+        self.config = config.Config(cfgfile, loop=bot.loop)
 
     async def check_strikes(self, server, user):
+        strikes = self.config.get('strikes', {})
+        server_id = server.id
+        db = strikes.get(server_id, {})
         strikeamt = int(self.bot.config["strikes"]["amount"])
         banlength = int(self.bot.config["strikes"]["ban_length"])
-        if self.strikes[user] >= strikeamt:
+        if db[user.id] >= strikeamt:
             embed = discord.Embed(description='{} reached the max strike limit!'.format(str(user)))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            self.strikes[user] = 0
+            db[user.id] = 0
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
             await self.bot.get_cog("Mod").ban_func(server, user, message="Reaching {} strikes.".format(strikeamt), length=banlength)
             return True
         return False
@@ -44,50 +52,92 @@ class Misc():
     async def strike(self, ctx, user : discord.Member):
         """Strike somebody. 25 strikes bans for 10 seconds."""
         server = ctx.message.server
+        strikes = self.config.get('strikes', {})
+        server_id = ctx.message.server.id
+        db = strikes.get(server_id, {})
+
         if user == server.me:
             embed = discord.Embed(description="Don't try to strike me!")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        if user in self.strikes:
-            self.strikes[user] += 1
+
+        if user.id in db:
+            db[user.id] += 1
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
             strike_check = await self.check_strikes(server, user)
             if strike_check == False:
-                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
-                if self.strikes[user] == 1:
+                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
+                if db[user.id] == 1:
                     embed = discord.Embed(description='{} now has 1 strike.'.format(str(user)))
                 embed.colour = 0x1BE118 # lucio green
                 await self.bot.say(embed=embed)
+
         else:
-            self.strikes[user] = 1
-            embed = discord.Embed(description='{} now has {} strike.'.format(str(user), self.strikes[user]))
+            db[user.id] = 1
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
+            embed = discord.Embed(description='{} now has {} strike.'.format(str(user), db[user.id]))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+
         llog = "{} striked {}.".format(str(ctx.message.author), str(user))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
+
+    @strike.command(name='list', pass_context=True)
+    async def strike_list(self, ctx, user : discord.Member):
+        server = ctx.message.server
+        server_id = server.id
+        strikes = self.config.get('strikes', {})
+        db = strikes.get(server_id, {})
+        if user.id not in db:
+            embed = discord.Embed(description='{} has 0 strikes.'.format(str(user)))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if int(db[user.id]) == 1:
+            embed = discord.Embed(description='{} has 1 strike.'.format(str(user)))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        embed = discord.Embed(description='{} has {} strikes.'.format(str(user), db[user.id]))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+        return
 
     @strike.command(name='add', pass_context=True)
     @commands.has_permissions(ban_members=True)
     async def strike_add(self, ctx, user : discord.Member, amount : int):
         """Add strikes to a user."""
         server = ctx.message.server
+        strikes = self.config.get('strikes', {})
+        server_id = ctx.message.server.id
+        db = strikes.get(server_id, {})
+
         if user == server.me:
             embed = discord.Embed(description="Don't try to strike me!")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        if user in self.strikes:
-            self.strikes[user] += amount
+
+        if user.id in db:
+            db[user.id] += amount
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
             strike_check = await self.check_strikes(server, user)
             if strike_check == False:
-                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
-                if self.strikes[user] == 1:
+                embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
+                if db[user.id] == 1:
                     embed = discord.Embed(description='{} now has 1 strike.'.format(str(user)))
                 embed.colour = 0x1BE118 # lucio green
                 await self.bot.say(embed=embed)
+
         else:
-            self.strikes[user] = amount
-            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+            db[user.id] = amount
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
+            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
         llog = "{} added {} strikes to {}.".format(str(ctx.message.author), amount, str(user))
@@ -98,20 +148,30 @@ class Misc():
     async def strike_remove(self, ctx, user : discord.Member, amount : int):
         """Remove strikes from a user."""
         server = ctx.message.server
+        strikes = self.config.get('strikes', {})
+        server_id = ctx.message.server.id
+        db = strikes.get(server_id, {})
+
         if user == server.me:
             embed = discord.Embed(description="Don't try to strike me!")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-        if self.strikes[user] == 0:
+
+        if db[user.id] == 0:
             embed = discord.Embed(description='That user has no strikes.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        if user in self.strikes:
-            self.strikes[user] -= amount
-            if self.strikes[user] < 0:
-                self.strikes[user] = 0
-            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), self.strikes[user]))
+
+        if user.id in db:
+            db[user.id] -= amount
+            strikes[server_id] = db
+            await self.config.put('strikes', strikes)
+            if db[user.id] < 0:
+                db[user.id] = 0
+                strikes[server_id] = db
+                await self.config.put('strikes', strikes)
+            embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
         llog = "{} removed {} strikes from {}.".format(str(ctx.message.author), amount, str(user))
