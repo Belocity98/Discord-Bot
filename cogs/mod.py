@@ -157,6 +157,7 @@ class Mod():
         await self.bot.say(embed=embed)
 
     @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(manage_messages=True)
     async def bannedchat(self, ctx):
         """View list of banned messages on the current server."""
 
@@ -165,10 +166,6 @@ class Mod():
         db = banned_chat.get(server_id, [])
 
         embed = discord.Embed(description='This server currently has {} banned messages.'.format(len(db)))
-        if len(db) > 25:
-            embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
-            return
         embed.title = 'Banned Messages'
         msgnumber = 1
         for item in db:
