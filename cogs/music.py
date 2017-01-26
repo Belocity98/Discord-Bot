@@ -101,13 +101,14 @@ class Music:
                 fut.result()
             except:
                 pass
-            del self.voice_states[ctx.message.server.id]
-            coro = state.voice.disconnect()
-            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
-            try:
-                fut.result()
-            except:
-                pass
+                del self.voice_states[ctx.message.server.id]
+                coro = state.voice.disconnect()
+                fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+                try:
+                    fut.result()
+                except:
+                    pass
+                    return
             return
         else:
             state.toggle_next()
@@ -203,7 +204,7 @@ class Music:
             "Oh, this is my jam!",
             "Oh, turn it up.",
             "Pump up the volume.",
-            "Rasin' the volume!",
+            "Raisin' the volume!",
             "Woo, you feel that?",
             "Ooh, you hear that?",
             "Oh, let's break it down!",
@@ -276,19 +277,26 @@ class Music:
         """Stops playing audio and leaves the voice channel.
         This also clears the queue.
         """
+        print('1')
         server = ctx.message.server
         state = self.get_voice_state(server)
-
+        print('2')
         if state.is_playing():
+            print('3')
             player = state.player
+            print('8')
             player.stop()
+            print('4')
             llog = "{} stopped the music bot.".format(str(ctx.message.author))
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
         try:
+            print('5')
             state.audio_player.cancel()
+            print('6')
             del self.voice_states[server.id]
             await state.voice.disconnect()
+            print('7')
         except:
             pass
 

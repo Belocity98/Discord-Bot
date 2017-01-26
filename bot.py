@@ -24,7 +24,7 @@ startup_extensions = [
     "cogs.music"
 ]
 
-bot = commands.Bot(command_prefix='>', description=description)
+bot = commands.Bot(command_prefix='?', description=description)
 
 try:
     bot.config = open_json("load", 'config.json')
@@ -63,4 +63,4 @@ if __name__ == "__main__":
     if "discord bot token" in bot.config["token"]:
         print("Bot token not found. Not running.")
     else:
-        bot.run(bot.config["token"])
+        bot.run(bot.config["test_token"])
