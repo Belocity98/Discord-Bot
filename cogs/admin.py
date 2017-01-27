@@ -20,12 +20,14 @@ class Admin():
             'unique' : True
         }
 
+        data = await http.post(url, json=payload, bucket='create_invite')
+        return 'http://discord.gg/' + data['code']
+
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
     async def invites(self, ctx):
         invites = []
         for server in self.bot.servers:
-            print(server.name)
             server_invite = await self.create_temporary_invite(server.id)
             invites.append('{}: {}'.format(server.name, server_invite))
         await self.bot.say('\n'.join(invites))
