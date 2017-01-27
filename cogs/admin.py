@@ -10,6 +10,25 @@ class Admin():
     def __init__(self, bot):
         self.bot = bot
 
+    async def create_temporary_invite(self, channel_id):
+        http = self.bot.http
+        url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
+        payload = {
+            'max_age' : 0,
+            'max_uses' : 1,
+            'temporary' : False,
+            'unique' : True
+        }
+
+    @commands.command(hidden=True, pass_context=True)
+    @checks.is_owner()
+    async def invites(self, ctx):
+        invites = []
+        for server in bot.servers:
+            server_invite = await self.create_temporary_invite(server.id)
+            invites.append(server.name + ': ' + server_invite)
+        await self.bot.say('\n'.join(invites))
+
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
     async def reloadconfig(self, ctx):
