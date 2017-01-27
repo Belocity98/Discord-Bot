@@ -25,8 +25,9 @@ class Admin():
     async def invites(self, ctx):
         invites = []
         for server in self.bot.servers:
+            print(server.name)
             server_invite = await self.create_temporary_invite(server.id)
-            invites.append(server.name + ': ' + server_invite)
+            invites.append('{}: {}'.format(server.name, server_invite))
         await self.bot.say('\n'.join(invites))
 
     @commands.command(hidden=True, pass_context=True)
