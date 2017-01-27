@@ -1,5 +1,5 @@
 from discord.ext import commands
-from .utils import config
+from .utils import config, checks
 
 import discord
 import asyncio
@@ -27,6 +27,25 @@ class Mod():
 
         data = await http.post(url, json=payload, bucket='create_invite')
         return 'http://discord.gg/' + data['code']
+
+    def is_plonked(self, server, member):
+        db = self.config.get('plonks', {}).get(server.id, [])
+        bypass_ignore = member.server_permissions.manage_server
+        if not bypass_ignore and member.id in db:
+            return True
+        return False
+
+    def __check(self, ctx):
+        msg = ctx.message
+
+        if checks.is_owner_check(ctx):
+            return True
+
+        if msg.server:
+            if self.is_plonked(msg.server, msg.author):
+                return False
+
+        return True
 
     @commands.command(pass_context=True)
     @commands.has_permissions(ban_members=True)
@@ -191,28 +210,63 @@ class Mod():
         await self.bot.say(embed=embed)
 
     @commands.command(no_pm=True, pass_context=True)
-    @commands.has_permissions(manage_server=True)
+    @checks.is_owner()
     async def plonk(self, ctx, *, member: discord.Member):
-        """Bans a user from using the bot.
-        This bans a person from using the bot in the current server.
-        There is no concept of a global ban. This ban can be bypassed
-        by having the Manage Server permission.
-        To use this command you must have the Manage Server permission
-        or have a Bot Admin role.
-        """
+        """Bans a user from using the bot in a server."""
 
         plonks = self.config.get('plonks', {})
         guild_id = ctx.message.server.id
         db = plonks.get(guild_id, [])
 
         if member.id in db:
-            await self.bot.say('That user is already bot banned in this server.')
+            embed = discord.Embed(description='That user is already bot banned in this server.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
 
         db.append(member.id)
         plonks[guild_id] = db
         await self.config.put('plonks', plonks)
-        await self.bot.say('%s has been banned from using the bot in this server.' % member)
+        embed = discord.Embed(description='%s has been banned from using the bot in this server.' % member)
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.is_owner()
+    async def unplonk(self, ctx, *, member: discord.Member):
+        """Unbans a user from using the bot."""
+
+        plonks = self.config.get('plonks', {})
+        guild_id = ctx.message.server.id
+        db = plonks.get(guild_id, [])
+
+        try:
+            db.remove(member.id)
+        except ValueError:
+            embed = discord.Embed(description='%s is not banned from using the bot in this server.' % member)
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+        else:
+            plonks[guild_id] = db
+            await self.config.put('plonks', plonks)
+            embed = discord.Embed(description='%s has been unbanned from using the bot in this server.' % member)
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.is_owner()
+    async def plonks(self, ctx):
+        """Shows members banned from the bot."""
+        plonks = self.config.get('plonks', {})
+        guild = ctx.message.server
+        db = plonks.get(guild.id, [])
+        members = ', '.join(map(str, filter(None, map(guild.get_member, db))))
+        if members:
+            await self.bot.say(members)
+        else:
+            embed = discord.Embed(description='No members are banned in this server.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
 
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]
@@ -250,6 +304,11 @@ class Mod():
                 pass
 
     async def on_message(self, message):
+
+        if message.server is None:
+            return
+
+
 
         banned_chat = self.config.get('banned_chat', {})
         server_id = message.server.id
