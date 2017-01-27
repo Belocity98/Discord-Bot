@@ -15,6 +15,19 @@ class Mod():
         cfgfile = os.path.join(app_path, 'mod.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
+    async def create_temporary_invite(self, channel_id):
+        http = self.bot.http
+        url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
+        payload = {
+            'max_age' = 0,
+            'max_uses' = 1,
+            'temporary' = False,
+            'unique' = True
+        }
+
+        data = await http.post(url, json=payload, bucket='create_invite')
+        return 'http://discord.gg/' + data['code']
+
     @commands.command(pass_context=True)
     @commands.has_permissions(ban_members=True)
     async def tempban(self, ctx, user : discord.Member, length : int, reason=None):
@@ -204,7 +217,7 @@ class Mod():
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]
         self.bot.tmp_banned_cache[user] = buserroles
-        invite = await self.bot.create_invite(server, max_uses=1)
+        invite = await self.bot.create_temporary_invite(server)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
         embed.add_field(name='Length', value='{} seconds'.format(str(length)))
