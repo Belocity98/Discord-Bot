@@ -19,10 +19,10 @@ class Mod():
         http = self.bot.http
         url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
         payload = {
-            'max_age' = 0,
-            'max_uses' = 1,
-            'temporary' = False,
-            'unique' = True
+            'max_age' : 0,
+            'max_uses' : 1,
+            'temporary' : False,
+            'unique' : True
         }
 
         data = await http.post(url, json=payload, bucket='create_invite')
