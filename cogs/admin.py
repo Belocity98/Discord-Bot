@@ -26,12 +26,14 @@ class Admin():
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
     async def invites(self, ctx):
+        """This command lists invites for each server this bot is in."""
         if len(self.bot.servers) > 25:
             embed = discord.Embed(description='Too many servers!')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
         embed = discord.Embed(title='Server Invites')
+        embed.description = 'Invite for each server the bot is in.'
         embed.colour = 0x1BE118 # lucio green
         for server in self.bot.servers:
             server_invite = await self.create_temporary_invite(server.id)
