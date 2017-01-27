@@ -26,11 +26,17 @@ class Admin():
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
     async def invites(self, ctx):
-        invites = []
+        if len(self.bot.servers) > 25:
+            embed = discord.Embed(description='Too many servers!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        embed = discord.Embed(title='Server Invites')
+        embed.colour = 0x1BE118 # lucio green
         for server in self.bot.servers:
             server_invite = await self.create_temporary_invite(server.id)
-            invites.append('{}: {}'.format(server.name, server_invite))
-        await self.bot.say('\n'.join(invites))
+            embed.add_field(name=server.name, value=server_invite)
+        await self.bot.say(embed=embed)
 
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
