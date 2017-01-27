@@ -217,7 +217,7 @@ class Mod():
     async def ban_func(self, server, user, message="No reason given.", length=10):
         buserroles = user.roles[1:]
         self.bot.tmp_banned_cache[user] = buserroles
-        invite = await self.bot.create_temporary_invite(server)
+        invite = await self.bot.create_temporary_invite(server.id)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
         embed.add_field(name='Length', value='{} seconds'.format(str(length)))
