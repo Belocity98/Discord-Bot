@@ -24,7 +24,7 @@ class Admin():
     @checks.is_owner()
     async def invites(self, ctx):
         invites = []
-        for server in bot.servers:
+        for server in self.bot.servers:
             server_invite = await self.create_temporary_invite(server.id)
             invites.append(server.name + ': ' + server_invite)
         await self.bot.say('\n'.join(invites))
