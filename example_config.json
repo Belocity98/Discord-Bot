@@ -3,6 +3,10 @@
 
     "token" : "discord bot token",
 
+    "mod" : {
+        "max_ban_length" : "1500"
+    },
+
     "strikes" : {
         "amount" : "25",
         "ban_length" : "10"
