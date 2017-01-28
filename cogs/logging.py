@@ -31,6 +31,8 @@ class Logging():
 
     async def on_message_edit(self, before, after):
         server = before.server
+        if server == None:
+            return
         logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
         if logging_channel == None:
             print("Logging channel not found.")
