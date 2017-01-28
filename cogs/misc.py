@@ -122,7 +122,7 @@ class Misc():
             return
 
         if user.id in db:
-            if amount > 0:
+            if amount < 0:
                 embed = discord.Embed(description="You can't add negative strikes!")
                 embed.colour = 0x1BE118 # lucio green
                 await self.bot.say(embed=embed)
