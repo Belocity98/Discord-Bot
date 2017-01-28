@@ -278,7 +278,7 @@ class Mod():
         embed.add_field(name='Invite', value="After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
         embed.set_footer(text='Banned', icon_url='http://i.imgur.com/wBkQqOp.png')
         embed.colour = 0x1BE118 # lucio green
-        max_ban_length = int(self.bot.config['mod']['max_ban_length'])
+        max_ban_length = int(self.bot.config["mod"]["max_ban_length"])
         if length > max_ban_length:
             embed = discord.Embed(description='You cannot ban users for more than {} seconds.'.format(max_ban_length))
             embed.colour = 0x1BE118 # lucio green
