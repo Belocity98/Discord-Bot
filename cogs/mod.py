@@ -269,6 +269,11 @@ class Mod():
             await self.bot.say(embed=embed)
 
     async def ban_func(self, server, user, message="No reason given.", length=10):
+        if length > max_ban_length:
+            embed = discord.Embed(description='You cannot ban users for more than {} seconds.'.format(max_ban_length))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.send_message(user, embed=embed)
+            return
         buserroles = user.roles[1:]
         self.bot.tmp_banned_cache[user] = buserroles
         invite = await self.create_temporary_invite(server.id)
@@ -279,11 +284,6 @@ class Mod():
         embed.set_footer(text='Banned', icon_url='http://i.imgur.com/wBkQqOp.png')
         embed.colour = 0x1BE118 # lucio green
         max_ban_length = int(self.bot.config["mod"]["max_ban_length"])
-        if length > max_ban_length:
-            embed = discord.Embed(description='You cannot ban users for more than {} seconds.'.format(max_ban_length))
-            embed.colour = 0x1BE118 # lucio green
-            await self.bot.send_message(user, embed=embed)
-            return
 
         await self.bot.send_message(user, embed=embed)
         #lines = []
