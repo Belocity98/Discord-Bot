@@ -201,7 +201,7 @@ class Misc():
         db = {}
         strikes[server_id] = db
         await self.config.put('strikes', strikes)
-        embed = discord.Embed(description='All strikes in server reset.'.format(str(user), db[user.id]))
+        embed = discord.Embed(description='All strikes in server reset.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
         llog = "{} reset all strikes in {}.".format(str(ctx.message.author), server.name)
