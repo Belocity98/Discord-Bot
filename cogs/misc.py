@@ -190,5 +190,22 @@ class Misc():
         llog = "{} removed {} strikes from {}.".format(str(ctx.message.author), amount, str(user))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
+    @strike.command(name='reset', pass_context=True)
+    @commands.has_permissions(manage_server=True)
+    async def strike_reset(self, ctx):
+        """Resets strikes for a server."""
+        server = ctx.message.server
+        strikes = self.config.get('strikes', {})
+        server_id = ctx.message.server.id
+        db = strikes.get(server_id, {})
+        db = {}
+        strikes[server_id] = db
+        await self.config.put('strikes', strikes)
+        embed = discord.Embed(description='All strikes in server reset.'.format(str(user), db[user.id]))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+        llog = "{} reset all strikes in {}.".format(str(ctx.message.author), server.name)
+        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
+
 def setup(bot):
     bot.add_cog(Misc(bot))
