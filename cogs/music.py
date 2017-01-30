@@ -4,6 +4,7 @@ from discord.ext import commands
 import youtube_dl
 import os, sys
 from random import choice
+from threading import Thread
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -50,7 +51,8 @@ class VoiceState:
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
-            self.player.stop()
+            self.toggle_next()
+            #self.player.stop()
 
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
@@ -96,14 +98,14 @@ class Music:
             embed = discord.Embed(description='Queue finished. Disconnecting.')
             embed.colour = 0x1BE118 # lucio green
             coro = self.bot.send_message(ctx.message.channel, embed=embed)
-            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+            fut = discord.compat.run_coroutine_threadsafe(coro, self.bot.loop)
             try:
                 fut.result()
             except:
                 pass
             del self.voice_states[ctx.message.server.id]
             coro = state.voice.disconnect()
-            fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+            fut = discord.compat.run_coroutine_threadsafe(coro, self.bot.loop)
             try:
                 fut.result()
             except:
@@ -220,7 +222,7 @@ class Music:
 
         try:
             #player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
-            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=lambda: self.check_if_done(ctx))
+            player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=lambda: self.bot.loop.call_soon_threadsafe(self.check_if_done, ctx))
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.bot.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
@@ -276,13 +278,14 @@ class Music:
         """Stops playing audio and leaves the voice channel.
         This also clears the queue.
         """
-        """
+
         server = ctx.message.server
         state = self.get_voice_state(server)
 
         if state.is_playing():
-            player = state.player
-            player.stop()
+            #player = state.player
+            #player.stop()
+            await state.voice.disconnect()
             llog = "{} stopped the music bot.".format(str(ctx.message.author))
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
@@ -292,10 +295,6 @@ class Music:
             await state.voice.disconnect()
         except:
             pass
-        """
-        embed = discord.Embed(description='Stopping is currently disabled until further notice. Sorry!')
-        embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
@@ -303,7 +302,6 @@ class Music:
         3 skip votes are needed for the song to be skipped.
         """
 
-        """
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
             await self.bot.say('Not playing any music right now...')
@@ -329,15 +327,11 @@ class Music:
                 await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         else:
             await self.bot.say('You have already voted to skip this song.')
-        """
-        embed = discord.Embed(description='Skipping is currently disabled until further notice. Sorry!')
-        embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True, hidden=True)
     @commands.has_permissions(administrator=True)
     async def masterskip(self, ctx):
-        """
+        """Override vote to skip and skip current song."""
         state = self.get_voice_state(ctx.message.server)
         if not state.is_playing():
             await self.bot.say("Not playing any music right now...")
@@ -346,10 +340,6 @@ class Music:
         await self.bot.say("Skipping song...")
         llog = "{} used a masterskip to skip the current song.".format(str(ctx.message.author))
         await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
-        """
-        embed = discord.Embed(description='Skipping is currently disabled until further notice. Sorry!')
-        embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
 
     @commands.command(pass_context=True, no_pm=True)
     async def queue(self, ctx):
