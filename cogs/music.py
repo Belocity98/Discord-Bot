@@ -51,8 +51,8 @@ class VoiceState:
     def skip(self):
         self.skip_votes.clear()
         if self.is_playing():
-            self.toggle_next()
-            #self.player.stop()
+            #self.toggle_next()
+            self.player.stop()
 
     def toggle_next(self):
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
@@ -95,6 +95,8 @@ class Music:
         state = self.get_voice_state(ctx.message.server)
         player = state.player
         if len(state.songs._queue) == 0 and state.is_playing() == False:
+            state.toggle_next() # workaround
+            return # workaround
             embed = discord.Embed(description='Queue finished. Disconnecting.')
             embed.colour = 0x1BE118 # lucio green
             coro = self.bot.send_message(ctx.message.channel, embed=embed)
@@ -283,9 +285,9 @@ class Music:
         state = self.get_voice_state(server)
 
         if state.is_playing():
-            #player = state.player
-            #player.stop()
-            await state.voice.disconnect()
+            player = state.player
+            player.stop()
+            #await state.voice.disconnect()
             llog = "{} stopped the music bot.".format(str(ctx.message.author))
             await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
