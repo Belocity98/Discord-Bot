@@ -121,12 +121,13 @@ class Misc():
             await self.bot.say(embed=embed)
             return
 
+        if amount < 0:
+            embed = discord.Embed(description="You can't add negative strikes!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
         if user.id in db:
-            if amount < 0:
-                embed = discord.Embed(description="You can't add negative strikes!")
-                embed.colour = 0x1BE118 # lucio green
-                await self.bot.say(embed=embed)
-                return
             db[user.id] += amount
             strikes[server_id] = db
             await self.config.put('strikes', strikes)
@@ -161,6 +162,13 @@ class Misc():
             embed = discord.Embed(description="Don't try to strike me!")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+
+        if amount < 0:
+            embed = discord.Embed(description="You can't remove negative strikes!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
 
         if db[user.id] == 0:
             embed = discord.Embed(description='That user has no strikes.')
