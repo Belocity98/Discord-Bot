@@ -4,8 +4,28 @@ import os
 import sys
 import json
 import asyncio
+import logging
 
 from discord.ext import commands
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+log_file = os.path.join(app_path, 'bot_log.log')
+fh = logging.FileHandler(filename=log_file, encoding='utf-8', mode='w')
+fh.setLevel(logging.INFO)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s","%Y-%m-%d %H:%M:%S")
+
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 description = "A general bot for personal use."
 

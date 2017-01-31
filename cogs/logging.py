@@ -1,21 +1,34 @@
 import discord
 import asyncio
+import logging
 
 from discord.ext import commands
+
+log = logging.getLogger(__name__)
 
 class Logging():
 
     def __init__(self, bot):
         self.bot = bot
 
+    async def create_logging_channel(self, server):
+        everyone_perms = discord.PermissionOverwrite(read_messages=False)
+        my_perms = discord.PermissionOverwrite(read_messages=True)
+        everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
+        mine = discord.ChannelPermissions(target=server.owner, overwrite=my_perms)
+
+        await self.bot.create_channel(server, 'bot-logging', everyone, mine)
+        log.info('bot-logging channel created in {}.'.format(server.name))
+        return
+
     async def on_message_delete(self, message):
         server = message.server
+        if server == None:
+            return
+
         logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
         if logging_channel == None:
-            print("Logging channel not found.")
-            print("Creating logging channel...")
-            await self.bot.create_channel(server, 'bot-logging')
-            return
+            await self.create_logging_channel(server)
 
         else:
             embed = discord.Embed(description=message.content)
@@ -34,9 +47,10 @@ class Logging():
         server = before.server
         if server == None:
             return
+
         logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
         if logging_channel == None:
-            print("Logging channel not found.")
+            await self.create_logging_channel(server)
             return
         if before.author == before.server.me:
             return
