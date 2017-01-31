@@ -133,7 +133,7 @@ class Games():
 
         if (challenger.id in db) and (being_attacked.id in db):
             if (db[challenger.id] == True) or (db[being_attacked.id] == True):
-                embed = discord.Embed(description="You cannot start a duel while you are your target are currently dueling!")
+                embed = discord.Embed(description="You cannot start a duel while you or your target are currently dueling!")
                 embed.colour = 0x1BE118 # lucio green
                 await self.bot.say(embed=embed)
                 return
