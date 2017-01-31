@@ -1,12 +1,14 @@
 import discord
-from discord.ext import commands
 import random
 import asyncio
+
+from discord.ext import commands
 
 class Games():
 
     def __init__(self, bot):
         self.bot = bot
+        self.duelchance = self.bot.config["games"]["duel_ban_chance"]
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -67,6 +69,7 @@ class Games():
         author = ctx.message.author
         server = ctx.message.server
         randnumber = random.randint(1, 2)
+
         if randnumber == 1:
             embed = discord.Embed(description='{} flipped poorly.'.format(author))
             embed.colour = 0x1BE118 # lucio green
@@ -76,6 +79,103 @@ class Games():
             embed = discord.Embed(description='{} flipped correctly.'.format(author))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+
+    def duel_check(self, msg):
+        yes_list = [
+            "yes",
+            "y",
+            "yup",
+            "ok",
+            "yeah",
+            "sure",
+            "why not",
+            "yea",
+            "affirmative",
+            "by all means",
+            "okey-dokey",
+            "roger",
+            "fo' shizzle",
+            "totally"
+        ]
+        if any(msg.content.lower() in s for s in yes_list):
+            return True
+        else:
+            return False
+
+    def duel_check_valid_int(self, msg):
+        try:
+            msg = int(msg.content)
+        except ValueError:
+            return False
+        if (msg > self.duelchance) or (msg < 1):
+            return False
+        return True
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def duel(self, ctx, user : discord.Member):
+        """Duel another user. Loser is banned for a short period of time."""
+        duelchance = self.duelchance
+        banlength = self.bot.config["games"]["duel_ban_length"]
+
+        challenger = ctx.message.author
+        being_attacked = user
+        server = ctx.message.server
+
+        embed = discord.Embed(description="{}, do you accept {}'s duel challenge? (yes/no)".format(being_attacked, challenger))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+        msg = await self.bot.wait_for_message(timeout=45, author=being_attacked)
+
+        if not self.duel_check(msg):
+            embed = discord.Embed(description='{} did not accept the duel challenge.'.format(being_attacked))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        embed = discord.Embed(description='{} accepted the duel challenge!\n{}, pick a number between 1 and {}.'.format(being_attacked, challenger, duelchance))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        challenger_number = await self.bot.wait_for_message(timeout=45, author=challenger, check=self.duel_check_valid_int)
+
+        embed = discord.Embed(description='{}, pick a number between 1 and {}.'.format(being_attacked, duelchance))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        being_attacked_number = await self.bot.wait_for_message(timeout=45, author=being_attacked, check=self.duel_check_valid_int)
+
+        randnumber = random.randint(1, duelchance)
+        challenger_distance = abs(randnumber - int(challenger_number.content))
+        being_attacked_distance = abs(randnumber - int(being_attacked_number.content))
+
+        if challenger_distance < being_attacked_distance:
+            embed = discord.Embed(title='{} won!'.format(challenger))
+            embed.description = 'The random number was {}.'.format(randnumber)
+            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
+            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance)
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
+            return
+        if challenger_distance == being_attacked_distance:
+            embed = discord.Embed(title=='There was a draw.')
+            embed.description = 'The random number was {}.'.format(randnumber)
+            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
+            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance)
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        else:
+            embed = discord.Embed(title='{} won!'.format(being_attacked))
+            embed.description = 'The random number was {}.'.format(randnumber)
+            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
+            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance)
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
+            return
+
 
 def setup(bot):
     bot.add_cog(Games(bot))
