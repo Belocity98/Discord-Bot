@@ -50,15 +50,5 @@ class Logging():
             embed.set_author(name=before.author, icon_url=before.author.avatar_url)
             await self.bot.send_message(logging_channel, embed=embed)
 
-    async def do_logging(self, llog, server, channel=None):
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
-        if logging_channel == None:
-            print("Logging channel not found.")
-            return
-        await self.bot.send_message(logging_channel, llog)
-        print(llog)
-        if channel != None:
-            await self.bot.send_message(channel, llog)
-
 def setup(bot):
     bot.add_cog(Logging(bot))

@@ -3,7 +3,7 @@ import discord
 import os
 import sys
 
-from .utils import checks, cjson
+from .utils import checks
 
 class Admin():
 
@@ -49,9 +49,10 @@ class Admin():
     @checks.is_owner()
     async def reloadconfig(self, ctx):
         """Reloads the configuration."""
-        self.bot.config = cjson.open_json("load", 'config.json')
-        llog = "Configuration reloaded."
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
+        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        tmp_file = os.path.join(app_path, 'config.json')
+        with open(tmp_file) as fp:
+            json.load(fp)
 
     @commands.command(name='reload', hidden=True, pass_context=True)
     @checks.is_owner()
@@ -65,8 +66,6 @@ class Admin():
                     self.bot.load_extension(cog)
                 except (AttributeError, ImportError) as e:
                     await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
-            llog = "All cogs reloaded."
-            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
             return
         try:
             self.bot.unload_extension(extension_name)
@@ -74,8 +73,6 @@ class Admin():
         except ImportError:
             await self.bot.say("Cog not found.")
             return
-        llog = "{} reloaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
@@ -86,16 +83,12 @@ class Admin():
         except (AttributeError, ImportError) as e:
             await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
-        llog = "{} loaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True, pass_context=True)
     @checks.is_owner()
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
-        llog = "{} unloaded.".format(extension_name)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server, channel=ctx.message.channel)
 
     @commands.command(hidden=True)
     @checks.is_owner()

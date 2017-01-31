@@ -82,9 +82,6 @@ class Misc():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
 
-        llog = "{} striked {}.".format(str(ctx.message.author), str(user))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
-
     @strike.command(name='list', pass_context=True)
     async def strike_list(self, ctx, user : discord.Member):
         server = ctx.message.server
@@ -146,8 +143,6 @@ class Misc():
             embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-        llog = "{} added {} strikes to {}.".format(str(ctx.message.author), amount, str(user))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @strike.command(name='remove', pass_context=True)
     @commands.has_permissions(ban_members=True)
@@ -187,8 +182,6 @@ class Misc():
             embed = discord.Embed(description='{} now has {} strikes.'.format(str(user), db[user.id]))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-        llog = "{} removed {} strikes from {}.".format(str(ctx.message.author), amount, str(user))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @strike.command(name='reset', pass_context=True)
     @commands.has_permissions(manage_server=True)
@@ -204,8 +197,6 @@ class Misc():
         embed = discord.Embed(description='All strikes in server reset.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
-        llog = "{} reset all strikes in {}.".format(str(ctx.message.author), server.name)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
 def setup(bot):
     bot.add_cog(Misc(bot))

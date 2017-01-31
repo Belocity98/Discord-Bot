@@ -68,8 +68,6 @@ class Mod():
             await self.ban_func(server, user, length=length)
         else:
             await self.ban_func(server, user, length=length, message=reason)
-        llog = "{} banned {} for {} seconds.".format(str(ctx.message.author), str(user), str(length))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(manage_messages=True)
@@ -84,8 +82,6 @@ class Mod():
         channel = ctx.message.channel
         server = ctx.message.server
         await self.bot.purge_from(channel, limit=limit)
-        llog = "{} purged {} messages from {}.".format(str(ctx.message.author), str(limit), str(channel.name))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -103,8 +99,6 @@ class Mod():
                     lines.append(member)
             for member in lines:
                 await self.bot.move_member(member, author.voice_channel)
-        llog = "{} mass moved everyone to {}.".format(str(author), author.voice_channel.name)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -137,8 +131,6 @@ class Mod():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        llog = "{} {}d all members in the {}".format(str(ctx.message.author), voicestate, destination)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(no_pm=True, pass_context=True)
     @commands.has_permissions(manage_messages=True)

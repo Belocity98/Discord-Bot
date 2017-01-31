@@ -29,8 +29,6 @@ class Games():
 
         else:
             await self.bot.say("{}'s revolver didn't fire.".format(str(author)))
-        llog = "{} played a game of Russian Roulette.".format(str(author))
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)

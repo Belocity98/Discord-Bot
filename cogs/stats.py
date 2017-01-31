@@ -29,8 +29,6 @@ class Stats():
             lines.append('```')
             message = '\n'.join(lines)
             await self.bot.say(message.format(data[0]))
-        llog = "{} found the matchup for {} and {}.".format(str(ctx.message.author), champ1, champ2)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
 
     @commands.command(pass_context=True)
     async def ostats(self, ctx, battletag : str, mode : str):
@@ -51,8 +49,6 @@ class Stats():
         lines.append("Gold Medals - {0[game_stats][medals_gold]}")
         lines.append('```')
         message = '\n'.join(lines)
-        llog = "{} found {}'s Overwatch stats.".format(str(ctx.message.author), battletag)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         if mode == "competitive":
             await self.bot.say(message.format(data["us"]["stats"]["competitive"]))
         elif mode == "quickplay":
@@ -63,8 +59,6 @@ class Stats():
     @commands.command(pass_context=True)
     async def winrate(self, ctx, *, champ : str):
         """Get the winrate for a champion."""
-        llog = "{} found LoL winrates for {}.".format(str(ctx.message.author), champ)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         if champ == "high":
             url = self.cggurl + "stats/champs/mostWinning?api_key=" + self.cggkey
             async with self.session.get(url) as rawdata:
@@ -104,8 +98,6 @@ class Stats():
     @commands.command(pass_context=True)
     async def playrate(self, ctx, *, champ : str):
         """Get the playrate for a champion."""
-        llog = "{} found LoL playrates for {}.".format(str(ctx.message.author), champ)
-        await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         if champ == "high":
             url = self.cggurl + "stats/champs/mostPlayed?api_key=" + self.cggkey
             async with self.session.get(url) as rawdata:

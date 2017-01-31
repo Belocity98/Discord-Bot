@@ -37,8 +37,6 @@ class Reddit():
             del subs[-tmp:]
             await self.bot.say("\n".join(subs))
             await self.bot.say("```\nFound {} submissions, printing {}.\n```".format(newsubs, amount))
-            llog = "{} fetched {} top {} posts from {}.".format(str(ctx.message.author), str(amount), time, subreddit)
-            await self.bot.get_cog("Logging").do_logging(llog, ctx.message.server)
         else:
             await self.bot.say("Time not recognized. Expected all/year/day/hour.")
 
