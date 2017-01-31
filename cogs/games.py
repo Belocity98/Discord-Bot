@@ -271,7 +271,7 @@ class Games():
         server_id = ctx.message.server.id
         current_duels = self.config.get('current_duels', {})
         db = current_duels.get(server_id, {})
-        db = []
+        db = {}
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
         embed = discord.Embed(description='Duel status reset in server.')
