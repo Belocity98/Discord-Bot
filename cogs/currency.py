@@ -19,6 +19,23 @@ class Currency():
         self.currency_name = 'Gems'
         self.currency_icon = '💎'
 
+        self.currency_gain_time = 10
+        self.currency_gain_amount = 25
+
+        self.currency_adder = bot.loop.create_task(self.currency_over_time())
+
+    async def currency_over_time(self)
+        while True:
+            members = self.bot.get_all_members()
+            for server in self.bot.servers:
+                for member in members:
+                    if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
+                        await self.user_add_currency(server, member, self.currency_gain_amount)
+                        print('currency added')
+            asyncio.sleep(self.currency_gain_time)
+
+
+
     def user_bank_embed(self, server, user):
         currency = self.config.get('currency', {})
         server_id = server.id
