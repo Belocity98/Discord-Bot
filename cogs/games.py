@@ -9,6 +9,7 @@ class Games():
     def __init__(self, bot):
         self.bot = bot
         self.duelchance = self.bot.config["games"]["duel_ban_chance"]
+        self.current_duels = {}
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -122,6 +123,14 @@ class Games():
         being_attacked = user
         server = ctx.message.server
 
+        db = self.current_duels[server]
+
+        if (db[challenger] == True) or (db[being_attacked] == True):
+            embed = discord.Embed(description="You cannot start a duel while you are your target are currently dueling!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
         embed = discord.Embed(description="{}, do you accept {}'s duel challenge? (yes/no)".format(being_attacked, challenger))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -133,6 +142,8 @@ class Games():
             await self.bot.say(embed=embed)
             return
 
+        db[challenger] == True
+        db[being_attacked] == True
         embed = discord.Embed(description='{} accepted the duel challenge!\n{}, pick a number between 1 and {}.'.format(being_attacked, challenger, duelchance))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -149,6 +160,8 @@ class Games():
         challenger_distance = abs(randnumber - int(challenger_number.content))
         being_attacked_distance = abs(randnumber - int(being_attacked_number.content))
 
+        db[challenger] == False
+        db[being_attacked] == False
         if challenger_distance < being_attacked_distance:
             embed = discord.Embed(title='{} won!'.format(challenger))
             embed.description = 'The random number was {}.'.format(randnumber)
