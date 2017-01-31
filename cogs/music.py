@@ -1,8 +1,10 @@
 import asyncio
 import discord
-from discord.ext import commands
 import youtube_dl
-import os, sys
+import os
+import sys
+
+from discord.ext import commands
 from random import choice
 from threading import Thread
 

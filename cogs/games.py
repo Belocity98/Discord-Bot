@@ -1,11 +1,11 @@
 import discord
 import random
 import asyncio
+import sys
+import os
 
 from discord.ext import commands
 from .utils import config
-
-import os, sys
 
 class Games():
 

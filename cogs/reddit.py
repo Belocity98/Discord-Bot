@@ -1,6 +1,7 @@
-from discord.ext import commands
 import discord
 import praw
+
+from discord.ext import commands
 
 class Reddit():
 

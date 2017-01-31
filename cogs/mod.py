@@ -1,11 +1,11 @@
-from discord.ext import commands
-from .utils import config, checks
-
 import discord
 import asyncio
 import json
 import os
 import sys
+
+from discord.ext import commands
+from .utils import config, checks
 
 class Mod():
 

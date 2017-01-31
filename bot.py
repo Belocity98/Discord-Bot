@@ -1,10 +1,11 @@
 ﻿import discord
-from discord.ext import commands
 import traceback
 import os
 import sys
 import json
 import asyncio
+
+from discord.ext import commands
 
 description = "A general bot for personal use."
 

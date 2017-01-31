@@ -1,8 +1,8 @@
-from discord.ext import commands
 import discord
 import asyncio
 import sys, os
 
+from discord.ext import commands
 from .utils import checks, config
 
 class Misc():

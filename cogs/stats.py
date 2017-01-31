@@ -1,8 +1,9 @@
-from discord.ext import commands
 import discord
 import json
 import aiohttp
 import os
+
+from discord.ext import commands
 
 class Stats():
 
