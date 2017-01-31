@@ -131,11 +131,12 @@ class Games():
         server_id = server.id
         db = current_duels.get(server_id, {})
 
-        if (db[challenger] == True) or (db[being_attacked] == True):
-            embed = discord.Embed(description="You cannot start a duel while you are your target are currently dueling!")
-            embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
-            return
+        if (challenger.id in db) and (being_attacked.id in db):
+            if (db[challenger.id] == True) or (db[being_attacked.id] == True):
+                embed = discord.Embed(description="You cannot start a duel while you are your target are currently dueling!")
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.say(embed=embed)
+                return
 
         embed = discord.Embed(description="{}, do you accept {}'s duel challenge? (yes/no)".format(being_attacked, challenger))
         embed.colour = 0x1BE118 # lucio green
@@ -148,8 +149,8 @@ class Games():
             await self.bot.say(embed=embed)
             return
 
-        db[challenger] == True
-        db[being_attacked] == True
+        db[challenger.id] == True
+        db[being_attacked.id] == True
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
 
@@ -171,8 +172,8 @@ class Games():
 
         current_duels = self.config.get('current_duels', {})
         db = current_duels.get(server_id, {})
-        db[challenger] == False
-        db[being_attacked] == False
+        db[challenger.id] == False
+        db[being_attacked.id] == False
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
 
