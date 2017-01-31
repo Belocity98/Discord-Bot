@@ -5,6 +5,8 @@ import asyncio
 from discord.ext import commands
 from .utils import config
 
+import os, sys
+
 class Games():
 
     def __init__(self, bot):
