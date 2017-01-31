@@ -28,7 +28,8 @@ class Games():
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def roll(self, ctx, number : str):
         """Pick a number between 1 and 10. If the number is
-        not the same number the bot chose, the user will be banned for a short period of time."""
+        not the same number the bot chose, the user will be
+         banned for a short period of time."""
         roll_chance = self.bot.config["games"]["roll_chance"]
         banlength = self.bot.config["games"]["ban_length"]
         try:
