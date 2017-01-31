@@ -3,13 +3,16 @@ import random
 import asyncio
 
 from discord.ext import commands
+from .utils import config
 
 class Games():
 
     def __init__(self, bot):
         self.bot = bot
         self.duelchance = self.bot.config["games"]["duel_ban_chance"]
-        self.current_duels = {}
+        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        cfgfile = os.path.join(app_path, 'games.json')
+        self.config = config.Config(cfgfile, loop=bot.loop)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -118,12 +121,13 @@ class Games():
         """Duel another user. Loser is banned for a short period of time."""
         duelchance = self.duelchance
         banlength = self.bot.config["games"]["duel_ban_length"]
+        current_duels = self.config.get('current_duels', {})
 
         challenger = ctx.message.author
         being_attacked = user
         server = ctx.message.server
-
-        db = self.current_duels[server]
+        server_id = server.id
+        db = current_duels.get(server_id, {})
 
         if (db[challenger] == True) or (db[being_attacked] == True):
             embed = discord.Embed(description="You cannot start a duel while you are your target are currently dueling!")
@@ -144,6 +148,9 @@ class Games():
 
         db[challenger] == True
         db[being_attacked] == True
+        current_duels[server_id] = db
+        await self.config.put('current_duels', current_duels)
+
         embed = discord.Embed(description='{} accepted the duel challenge!\n{}, pick a number between 1 and {}.'.format(being_attacked, challenger, duelchance))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -160,8 +167,13 @@ class Games():
         challenger_distance = abs(randnumber - int(challenger_number.content))
         being_attacked_distance = abs(randnumber - int(being_attacked_number.content))
 
+        current_duels = self.config.get('current_duels', {})
+        db = current_duels.get(server_id, {})
         db[challenger] == False
         db[being_attacked] == False
+        current_duels[server_id] = db
+        await self.config.put('current_duels', current_duels)
+
         if challenger_distance < being_attacked_distance:
             embed = discord.Embed(title='{} won!'.format(challenger))
             embed.description = 'The random number was {}.'.format(randnumber)
@@ -171,7 +183,7 @@ class Games():
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
             return
-        if challenger_distance == being_attacked_distance:
+        elif challenger_distance == being_attacked_distance:
             embed = discord.Embed(title=='There was a draw.')
             embed.description = 'The random number was {}.'.format(randnumber)
             embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
