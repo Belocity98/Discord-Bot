@@ -94,7 +94,6 @@ class Games():
             "ok",
             "yeah",
             "sure",
-            "why not",
             "yea",
             "affirmative",
             "by all means",
@@ -138,6 +137,11 @@ class Games():
                 await self.bot.say(embed=embed)
                 return
 
+        db[challenger.id] = True
+        db[being_attacked.id] = True
+        current_duels[server_id] = db
+        await self.config.put('current_duels', current_duels)
+
         embed = discord.Embed(description="{}, do you accept {}'s duel challenge? (yes/no)".format(being_attacked, challenger))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -146,18 +150,25 @@ class Games():
             embed = discord.Embed(description="{} didn't respond to the duel challenge.".format(being_attacked))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            current_duels = self.config.get('current_duels', {})
+            db = current_duels.get(server_id, {})
+            db[challenger.id] = False
+            db[being_attacked.id] = False
+            current_duels[server_id] = db
+            await self.config.put('current_duels', current_duels)
             return
 
         if not self.duel_check(msg):
             embed = discord.Embed(description='{} did not accept the duel challenge.'.format(being_attacked))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            current_duels = self.config.get('current_duels', {})
+            db = current_duels.get(server_id, {})
+            db[challenger.id] = False
+            db[being_attacked.id] = False
+            current_duels[server_id] = db
+            await self.config.put('current_duels', current_duels)
             return
-
-        db[challenger.id] = True
-        db[being_attacked.id] = True
-        current_duels[server_id] = db
-        await self.config.put('current_duels', current_duels)
 
         embed = discord.Embed(description='{} accepted the duel challenge!\n{}, pick a number between 1 and {}.'.format(being_attacked, challenger, duelchance))
         embed.colour = 0x1BE118 # lucio green
@@ -168,17 +179,38 @@ class Games():
             embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(challenger))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            current_duels = self.config.get('current_duels', {})
+            db = current_duels.get(server_id, {})
+            db[challenger.id] = False
+            db[being_attacked.id] = False
+            current_duels[server_id] = db
+            await self.config.put('current_duels', current_duels)
             return
 
         embed = discord.Embed(description='{}, pick a number between 1 and {}.'.format(being_attacked, duelchance))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
-        being_attacked_number = await self.bot.wait_for_message(timeout=45, author=being_attacked, check=self.duel_check_valid_int)
+        while True:
+            being_attacked_number = await self.bot.wait_for_message(timeout=45, author=being_attacked, check=self.duel_check_valid_int)
+            if challenger_number.content == being_attacked_number.content:
+                embed = discord.Embed(description="Number cannot be the same as opponent's number. Please re-enter your number.")
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.say(embed=embed)
+                continue
+            else:
+                break
+
         if being_attacked_number == None:
             embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(being_attacked))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            current_duels = self.config.get('current_duels', {})
+            db = current_duels.get(server_id, {})
+            db[challenger.id] = False
+            db[being_attacked.id] = False
+            current_duels[server_id] = db
+            await self.config.put('current_duels', current_duels)
             return
 
         randnumber = random.randint(1, duelchance)
