@@ -22,18 +22,18 @@ startup_extensions = [
     "cogs.music"
 ]
 
-bot = commands.Bot(command_prefix='>', description=description)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('>'), description=description, pm_help=True)
 
 try:
     app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
     tmp_file = os.path.join(app_path, 'config.json')
     with open(tmp_file) as fp:
-        json.load(fp)
+        bot.config = json.load(fp)
 except:
     app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
     tmp_file = os.path.join(app_path, 'example_config.json')
     with open(tmp_file) as fp:
-        json.load(fp)
+        bot.config = json.load(fp)
 
 bot.tmp_banned_cache = {}
 
