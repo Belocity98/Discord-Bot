@@ -78,7 +78,7 @@ class Currency():
         await self.bot.send_message(user, embed=bank_embed)
 
     @commands.group(pass_context=True, invoke_without_command=False, no_pm=True)
-    async def currency(self, ctx, user : discord.Member):
+    async def currency(self, ctx):
         """Command for adding/removing/setting/viewing a user's currency."""
         log.info('No subcommand entered for currency in {} in {}.'.format(ctx.message.channel.name, ctx.message.server.name))
 
