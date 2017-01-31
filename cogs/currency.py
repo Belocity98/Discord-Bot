@@ -29,6 +29,7 @@ class Currency():
             embed.add_field(name=self.currency_name, value='0 {}'.format(self.currency_icon), inline=False)
         else:
             embed.add_field(name=self.currency_name, value='{} {}'.format(db[user.id], self.currency_icon), inline=False)
+        embed.colour = 0x1BE118 # lucio green
         return embed
 
     @commands.command(name='bank', pass_context=True, no_pm=True)
