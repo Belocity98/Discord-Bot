@@ -62,6 +62,7 @@ class Games():
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def flip(self, ctx):
+        """50 percent chance of being banned for a short period of time."""
         banlength = self.bot.config["games"]["flip_ban_length"]
         author = ctx.message.author
         server = ctx.message.server
