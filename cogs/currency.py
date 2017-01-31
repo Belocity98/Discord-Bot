@@ -63,6 +63,8 @@ class Currency():
         if user.id not in db:
             return
         db[user.id] -= amount
+        if db[user.id] < 0:
+            db[user.id] = 0
         currency[server.id] = db
         await self.config.put('currency', currency)
         return
