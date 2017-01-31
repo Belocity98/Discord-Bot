@@ -24,7 +24,7 @@ class Currency():
         server_id = server.id
         db = currency.get(server_id, {})
         embed = discord.Embed(title="{}'s Bank Account")
-        embed.desscription = 'Server: {}'.format(server.name)
+        embed.description = 'Server: {}'.format(server.name)
         if user.id not in db:
             embed.add_field(name=self.currency_name, value='0 {}'.format(self.currency_icon), inline=False)
         else:
