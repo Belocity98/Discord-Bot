@@ -24,7 +24,7 @@ class Currency():
 
         self.currency_adder = bot.loop.create_task(self.currency_over_time())
 
-    async def currency_over_time(self)
+    async def currency_over_time(self):
         while True:
             members = self.bot.get_all_members()
             for server in self.bot.servers:
