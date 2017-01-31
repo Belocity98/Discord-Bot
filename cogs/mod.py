@@ -3,9 +3,12 @@ import asyncio
 import json
 import os
 import sys
+import logging
 
 from discord.ext import commands
 from .utils import config, checks
+
+log = logging.getLogger(__name__)
 
 class Mod():
 
@@ -64,6 +67,7 @@ class Mod():
         embed.add_field(name="By", value=str(author))
         embed.add_field(name="For", value=str(length) + " seconds")
         await self.bot.say(embed=embed)
+        log.info('{} banned {} for {} seconds from {}.'.format(author, user, length, server.name))
         if reason == None:
             await self.ban_func(server, user, length=length)
         else:
@@ -82,6 +86,8 @@ class Mod():
         channel = ctx.message.channel
         server = ctx.message.server
         await self.bot.purge_from(channel, limit=limit)
+        author = ctx.message.author
+        log.info('{} purged {} messages from {} in {}.'.format(author, limit, channel.name, server.name))
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -99,6 +105,7 @@ class Mod():
                     lines.append(member)
             for member in lines:
                 await self.bot.move_member(member, author.voice_channel)
+            log.info('{} massmoved all members to {} in {}.'.format(author, channel.name, server.name))
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)

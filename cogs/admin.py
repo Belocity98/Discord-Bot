@@ -1,9 +1,12 @@
 import discord
 import os
 import sys
+import logging
 
 from discord.ext import commands
 from .utils import checks
+
+log = logging.getLogger(__name__)
 
 class Admin():
 
@@ -53,6 +56,7 @@ class Admin():
         tmp_file = os.path.join(app_path, 'config.json')
         with open(tmp_file) as fp:
             json.load(fp)
+        log.info('Configuration reloaded.')
 
     @commands.command(name='reload', hidden=True, pass_context=True)
     @checks.is_owner()
@@ -70,6 +74,7 @@ class Admin():
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
+            log.info('{} reloaded.'.format(extension_name))
         except ImportError:
             await self.bot.say("Cog not found.")
             return
@@ -80,6 +85,7 @@ class Admin():
         """Loads an extension."""
         try:
             self.bot.load_extension(extension_name)
+            log.info('{} loaded.'.format(extension_name))
         except (AttributeError, ImportError) as e:
             await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
@@ -89,11 +95,13 @@ class Admin():
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
+        log.info('{} unloaded.'.format(extension_name))
 
     @commands.command(hidden=True)
     @checks.is_owner()
     async def logout(self):
         """Turns off the bot."""
+        log.info('Bot logging off.')
         await self.bot.logout()
 
     @commands.command(hidden=True, pass_context=True)

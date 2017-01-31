@@ -1,9 +1,13 @@
 import discord
 import asyncio
-import sys, os
+import sys
+import os
+import logging
 
 from discord.ext import commands
 from .utils import checks, config
+
+log = logging.getLogger(__name__)
 
 class Misc():
 
@@ -52,6 +56,7 @@ class Misc():
     async def strike(self, ctx, user : discord.Member):
         """Strike somebody. 25 strikes bans for 10 seconds."""
         server = ctx.message.server
+        author = ctx.message.author
         strikes = self.config.get('strikes', {})
         server_id = ctx.message.server.id
         db = strikes.get(server_id, {})
@@ -62,6 +67,7 @@ class Misc():
             await self.bot.say(embed=embed)
             return
 
+        log.info('{} striked {} in {}.'.format(author, user, server.name))
         if user.id in db:
             db[user.id] += 1
             strikes[server_id] = db
@@ -125,6 +131,7 @@ class Misc():
             return
 
         if user.id in db:
+            log.info('{} added {} strikes to {} in {}.'.format(ctx.message.author, amount, user, server.name))
             db[user.id] += amount
             strikes[server_id] = db
             await self.config.put('strikes', strikes)
@@ -137,6 +144,7 @@ class Misc():
                 await self.bot.say(embed=embed)
 
         else:
+            log.info('{} added {} strikes to {} in {}.'.format(ctx.message.author, amount, user, server.name))
             db[user.id] = amount
             strikes[server_id] = db
             await self.config.put('strikes', strikes)
@@ -172,6 +180,7 @@ class Misc():
             return
 
         if user.id in db:
+            log.info('{} removed {} strikes to {} in {}.'.format(ctx.message.author, amount, user, server.name))
             db[user.id] -= amount
             strikes[server_id] = db
             await self.config.put('strikes', strikes)
@@ -197,6 +206,7 @@ class Misc():
         embed = discord.Embed(description='All strikes in server reset.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
+        log.info('{} reset all strikes in {}.'.format(ctx.message.author, server.name))
 
 def setup(bot):
     bot.add_cog(Misc(bot))
