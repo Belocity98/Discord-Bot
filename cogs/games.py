@@ -202,7 +202,7 @@ class Games():
             await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
             return
         elif challenger_distance == being_attacked_distance:
-            embed = discord.Embed(title=='There was a draw.')
+            embed = discord.Embed(title='There was a draw.')
             embed.description = 'The random number was {}.'.format(randnumber)
             embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
             embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
@@ -218,7 +218,6 @@ class Games():
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
             return
-
 
 def setup(bot):
     bot.add_cog(Games(bot))
