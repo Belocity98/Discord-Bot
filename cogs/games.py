@@ -149,8 +149,8 @@ class Games():
             await self.bot.say(embed=embed)
             return
 
-        db[challenger.id] == True
-        db[being_attacked.id] == True
+        db[challenger.id] = True
+        db[being_attacked.id] = True
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
 
@@ -172,8 +172,8 @@ class Games():
 
         current_duels = self.config.get('current_duels', {})
         db = current_duels.get(server_id, {})
-        db[challenger.id] == False
-        db[being_attacked.id] == False
+        db[challenger.id] = False
+        db[being_attacked.id] = False
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
 
