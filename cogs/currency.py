@@ -32,7 +32,7 @@ class Currency():
         embed.colour = 0x1BE118 # lucio green
         return embed
 
-    def user_add_currency(self, server, user, amount):
+    async def user_add_currency(self, server, user, amount):
         currency = self.config.get('currency', {})
         server_id = server.id
         db = currency.get(server_id, {})
@@ -40,10 +40,10 @@ class Currency():
             return
         db[user.id] += amount
         currency[server.id] = db
-        self.config.put('currency', currency)
+        await self.config.put('currency', currency)
         return
 
-    def user_set_currency(self, server, user, amount):
+    async def user_set_currency(self, server, user, amount):
         currency = self.config.get('currency', {})
         server_id = server.id
         db = currency.get(server_id, {})
@@ -51,10 +51,10 @@ class Currency():
             return
         db[user.id] = amount
         currency[server.id] = db
-        self.config.put('currency', currency)
+        await self.config.put('currency', currency)
         return
 
-    def user_remove_currency(self, server, user, amount):
+    async def user_remove_currency(self, server, user, amount):
         currency = self.config.get('currency', {})
         server_id = server.id
         db = currency.get(server_id, {})
@@ -64,7 +64,7 @@ class Currency():
             return
         db[user.id] -= amount
         currency[server.id] = db
-        self.config.put('currency', currency)
+        await self.config.put('currency', currency)
         return
 
 
@@ -93,19 +93,19 @@ class Currency():
     async def currency_add(self, ctx, user : discord.Member, amount : int):
         """Add currency to a user in the current server."""
         server = ctx.message.server
-        self.user_add_currency(server, user, amount)
+        await self.user_add_currency(server, user, amount)
 
     @currency.command(name='remove', pass_context=True, no_pm=True)
     async def currency_remove(self, ctx, user : discord.Member, amount : int):
         """Remove currency from a user in the current server."""
         server = ctx.message.server
-        self.user_remove_currency(server, user, amount)
+        await self.user_remove_currency(server, user, amount)
 
     @currency.command(name='set', pass_context=True, no_pm=True)
     async def currency_set(self, ctx, user : discord.Member, amount : int):
         """Set the currency of a user in the current server."""
         server = ctx.message.server
-        self.user_set_currency(server, user, amount)
+        await self.user_set_currency(server, user, amount)
 
 def setup(bot):
     bot.add_cog(Currency(bot))
