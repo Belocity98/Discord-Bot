@@ -266,7 +266,7 @@ class Games():
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
             return
-    @strike.command(name='resetstatus', pass_context=True)
+    @duel.command(name='resetstatus', pass_context=True)
     async def duel_resetstatus(self, ctx):
         server_id = ctx.message.server.id
         current_duels = self.config.get('current_duels', {})
