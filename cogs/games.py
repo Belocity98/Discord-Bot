@@ -114,7 +114,7 @@ class Games():
             return False
         return True
 
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, no_pm=True,invoke_without_command=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def duel(self, ctx, user : discord.Member):
         """Duel another user. Loser is banned for a short period of time."""
