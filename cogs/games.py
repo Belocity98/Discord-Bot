@@ -114,7 +114,7 @@ class Games():
             return False
         return True
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def duel(self, ctx, user : discord.Member):
         """Duel another user. Loser is banned for a short period of time."""
@@ -266,6 +266,17 @@ class Games():
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
             return
+    @strike.command(name='resetstatus', pass_context=True)
+    async def duel_resetstatus(self, ctx):
+        server_id = ctx.message.server.id
+        current_duels = self.config.get('current_duels', {})
+        db = current_duels.get(server_id, {})
+        db = []
+        current_duels[server_id] = db
+        await self.config.put('current_duels', current_duels)
+        embed = discord.Embed(description='Duel status reset in server.')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Games(bot))
