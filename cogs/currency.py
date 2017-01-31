@@ -2,6 +2,7 @@ import discord
 import os
 import sys
 import logging
+import asyncio
 
 from discord.ext import commands
 from .utils import config, checks
