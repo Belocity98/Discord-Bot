@@ -128,6 +128,12 @@ class Games():
         server_id = server.id
         db = current_duels.get(server_id, {})
 
+        if user == server.me:
+            embed = discord.Embed(description="You cannot start a duel with a bot!")
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
         if challenger.id == user.id:
             embed = discord.Embed(description="You cannot duel yourself!")
             embed.colour = 0x1BE118 # lucio green
