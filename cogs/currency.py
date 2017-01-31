@@ -29,7 +29,7 @@ class Currency():
             members = self.bot.get_all_members()
             for server in self.bot.servers:
                 for member in members:
-                    if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
+                    if (member.voice_channel != None) and (member.voice_channel != server.afk_channel ):
                         await self.user_add_currency(server, member, self.currency_gain_amount)
                         print('currency added')
             asyncio.sleep(self.currency_gain_time)
