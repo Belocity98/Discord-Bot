@@ -31,7 +31,7 @@ class Games():
         not the same number the bot chose, the user will be
          banned for a short period of time."""
         roll_chance = self.bot.config["games"]["roll_chance"]
-        banlength = self.bot.config["games"]["ban_length"]
+        banlength = self.bot.config["games"]["roll_ban_length"]
         try:
             number = int(number)
         except ValueError:
@@ -59,6 +59,22 @@ class Games():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def flip(self, ctx):
+        banlength = self.bot.config["games"]["flip_ban_length"]
+        author = ctx.message.author
+        server = ctx.message.server
+        randnumber = random.randint(1, 2)
+        if randnumber == 1:
+            embed = discord.Embed(description='{} flipped poorly.'.format(author))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            await self.bot.get_cog("Mod").ban_func(server, author, message="Flipped poorly.", length=banlength)
+        else:
+            embed = discord.Embed(description='{} flipped correctly.'.format(author))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Games(bot))
