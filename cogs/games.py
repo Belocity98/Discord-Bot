@@ -142,6 +142,11 @@ class Games():
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
         msg = await self.bot.wait_for_message(timeout=45, author=being_attacked)
+        if msg == None:
+            embed = discord.Embed(description="{} didn't respond to the duel challenge.".format(being_attacked))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         if not self.duel_check(msg):
             embed = discord.Embed(description='{} did not accept the duel challenge.'.format(being_attacked))
@@ -159,12 +164,22 @@ class Games():
         await self.bot.say(embed=embed)
 
         challenger_number = await self.bot.wait_for_message(timeout=45, author=challenger, check=self.duel_check_valid_int)
+        if challenger_number == None:
+            embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(challenger))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         embed = discord.Embed(description='{}, pick a number between 1 and {}.'.format(being_attacked, duelchance))
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
         being_attacked_number = await self.bot.wait_for_message(timeout=45, author=being_attacked, check=self.duel_check_valid_int)
+        if being_attacked_number == None:
+            embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(being_attacked))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         randnumber = random.randint(1, duelchance)
         challenger_distance = abs(randnumber - int(challenger_number.content))
