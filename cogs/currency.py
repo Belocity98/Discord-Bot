@@ -20,26 +20,6 @@ class Currency():
         self.currency_name = 'Gems'
         self.currency_icon = '💎'
 
-        self.currency_gain_time = 10
-        self.currency_gain_amount = 25
-
-        self.currency_adder = bot.loop.create_task(self.currency_over_time())
-
-    async def currency_over_time(self):
-        while True:
-            members = self.bot.get_all_members()
-            for server in self.bot.servers:
-                print('checking {}'.format(server.name))
-                for member in members:
-                    print('checking {}'.format(member.name))
-                    if (member.voice_channel != None) and (member.voice_channel != server.afk_channel ):
-                        await self.user_add_currency(server, member, self.currency_gain_amount)
-                        print('currency added')
-            print("loop done")
-            asyncio.sleep(self.currency_gain_time)
-
-
-
     def user_bank_embed(self, server, user):
         currency = self.config.get('currency', {})
         server_id = server.id
@@ -53,12 +33,30 @@ class Currency():
         embed.colour = 0x1BE118 # lucio green
         return embed
 
+    def get_shop_embed(self, server):
+        shop = self.config.get('shop', {})
+        server_id = server.id
+        db = shop.get(server_id, {})
+
+        embed = discord.Embed(title="{}'s Shop".format(server.name))
+        embed.description = 'This server has {} items in the shop.'.format(len(db))
+        for item in db:
+            roleobj = discord.utils.get(server.roles, id=item)
+            itemname = roleobj.name
+            embed.add_field(name='{}'.format(itemname), value='{} {}'.format(db[item], self.currency_name))
+        if len(db) == 0:
+            embed.description = 'This server has no items in the shop.'
+        embed.colour = 0x1BE118 # lucio green
+        return embed
+
     async def user_add_currency(self, server, user, amount):
         currency = self.config.get('currency', {})
         server_id = server.id
         db = currency.get(server_id, {})
         if amount < 0:
             return
+        if user.id not in db:
+            db[user.id] = 0
         db[user.id] += amount
         currency[server.id] = db
         await self.config.put('currency', currency)
@@ -80,9 +78,9 @@ class Currency():
         server_id = server.id
         db = currency.get(server_id, {})
         if amount < 0:
-            return
+            return False
         if user.id not in db:
-            return
+            return False
         db[user.id] -= amount
         if db[user.id] < 0:
             db[user.id] = 0
@@ -90,9 +88,25 @@ class Currency():
         await self.config.put('currency', currency)
         return
 
+    async def user_transfer_currency(self, server, user1, user2, amount):
+        currency = self.config.get('currency', {})
+        server_id = server.id
+        db = currency.get(server_id, {})
+        if amount < 0:
+            return False
+        if user1.id not in db:
+            return False
+        if user2.id not in db:
+            db[user2.id] = 0
+        if db[user1.id] < amount:
+            return False
+        db[user1.id] -= amount
+        db[user2.id] += amount
+        currency[server.id] = db
+        await self.config.put('currency', currency)
+        return
 
     @commands.command(name='bank', pass_context=True, no_pm=True)
-    @commands.has_permissions(manage_server=True)
     async def currency_bank_account(self, ctx):
         """Display your own bank account for the current server."""
         server = ctx.message.server
@@ -100,16 +114,32 @@ class Currency():
         bank_embed = self.user_bank_embed(server, user)
         await self.bot.send_message(user, embed=bank_embed)
 
+    @commands.command(name='transfer', pass_context=True, no_pm=True)
+    async def currency_transfer(self, ctx, user : discord.Member, amount : int):
+        """Transfer currency to another user."""
+        server = ctx.message.server
+        user1 = ctx.message.author
+        user2 = user
+        if await self.user_transfer_currency(server, user1, user2, amount) == False:
+            embed = discord.Embed(description='You either do not have enough currency, or entered an invalid amount.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        embed = discord.Embed(description='{} sent you {} {}!'.format(user.name, amount, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.send_message(user2, embed=embed)
+
     @commands.group(pass_context=True, invoke_without_command=False, no_pm=True)
     async def currency(self, ctx):
         """Command for adding/removing/setting/viewing a user's currency."""
-        log.info('No subcommand entered for currency in {} in {}.'.format(ctx.message.channel.name, ctx.message.server.name))
 
     @currency.command(name='view', pass_context=True, no_pm=True)
     async def currency_view(self, ctx, user : discord.Member):
         """View a user's currency for the current server."""
         server = ctx.message.server
         bank_embed = self.user_bank_embed(server, user)
+        if user == None:
+            bank_embed = self.user_bank_embed(server, ctx.message.author)
         await self.bot.send_message(ctx.message.author, embed=bank_embed)
 
     @currency.command(name='add', pass_context=True, no_pm=True)
@@ -129,6 +159,82 @@ class Currency():
         """Set the currency of a user in the current server."""
         server = ctx.message.server
         await self.user_set_currency(server, user, amount)
+
+    @currency.command(name='reset', pass_context=True, no_pm=True)
+    async def currency_reset(self, ctx):
+        """Resets all currency for a server."""
+        server = ctx.message.server
+        currency = self.config.get('currency', {})
+        db = currency.get(server.id, {})
+        db = {}
+        currency[server.id] = db
+        await self.config.put('currency', currency)
+
+    @commands.group(name='shop', pass_context=True, invoke_without_command=True, no_pm=True)
+    async def shop(self, ctx):
+        """Command for purchasing and listing items from the shop."""
+        shop_embed = self.get_shop_embed(ctx.message.server)
+        await self.bot.say(embed=shop_embed)
+
+    @shop.command(name='add', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def shop_add(self, ctx, role : discord.Role, amount : int):
+        """Command for adding a role to the shop."""
+        server = ctx.message.server
+        shop = self.config.get('shop', {})
+        server_id = server.id
+        db = shop.get(server.id, {})
+        db[role.id] = amount
+        shop[server.id] = db
+        await self.config.put('shop', shop)
+
+    @shop.command(name='remove', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def shop_remove(self, ctx, role : discord.Role):
+        """Command for removing a role from the shop."""
+        server = ctx.message.server
+        shop = self.config.get('shop', {})
+        server_id = server.id
+        db = shop.get(server.id, {})
+        if role.id in db:
+            del db[role.id]
+        shop[server.id] = db
+        await self.config.put('shop', shop)
+
+    @shop.command(name='buy', pass_context=True, no_pm=True)
+    async def shop_buy(self, ctx, role : discord.Role):
+        """Command for buying a role from the shop."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        shop = self.config.get('shop', {})
+        shopdb = shop.get(server.id, {})
+        currency = self.config.get('currency', {})
+        currencydb = currency.get(server.id, {})
+        if role in author.roles:
+            embed = discord.Embed(description='You already have that role!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if role.id not in shopdb:
+            embed = discord.Embed(description='You cannot purchase that role from the shop!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if author.id not in currencydb:
+            embed = discord.Embed(description='You cannot afford that!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if currencydb[author.id] < shopdb[role.id]:
+            embed = discord.Embed(description='You cannot afford that!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        await self.user_remove_currency(server, author, shopdb[role.id])
+        await self.bot.add_roles(author, role)
+
+
 
 def setup(bot):
     bot.add_cog(Currency(bot))
