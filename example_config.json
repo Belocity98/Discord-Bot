@@ -1,10 +1,19 @@
 {
     "your_user_id" : "user id here",
 
-    "token" : "discord bot token",
+    "token" : "token here",
 
     "mod" : {
-        "max_ban_length" : "1500"
+        "max_ban_length" : "1500",
+        "purge_limit" : "50"
+    },
+
+    "games" : {
+        "roll_chance" : 10,
+        "roll_ban_length" : 10,
+        "flip_ban_length" : 10,
+        "duel_ban_chance" : 100,
+        "duel_ban_length" : 25
     },
 
     "strikes" : {
@@ -12,19 +21,15 @@
         "ban_length" : "10"
     },
 
-    "mod" : {
-        "purge_limit" : "50"
-    },
-
     "cgg" : {
-        "token" : "championgg api token",
+        "token" : "cgg token here",
         "url" : "http://api.champion.gg/"
     },
 
     "reddit" : {
-        "secret" : "reddit secret",
-        "password" : "reddit password",
-        "id" : "reddit id",
-        "username" : "reddit username"
+        "secret" : "secret here",
+        "password" : "password here",
+        "id" : "id here",
+        "username" : "username here"
     }
 }
