@@ -16,12 +16,20 @@ class Games():
         cfgfile = os.path.join(app_path, 'games.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
+        self.roulette_max_currency = 30
+        self.roll_max_currency = 60
+        self.flip_max_currency = 20
+        self.duel_max_currency = 30
+
+        self.currency_instance = self.bot.get_cog("Currency")
+
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def roulette(self, ctx):
         """Game of Russian Roulette."""
         author = ctx.message.author
         server = ctx.message.server
+        pot_winning = random.randint(1, self.roulette_max_currency)
         randnumber = random.randrange(6)
         if randnumber == 5:
             await self.bot.say("{} found a bullet.".format(str(author)))
@@ -29,6 +37,7 @@ class Games():
 
         else:
             await self.bot.say("{}'s revolver didn't fire.".format(str(author)))
+            await self.currency_instance.user_add_currency(server, author, pot_winning)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -38,6 +47,7 @@ class Games():
          banned for a short period of time."""
         roll_chance = self.bot.config["games"]["roll_chance"]
         banlength = self.bot.config["games"]["roll_ban_length"]
+        pot_winning = random.randint(1, self.roll_max_currency)
         try:
             number = int(number)
         except ValueError:
@@ -64,11 +74,13 @@ class Games():
             embed = discord.Embed(description='{} entered the correct number!'.format(author))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            await self.currency_instance.user_add_currency(server, author, pot_winning)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def flip(self, ctx):
         """50 percent chance of being banned for a short period of time."""
+        pot_winning = random.randint(1, self.flip_max_currency)
         banlength = self.bot.config["games"]["flip_ban_length"]
         author = ctx.message.author
         server = ctx.message.server
@@ -83,6 +95,7 @@ class Games():
             embed = discord.Embed(description='{} flipped correctly.'.format(author))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            await self.currency_instance.user_add_currency(server, author, pot_winning)
 
     def duel_check(self, msg):
         yes_list = [
@@ -118,6 +131,7 @@ class Games():
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def duel(self, ctx, user : discord.Member):
         """Duel another user. Loser is banned for a short period of time."""
+        pot_winning = random.randint(1, self.duel_max_currency)
         duelchance = self.duelchance
         banlength = self.bot.config["games"]["duel_ban_length"]
         current_duels = self.config.get('current_duels', {})
@@ -247,6 +261,7 @@ class Games():
             embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            await self.currency_instance.user_add_currency(server, challenger, pot_winning)
             await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
             return
         elif challenger_distance == being_attacked_distance:
@@ -264,6 +279,7 @@ class Games():
             embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
+            await self.currency_instance.user_add_currency(server, being_attacked, pot_winning)
             await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
             return
     @duel.command(name='resetstatus', pass_context=True)
