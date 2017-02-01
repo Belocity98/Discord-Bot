@@ -130,10 +130,12 @@ class Currency():
         await self.bot.send_message(user2, embed=embed)
 
     @commands.group(pass_context=True, invoke_without_command=False, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency(self, ctx):
         """Command for adding/removing/setting/viewing a user's currency."""
 
     @currency.command(name='view', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency_view(self, ctx, user : discord.Member):
         """View a user's currency for the current server."""
         server = ctx.message.server
@@ -143,24 +145,28 @@ class Currency():
         await self.bot.send_message(ctx.message.author, embed=bank_embed)
 
     @currency.command(name='add', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency_add(self, ctx, user : discord.Member, amount : int):
         """Add currency to a user in the current server."""
         server = ctx.message.server
         await self.user_add_currency(server, user, amount)
 
     @currency.command(name='remove', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency_remove(self, ctx, user : discord.Member, amount : int):
         """Remove currency from a user in the current server."""
         server = ctx.message.server
         await self.user_remove_currency(server, user, amount)
 
     @currency.command(name='set', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency_set(self, ctx, user : discord.Member, amount : int):
         """Set the currency of a user in the current server."""
         server = ctx.message.server
         await self.user_set_currency(server, user, amount)
 
     @currency.command(name='reset', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
     async def currency_reset(self, ctx):
         """Resets all currency for a server."""
         server = ctx.message.server
