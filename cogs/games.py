@@ -16,7 +16,7 @@ class Games():
         cfgfile = os.path.join(app_path, 'games.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
-        self.roulette_max_currency = 30
+        self.roulette_max_currency = 10
         self.roll_max_currency = 60
         self.flip_max_currency = 20
         self.duel_max_currency = 30
