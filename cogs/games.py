@@ -21,8 +21,6 @@ class Games():
         self.flip_max_currency = 20
         self.duel_max_currency = 30
 
-        self.currency_instance = self.bot.get_cog("Currency")
-
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def roulette(self, ctx):
@@ -37,7 +35,7 @@ class Games():
 
         else:
             await self.bot.say("{}'s revolver didn't fire.".format(str(author)))
-            await self.currency_instance.user_add_currency(server, author, pot_winning)
+            await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -74,7 +72,7 @@ class Games():
             embed = discord.Embed(description='{} entered the correct number!'.format(author))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            await self.currency_instance.user_add_currency(server, author, pot_winning)
+            await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -95,7 +93,7 @@ class Games():
             embed = discord.Embed(description='{} flipped correctly.'.format(author))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            await self.currency_instance.user_add_currency(server, author, pot_winning)
+            await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
 
     def duel_check(self, msg):
         yes_list = [
@@ -261,7 +259,7 @@ class Games():
             embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            await self.currency_instance.user_add_currency(server, challenger, pot_winning)
+            await self.bot.get_cog("Currency").user_add_currency(server, challenger, pot_winning)
             await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
             return
         elif challenger_distance == being_attacked_distance:
@@ -279,7 +277,7 @@ class Games():
             embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            await self.currency_instance.user_add_currency(server, being_attacked, pot_winning)
+            await self.bot.get_cog("Currency").user_add_currency(server, being_attacked, pot_winning)
             await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
             return
     @duel.command(name='resetstatus', pass_context=True)
