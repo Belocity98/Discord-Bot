@@ -287,7 +287,7 @@ class Currency():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        richest_person = self.bot.get_member(max(currencydb, key=currencydb.get))
+        richest_person = server.get_member(max(currencydb, key=currencydb.get))
         richest_person_amt = currencydb[richest_person.id]
         embed = discord.Embed(description='The richest person on this server is {}, with {} {}.'.format(richest_person.name, richest_person_amt, self.currency_name))
         embed.colour = 0x1BE118 # lucio green
