@@ -249,7 +249,31 @@ class Currency():
         await self.user_remove_currency(server, author, shopdb[role.id])
         await self.bot.add_roles(author, role)
 
+    @shop.command(name='sell', pass_context=True, no_pm=True)
+    async def shop_sell(self, ctx, role : discord.Role):
+        """Command for selling a role to the shop."""
+        server = ctx.message.server
+        author = ctx.message.author
 
+        shop = self.config.get('shop', {})
+        shopdb = shop.get(server.id, {})
+        currency = self.config.get('currency', {})
+        currencydb = currency.get(server.id, {})
+        if role not in author.roles:
+            embed = discord.Embed(description='You cannot sell a role that you do not have!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if role.id not in shopdb:
+            embed = discord.Embed(description='You cannot sell a role that is not in the shop!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        if author.id not in currencydb:
+            currencydb[author.id] = 0
+            return
+        await self.user_add_currency(server, author, shopdb[role.id]/2)
+        await self.bot.remove_roles(author, role)
 
 def setup(bot):
     bot.add_cog(Currency(bot))
