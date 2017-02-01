@@ -275,5 +275,23 @@ class Currency():
         await self.user_add_currency(server, author, shopdb[role.id]/2)
         await self.bot.remove_roles(author, role)
 
+    @commands.command(name='richest', pass_context=True, no_pm=True)
+    async def currency_richest(self, ctx):
+        """Command for displaying the richest person on the server."""
+        server = ctx.message.server
+
+        currency = self.config.get('currency', {})
+        currencydb = currency.get(server.id, {})
+        if len(currencydb) == 0:
+            embed = discord.Embed(description='Nobody on this server has any currency!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        richest_person = self.bot.get_member(max(currencydb, key=currencydb.get))
+        richest_person_amt = currencydb[richest_person.id]
+        embed = discord.Embed(description='The richest person on this server is {}, with {} {}.'.format(richest_person.name, richest_person_amt, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
 def setup(bot):
     bot.add_cog(Currency(bot))
