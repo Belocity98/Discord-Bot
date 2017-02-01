@@ -201,6 +201,21 @@ class Currency():
         shop[server.id] = db
         await self.config.put('shop', shop)
 
+    @shop.command(name='edit', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def shop_edit(self, ctx, role : discord.Role, amount : int):
+        """Command for editing a role in the shop."""
+        server = ctx.message.server
+        shop = self.config.get('shop', {})
+        server_id = server.id
+        db = shop.get(server.id, {})
+        if amount < 0:
+            return
+        if role.id in db:
+            db[role.id] = amount
+        shop[server.id] = db
+        await self.config.put('shop', shop)
+
     @shop.command(name='buy', pass_context=True, no_pm=True)
     async def shop_buy(self, ctx, role : discord.Role):
         """Command for buying a role from the shop."""
