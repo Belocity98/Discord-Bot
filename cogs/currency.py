@@ -114,7 +114,29 @@ class Currency():
         bank_embed = self.user_bank_embed(server, user)
         await self.bot.send_message(user, embed=bank_embed)
 
-    @commands.command(name='transfer', pass_context=True, no_pm=True)
+    @commands.group(pass_context=True, invoke_without_command=False, no_pm=True)
+    async def currency(self, ctx):
+        """General currency command."""
+
+    @currency.command(name='richest', pass_context=True, no_pm=True)
+    async def currency_richest(self, ctx):
+        """Command for displaying the richest person on the server."""
+        server = ctx.message.server
+
+        currency = self.config.get('currency', {})
+        currencydb = currency.get(server.id, {})
+        if len(currencydb) == 0:
+            embed = discord.Embed(description='Nobody on this server has any currency!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+        richest_person = server.get_member(max(currencydb, key=currencydb.get))
+        richest_person_amt = currencydb[richest_person.id]
+        embed = discord.Embed(description='The richest person on this server is {}, with {} {}.'.format(richest_person.name, richest_person_amt, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+    @currency.command(name='transfer', pass_context=True, no_pm=True)
     async def currency_transfer(self, ctx, user : discord.Member, amount : int):
         """Transfer currency to another user."""
         server = ctx.message.server
@@ -129,10 +151,25 @@ class Currency():
         embed.colour = 0x1BE118 # lucio green
         await self.bot.send_message(user2, embed=embed)
 
-    @commands.group(pass_context=True, invoke_without_command=False, no_pm=True)
-    @commands.has_permissions(manage_server=True)
-    async def currency(self, ctx):
-        """Command for adding/removing/setting/viewing a user's currency."""
+    @currency.command(name='totalmoney', pass_context=True, no_pm=True)
+    async def currency_totalmoney(self, ctx):
+        """Displays the collective amount of currency in the server."""
+        server = ctx.message.server
+
+        currency = self.config.get('currency', {})
+        currencydb = currency.get(server.id, {})
+        total_currency = 0
+        if len(currencydb) == 0:
+            embed = discord.Embed(description='Nobody on this server has any currency!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        for key in currencydb:
+            total_currency += currencydb[key]
+        embed = discord.Embed(description='The total amount of money on this server is: {} {}.'.format(total_currency, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     @currency.command(name='view', pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
@@ -280,24 +317,6 @@ class Currency():
             return
         await self.user_add_currency(server, author, shopdb[role.id]/2)
         await self.bot.remove_roles(author, role)
-
-    @commands.command(name='richest', pass_context=True, no_pm=True)
-    async def currency_richest(self, ctx):
-        """Command for displaying the richest person on the server."""
-        server = ctx.message.server
-
-        currency = self.config.get('currency', {})
-        currencydb = currency.get(server.id, {})
-        if len(currencydb) == 0:
-            embed = discord.Embed(description='Nobody on this server has any currency!')
-            embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
-            return
-        richest_person = server.get_member(max(currencydb, key=currencydb.get))
-        richest_person_amt = currencydb[richest_person.id]
-        embed = discord.Embed(description='The richest person on this server is {}, with {} {}.'.format(richest_person.name, richest_person_amt, self.currency_name))
-        embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
 
 def setup(bot):
     bot.add_cog(Currency(bot))
