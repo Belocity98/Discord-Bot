@@ -4,6 +4,7 @@ import sys
 import os
 import logging
 
+from cleverbot import Cleverbot
 from discord.ext import commands
 from .utils import checks, config
 
@@ -16,6 +17,8 @@ class Misc():
         app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
         cfgfile = os.path.join(app_path, 'misc.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
+
+        self.cb = Cleverbot('discord-bot')
 
     async def check_strikes(self, server, user):
         strikes = self.config.get('strikes', {})
@@ -33,6 +36,12 @@ class Misc():
             await self.bot.get_cog("Mod").ban_func(server, user, message="Reaching {} strikes.".format(strikeamt), length=banlength)
             return True
         return False
+
+    @commands.command(pass_context=True, no_pm=True, name='c')
+    @commands.cooldown(1, 3, commands.BucketType.server)
+    async def cleverbot(self, ctx, *, msg : str):
+        response = self.cb.ask(msg)
+        await self.bot.say(response)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.server)
