@@ -323,7 +323,7 @@ class Currency():
 
     @shop.command(name='removeonbuy', pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
-    async def shop_rmonbuy(self, ctx, role : discord.Role):
+    async def shop_rmonbuy(self, ctx, role : discord.Role=None):
         """Toggle for enabling remove role on purchase for a specific role."""
         server = ctx.message.server
 
@@ -332,6 +332,18 @@ class Currency():
 
         shop = self.config.get('shop_rmonbuy', {})
         shop_rmonbuy_db = shop.get(server.id, [])
+
+        if role == None:
+            embed = discord.Embed(title='Roles with remove on buy enabled')
+            embed.description = 'There are {} roles with remove on buy enabled in this server.'.format(len(shop_rmonbuy_db))
+            role_number = 1
+            for role in shop_rmonbuy_db:
+                roleobj = discord.utils.get(server.roles, id=role)
+                embed.add_field(name='Role {}'.format(role_number), value='{}'.format(roleobj.name))
+                role_number += 1
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         if role.id not in itemsdb:
             embed = discord.Embed(description='That item is not in the shop!')
@@ -351,7 +363,7 @@ class Currency():
 
     @shop.command(name='notify', pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
-    async def shop_notify(self, ctx, role : discord.Role):
+    async def shop_notify(self, ctx, role : discord.Role=None):
         """Toggle for enabling notifications on purchase for a specific role."""
         server = ctx.message.server
 
@@ -360,6 +372,18 @@ class Currency():
 
         shop = self.config.get('shop_notify', {})
         shop_notify_db = shop.get(server.id, [])
+
+        if role == None:
+            embed = discord.Embed(title='Roles with Notify Enabled')
+            embed.description = 'There are {} roles with notify enabled in this server.'.format(len(shop_notify_db))
+            role_number = 1
+            for role in shop_notify_db:
+                roleobj = discord.utils.get(server.roles, id=role)
+                embed.add_field(name='Role {}'.format(role_number), value='{}'.format(roleobj.name))
+                role_number += 1
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         if role.id not in itemsdb:
             embed = discord.Embed(description='That item is not in the shop!')
