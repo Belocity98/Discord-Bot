@@ -40,6 +40,7 @@ class Misc():
     @commands.command(pass_context=True, no_pm=True, name='c')
     @commands.cooldown(1, 3, commands.BucketType.server)
     async def cleverbot(self, ctx, *, msg : str):
+        """Talk with Cleverbot."""
         response = self.cb.ask(msg)
         await self.bot.say(response)
 
