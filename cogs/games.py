@@ -461,6 +461,24 @@ class Games():
 
         await self.stop_lottery(server)
 
+    @lottery.command(name='forcerefund', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def lottery_forcerefund(self, ctx):
+        """Force a refund for the lottery."""
+        server = ctx.message.server
+
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        embed = discord.Embed(description='Returning money...')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        for player in players:
+            playerobj = server.get_member(player)
+            await self.bot.get_cog("Currency").user_add_currency(server, playerobj, players[player])
+
+        await self.stop_lottery(server)
 
 def setup(bot):
     bot.add_cog(Games(bot))
