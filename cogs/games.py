@@ -3,9 +3,12 @@ import random
 import asyncio
 import sys
 import os
+import logging
 
 from discord.ext import commands
 from .utils import config
+
+log = logging.getLogger(__name__)
 
 class Games():
 
@@ -16,10 +19,14 @@ class Games():
         cfgfile = os.path.join(app_path, 'games.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
+        self.currency_name = 'Gems'
+
         self.roulette_max_currency = 10
         self.roll_max_currency = 60
         self.flip_max_currency = 20
         self.duel_max_currency = 30
+
+        self.lottery_time = 120
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -291,6 +298,140 @@ class Games():
         embed = discord.Embed(description='Duel status reset in server.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
+
+    async def start_lottery(self, server):
+        lottery_status = self.config.get('lottery_status', {})
+
+        lottery_status[server.id] = True
+        log.info('Lottery started in {}.'.format(server.name))
+        await self.config.put('lottery_status', lottery_status)
+        return
+
+    async def stop_lottery(self, server):
+        lottery_status = self.config.get('lottery_status', {})
+
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        players = {}
+        lottery[server.id] = players
+        lottery_status[server.id] = False
+        log.info('Lottery stopped in {}.'.format(server.name))
+        await self.config.put('lottery_status', lottery_status)
+        await self.config.put('lottery', lottery)
+        return
+
+    def lottery_jackpot(self, server):
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        jackpot = 0
+        for player in players:
+            jackpot += players[player]
+
+        return jackpot
+
+    @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
+    async def lottery(self, ctx):
+        """Lottery game. There must be atleast three people for a winner to be drawn after two minutes."""
+        server = ctx.message.server
+
+        lottery_status = self.config.get('lottery_status', {})
+
+        if server.id not in lottery_status:
+            await self.stop_lottery(server)
+
+        lottery_status = self.config.get('lottery_status', {})
+
+        if lottery_status[server.id] == True:
+            embed = discord.Embed(description='There is an ongoing lottery!\nType `>lottery bet <amount>` to enter!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        embed = discord.Embed(description='Started a lottery!\nType `>lottery bet <amount>` to enter!')
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        await self.start_lottery(server)
+
+        await asyncio.sleep(self.lottery_time)
+
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        if len(players) < 3:
+            embed = discord.Embed(description='Not enough players entered the lottery! Returning money...')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            for player in players:
+                playerobj = server.get_member(player)
+                await self.bot.get_cog("Currency").user_add_currency(server, playerobj, players[player])
+            await self.stop_lottery(server)
+            return
+
+        winner_id = random.choice(list(players.keys()))
+        winner_obj = server.get_member(winner_id)
+
+        jackpot = self.lottery_jackpot(server)
+
+        embed = discord.Embed(description='{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        await self.bot.get_cog("Currency").user_add_currency(server, winner_obj, jackpot)
+
+        await self.stop_lottery(server)
+
+    @lottery.command(name='bet', pass_context=True, no_pm=True)
+    async def lottery_bet(self, ctx, amount : int):
+        """Bet in the lottery."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        lottery_status = self.config.get('lottery_status', {})
+
+        if amount < 0:
+            embed = discord.Embed(description='You cannot bet a negative amount!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if server.id not in lottery_status:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if lottery_status[server.id] == False:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if await self.bot.get_cog("Currency").user_remove_currency(server, author, amount) == False:
+            embed = discord.Embed(description='You cannot afford to bet that much!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if author.id not in players:
+            players[author.id] = amount
+        else:
+            players[author.id] += amount
+
+        lottery[server.id] = players
+        await self.config.put('lottery', lottery)
+
+        jackpot = self.lottery_jackpot(server)
+
+        embed = discord.Embed(description='You currently have {} {} in the lottery.\nThe current jackpot is {} {}!'.format(players[author.id], self.currency_name, jackpot, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Games(bot))
