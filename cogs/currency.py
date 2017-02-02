@@ -225,7 +225,6 @@ class Currency():
         """Command for adding a role to the shop."""
         server = ctx.message.server
         shop = self.config.get('shop', {})
-        server_id = server.id
         db = shop.get(server.id, {})
         db[role.id] = amount
         shop[server.id] = db
@@ -237,7 +236,6 @@ class Currency():
         """Command for removing a role from the shop."""
         server = ctx.message.server
         shop = self.config.get('shop', {})
-        server_id = server.id
         db = shop.get(server.id, {})
         if role.id in db:
             del db[role.id]
@@ -317,6 +315,103 @@ class Currency():
             return
         await self.user_add_currency(server, author, shopdb[role.id]/2)
         await self.bot.remove_roles(author, role)
+
+    @shop.command(name='removeonbuy', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def shop_rmonbuy(self, ctx, role : discord.Role):
+        """Toggle for enabling remove role on purchase for a specific role."""
+        server = ctx.message.server
+
+        shopitems = self.config.get('shop', {})
+        itemsdb = shopitems.get(server.id, {})
+
+        shop = self.config.get('shop_rmonbuy', {})
+        shop_rmonbuy_db = shop.get(server.id, [])
+
+        if role.id not in itemsdb:
+            embed = discord.Embed(description='That item is not in the shop!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if role.id in shop_rmonbuy_db:
+            shop_rmonbuy_db.remove(role.id)
+            shop[server.id] = shop_rmonbuy_db
+            await self.config.put('shop_rmonbuy', shop)
+            return
+
+        shop_rmonbuy_db.append(role.id)
+        shop[server.id] = shop_rmonbuy_db
+        await self.config.put('shop_rmonbuy', shop)
+
+    @shop.command(name='notify', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def shop_notify(self, ctx, role : discord.Role):
+        """Toggle for enabling notifications on purchase for a specific role."""
+        server = ctx.message.server
+
+        shopitems = self.config.get('shop', {})
+        itemsdb = shopitems.get(server.id, {})
+
+        shop = self.config.get('shop_notify', {})
+        shop_notify_db = shop.get(server.id, [])
+
+        if role.id not in itemsdb:
+            embed = discord.Embed(description='That item is not in the shop!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if role.id in shop_notify_db:
+            shop_notify_db.remove(role.id)
+            shop[server.id] = shop_notify_db
+            await self.config.put('shop_notify', shop)
+            return
+
+        shop_notify_db.append(role.id)
+        shop[server.id] = shop_notify_db
+        await self.config.put('shop_notify', shop)
+
+    async def create_shop_notify_channel(self, server):
+        everyone_perms = discord.PermissionOverwrite(read_messages=False)
+        my_perms = discord.PermissionOverwrite(read_messages=True)
+        everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
+        mine = discord.ChannelPermissions(target=server.owner, overwrite=my_perms)
+
+        await self.bot.create_channel(server, 'shop-notify', everyone, mine)
+        log.info('shop-notify channel created in {}.'.format(server.name))
+        return
+
+    async def on_member_update(self, before, after):
+        server = after.server
+
+        shoprmonbuy = self.config.get('shop_rmonbuy', {})
+        shopnotify = self.config.get('shop_notify', {})
+        shopitems = self.config.get('shop', {})
+
+        items_db = shopitems.get(server.id, {})
+        rmonbuy_db = shoprmonbuy.get(server.id, [])
+        notify_db = shopnotify.get(server.id, [])
+
+        shop_notify_channel = discord.utils.find(lambda c: c.name == 'shop-notify', server.channels)
+        if shop_notify_channel == None:
+            shop_notify_channel = await self.create_shop_notify_channel(server)
+
+        if before.server != after.server:
+            log.info('Before and after server are not the same.')
+
+        for role in notify_db:
+            roleobj = discord.utils.get(server.roles, id=role)
+            if roleobj in after.roles:
+                embed = discord.Embed(description='{} ({}) bought {}.'.format(after.name, after, roleobj.name))
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.send_message(shop_notify_channel, embed=embed)
+
+        for role in rmonbuy_db:
+            roleobj = discord.utils.get(server.roles, id=role)
+            if roleobj in after.roles:
+                await self.bot.remove_roles(after, roleobj)
+
 
 def setup(bot):
     bot.add_cog(Currency(bot))
