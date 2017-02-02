@@ -395,7 +395,7 @@ class Games():
 
         lottery_status = self.config.get('lottery_status', {})
 
-        if amount < self.lottery_min_amt:
+        if amount < self.lottery_min_amt and author.id not in players:
             embed = discord.Embed(description='You must bet atleast {} {} to enter the lottery!'.format(self.lottery_min_amt, self.currency_name))
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
