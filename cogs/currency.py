@@ -226,6 +226,11 @@ class Currency():
         server = ctx.message.server
         shop = self.config.get('shop', {})
         db = shop.get(server.id, {})
+
+        if len(db) >= 25:
+            log.info('There cannot be more than 25 items in the shop.')
+            return
+
         db[role.id] = amount
         shop[server.id] = db
         await self.config.put('shop', shop)
