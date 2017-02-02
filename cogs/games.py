@@ -380,7 +380,7 @@ class Games():
         random_double = random.randint(1, 100)
         if random_double == 100:
             jackpot = jackpot * 2
-            embed.description = 'The jackpot was randomly doubled!\n{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name
+            embed.description = 'The jackpot was randomly doubled!\n{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name)
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
