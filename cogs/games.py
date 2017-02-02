@@ -27,6 +27,7 @@ class Games():
         self.duel_max_currency = 30
 
         self.lottery_time = 120
+        self.lottery_min_amt = 30
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -393,6 +394,12 @@ class Games():
         players = lottery.get(server.id, {})
 
         lottery_status = self.config.get('lottery_status', {})
+
+        if amount < self.lottery_min_amt:
+            embed = discord.Embed(description='You must bet atleast {} {} to enter the lottery!'.format(self.lottery_min_amt, self.currency_name))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         if amount < 0:
             embed = discord.Embed(description='You cannot bet a negative amount!')
