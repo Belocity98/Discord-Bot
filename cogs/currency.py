@@ -81,6 +81,8 @@ class Currency():
             return False
         if user.id not in db:
             return False
+        if db[user.id] < amount:
+            return False
         db[user.id] -= amount
         if db[user.id] < 0:
             db[user.id] = 0
