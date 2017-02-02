@@ -45,6 +45,24 @@ class Misc():
         await self.bot.say(response)
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_roles=True)
+    async def maketitle(self, ctx, *, name : str):
+        """This command makes a role with no permissions that can be mentioned by anyone."""
+        server = ctx.message.server
+
+        for role in server.roles:
+            if role.name.lower() == name.lower():
+                embed = discord.Embed(description='A role with that name already exists!')
+                embed.colour = 0x1BE118 # lucio green
+                await self.bot.say(embed=embed)
+                return
+
+        permissions = discord.Permissions()
+        color = discord.Color(value=0).orange()
+
+        await self.bot.create_role(server, color=color, name=name, hoist=True, mentionable=True, permissions=permissions)
+
+    @commands.command(pass_context=True, no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.server)
     async def lying(self, ctx, user : discord.Member):
         """Keep record of a lie that someone says."""
