@@ -439,6 +439,28 @@ class Games():
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
+    @lottery.command(name='forcepayout', pass_context=True, no_pm=True)
+    @commands.has_permissions(manage_server=True)
+    async def lottery_forcepayout(self, ctx, server):
+        """Force a payout for the lottery."""
+        server = ctx.message.server
+
+        lottery = self.config.get('lottery', {})
+        players = lottery.get(server.id, {})
+
+        winner_id = random.choice(list(players.keys()))
+        winner_obj = server.get_member(winner_id)
+
+        jackpot = self.lottery_jackpot(server)
+
+        embed = discord.Embed(description='{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
+
+        await self.bot.get_cog("Currency").user_add_currency(server, winner_obj, jackpot)
+
+        await self.stop_lottery(server)
+
 
 def setup(bot):
     bot.add_cog(Games(bot))
