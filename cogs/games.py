@@ -445,6 +445,19 @@ class Games():
         """Force a payout for the lottery."""
         server = ctx.message.server
 
+        lottery_status = self.config.get('lottery_status', {})
+        if server.id not in lottery_status:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if lottery_status[server.id] == False:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
         lottery = self.config.get('lottery', {})
         players = lottery.get(server.id, {})
 
@@ -466,6 +479,19 @@ class Games():
     async def lottery_forcerefund(self, ctx):
         """Force a refund for the lottery."""
         server = ctx.message.server
+
+        lottery_status = self.config.get('lottery_status', {})
+        if server.id not in lottery_status:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
+
+        if lottery_status[server.id] == False:
+            embed = discord.Embed(description='There is no ongoing lottery!\nType `>lottery` to start a lottery!')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            return
 
         lottery = self.config.get('lottery', {})
         players = lottery.get(server.id, {})
