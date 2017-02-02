@@ -441,7 +441,7 @@ class Games():
 
     @lottery.command(name='forcepayout', pass_context=True, no_pm=True)
     @commands.has_permissions(manage_server=True)
-    async def lottery_forcepayout(self, ctx, server):
+    async def lottery_forcepayout(self, ctx):
         """Force a payout for the lottery."""
         server = ctx.message.server
 
