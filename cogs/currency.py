@@ -54,7 +54,7 @@ class Currency():
 
         if len(db) == 0:
             embed.description = 'This server has no items in the shop.'
-            
+
         embed.colour = 0x1BE118 # lucio green
         return embed
 
@@ -365,11 +365,17 @@ class Currency():
         if role.id in shop_rmonbuy_db:
             shop_rmonbuy_db.remove(role.id)
             shop[server.id] = shop_rmonbuy_db
+            embed = discord.Embed(description='{} will no longer remove on purchase.'.format(role.name))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             await self.config.put('shop_rmonbuy', shop)
             return
 
         shop_rmonbuy_db.append(role.id)
         shop[server.id] = shop_rmonbuy_db
+        embed = discord.Embed(description='{} will now remove on purchase.'.format(role.name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
         await self.config.put('shop_rmonbuy', shop)
 
     @shop.command(name='notify', pass_context=True, no_pm=True)
@@ -406,10 +412,16 @@ class Currency():
             shop_notify_db.remove(role.id)
             shop[server.id] = shop_notify_db
             await self.config.put('shop_notify', shop)
+            embed = discord.Embed(description='{} will no longer notify on purchase.'.format(role.name))
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
             return
 
         shop_notify_db.append(role.id)
         shop[server.id] = shop_notify_db
+        embed = discord.Embed(description='{} will now notify on purchase.'.format(role.name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
         await self.config.put('shop_notify', shop)
 
     async def create_shop_notify_channel(self, server):
