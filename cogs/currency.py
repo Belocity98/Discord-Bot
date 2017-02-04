@@ -6,6 +6,7 @@ import asyncio
 
 from discord.ext import commands
 from .utils import config, checks
+from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -40,12 +41,20 @@ class Currency():
 
         embed = discord.Embed(title="{}'s Shop".format(server.name))
         embed.description = 'This server has {} items in the shop.'.format(len(db))
-        for item in db:
+        sortedlist = sorted(db, key=lambda i: int(db[i]))
+        sorteddb = OrderedDict()
+
+        for item in sortedlist:
+            sorteddb[item] = db[item]
+
+        for item in sorteddb:
             roleobj = discord.utils.get(server.roles, id=item)
             itemname = roleobj.name
-            embed.add_field(name='{}'.format(itemname), value='{} {}'.format(db[item], self.currency_name))
+            embed.add_field(name='{}'.format(itemname), value='{} {}'.format(sorteddb[item], self.currency_name))
+
         if len(db) == 0:
             embed.description = 'This server has no items in the shop.'
+            
         embed.colour = 0x1BE118 # lucio green
         return embed
 
