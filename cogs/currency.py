@@ -214,7 +214,7 @@ class Currency():
         await self.user_set_currency(server, user, amount)
 
     @currency.command(name='reset', pass_context=True, no_pm=True)
-    @commands.has_permissions(manage_server=True)
+    @commands.has_permissions(administrator=True)
     async def currency_reset(self, ctx):
         """Resets all currency for a server."""
         server = ctx.message.server
