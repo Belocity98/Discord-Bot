@@ -16,7 +16,9 @@ class Mod():
         self.bot = bot
         app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
         cfgfile = os.path.join(app_path, 'mod.json')
+        cfgfile2 = os.path.join(app_path, 'banned_cache.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
+        self.tmp_banned_cache = config.Config(cfgfile2, loop=bot.loop)
 
     async def create_temporary_invite(self, channel_id):
         http = self.bot.http
@@ -274,8 +276,22 @@ class Mod():
             await self.bot.say(embed=embed)
 
     async def ban_func(self, server, user, message="No reason given.", length=10):
-        buserroles = user.roles[1:]
-        self.bot.tmp_banned_cache[user] = buserroles
+
+        bans = self.tmp_banned_cache.get('bans', {})
+        db = bans.get(server.id, {})
+        memberinfo = db.get(user.id, {})
+
+        buserroles = []
+        for role in user.roles[1:]:
+            buserroles.append(role.id)
+
+        memberinfo['roles'] = buserroles
+        memberinfo['nick'] = user.nick
+
+        db[user.id] = memberinfo
+        bans[server.id] = db
+        await self.tmp_banned_cache.put('bans', bans)
+
         invite = await self.create_temporary_invite(server.id)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
@@ -285,15 +301,7 @@ class Mod():
         embed.colour = 0x1BE118 # lucio green
 
         await self.bot.send_message(user, embed=embed)
-        #lines = []
-        #lines.append("--------------------")
-        #lines.append("**You have been banned!**")
-        #lines.append("For: {}".format(message))
-        #lines.append("Length: {} seconds.".format(str(length)))
-        #lines.append("After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
-        #lines.append("This invite will say expired when your ban time is up, but it is not expired!")
-        #lines.append("--------------------")
-        #await self.bot.send_message(user, '\n'.join(lines))
+
         await self.bot.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
         await self.bot.unban(server, user)
@@ -302,19 +310,30 @@ class Mod():
         await self.bot.say(embed=embed)
 
     async def on_member_join(self, member):
-        if member in self.bot.tmp_banned_cache:
-            await self.bot.add_roles(member, *self.bot.tmp_banned_cache[member])
-            try:
-                del self.bot.tmp_banned_cache[member]
-            except KeyError:
-                pass
+
+        bans = self.tmp_banned_cache.get('bans', {})
+        db = bans.get(member.server.id, {})
+
+        if member.id in db:
+
+            memberinfo = db.get(member.id, {})
+
+            role_objects = []
+            for role in memberinfo['roles']:
+                role_objects.append(discord.utils.get(member.server.roles, id=role))
+
+            await self.bot.add_roles(member, *role_objects)
+
+            await self.bot.change_nickname(member, memberinfo['nick'])
+
+            del db[member.id]
+            bans[member.server.id] = db
+            await self.tmp_banned_cache.put('bans', bans)
 
     async def on_message(self, message):
 
         if message.server is None:
             return
-
-
 
         banned_chat = self.config.get('banned_chat', {})
         server_id = message.server.id
