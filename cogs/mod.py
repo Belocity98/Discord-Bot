@@ -150,7 +150,7 @@ class Mod():
         server_id = ctx.message.server.id
         db = banned_chat.get(server_id, [])
 
-        if msg in db:
+        if msg.lower() in db:
             embed = discord.Embed(description='Message already banned.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
