@@ -1,8 +1,11 @@
 import discord
 import asyncio
 import logging
+import os
+import sys
 
 from discord.ext import commands
+from .utils import config
 
 log = logging.getLogger(__name__)
 
@@ -10,6 +13,71 @@ class Logging():
 
     def __init__(self, bot):
         self.bot = bot
+
+        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+        cfgfile = os.path.join(app_path, 'logging.json')
+        self.config = config.Config(cfgfile, loop=bot.loop)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(administrator=True)
+    async def enablelogging(self, ctx):
+        """Enable logging for the server."""
+        server = ctx.message.server
+
+        logging = self.config.get('logging', {})
+        db = logging.get(server.id, {})
+
+        if db == True:
+            embed = discord.Embed(description='Logging is already enabled!')
+            embed.colour = 0x1BE118
+            await self.bot.say(embed=embed)
+            return
+
+        db = True
+        embed = discord.Embed(description='Logging enabled!')
+        embed.colour = 0x1BE118
+        await self.bot.say(embed=embed)
+
+        logging[server.id] = db
+
+        await self.config.put('logging', logging)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(administrator=True)
+    async def disablelogging(self, ctx):
+        """Disable logging for the server."""
+        server = ctx.message.server
+
+        logging = self.config.get('logging', {})
+        db = logging.get(server.id, {})
+
+        if db == False:
+            embed = discord.Embed(description='Logging is already disabled!')
+            embed.colour = 0x1BE118
+            await self.bot.say(embed=embed)
+            return
+
+        db = False
+        embed = discord.Embed(description='Logging disabled!')
+        embed.colour = 0x1BE118
+        await self.bot.say(embed=embed)
+
+        logging[server.id] = db
+
+        await self.config.put('logging', logging)
+
+    def check_if_logging(self, server):
+        logging = self.config.get('logging', {})
+        db = logging.get(server.id, {})
+
+        if db == False:
+            return False
+
+        elif db == True:
+            return True
+
+        else:
+            return True
 
     async def create_logging_channel(self, server):
         everyone_perms = discord.PermissionOverwrite(read_messages=False)
@@ -23,6 +91,10 @@ class Logging():
 
     async def on_message_delete(self, message):
         server = message.server
+
+        if not self.check_if_logging(server):
+            return
+
         if server == None:
             return
 
@@ -45,6 +117,10 @@ class Logging():
 
     async def on_message_edit(self, before, after):
         server = before.server
+
+        if not self.check_if_logging(server):
+            return
+
         if server == None:
             return
 
