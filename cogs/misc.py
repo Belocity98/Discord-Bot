@@ -7,6 +7,7 @@ import logging
 from cleverbot import Cleverbot
 from discord.ext import commands
 from .utils import checks, config
+from datetime import datetime, timezone
 
 log = logging.getLogger(__name__)
 
@@ -67,17 +68,29 @@ class Misc():
     async def lying(self, ctx, user : discord.Member):
         """Keep record of a lie that someone says."""
         server = ctx.message.server
+        author = ctx.message.author
+
         lie_channel = discord.utils.find(lambda c: c.name == 'lie-channel', server.channels)
         if lie_channel == None:
             print("Lie channel not found. Returning.")
             return
-        await self.bot.say("{} is lying? What are they lying about?\nReply with their lie.".format(str(user)))
+
+        embed = discord.Embed(description="{} is lying? What are they lying about?\nReply with their lie.".format(user.name))
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
         lie = await self.bot.wait_for_message(timeout=60, author=ctx.message.author, channel=ctx.message.channel)
-        lines = ['```']
-        lines.append('{} was caught lying!'.format(str(user)))
-        lines.append('Lie: {}\n```'.format(lie.content))
-        await self.bot.send_message(lie_channel, '\n'.join(lines))
-        await self.bot.say("Lie logged!")
+
+        embed = discord.Embed(title='{} was caught lying!'.format(user.name))
+        embed.description = 'Exposed by: {}'.format(author.name)
+        embed.timestamp = datetime.utcnow()
+        embed.add_field(name='Lie', value=lie.content)
+        embed.colour = 0x1BE118 # lucio green
+
+        await self.bot.send_message(lie_channel, embed=embed)
+        
+        embed = discord.Embed(description="Lie logged!")
+        embed.colour = 0x1BE118 # lucio green
+        await self.bot.say(embed=embed)
 
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
     @commands.cooldown(1, 5.1, commands.BucketType.user)
