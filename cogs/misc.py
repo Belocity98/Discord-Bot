@@ -82,12 +82,12 @@ class Misc():
 
         embed = discord.Embed(title='{} was caught lying!'.format(user.name))
         embed.description = 'Exposed by: {}'.format(author.name)
-        embed.timestamp = datetime.utcnow()
+        embed.timestamp = ctx.message.timestamp
         embed.add_field(name='Lie', value=lie.content)
         embed.colour = 0x1BE118 # lucio green
 
         await self.bot.send_message(lie_channel, embed=embed)
-        
+
         embed = discord.Embed(description="Lie logged!")
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
