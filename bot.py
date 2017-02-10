@@ -56,8 +56,6 @@ except:
     with open(tmp_file) as fp:
         bot.config = json.load(fp)
 
-bot.tmp_banned_cache = {}
-
 @bot.event
 async def on_ready():
     await bot.change_presence(game=discord.Game(name=">help"))
