@@ -249,5 +249,37 @@ class Misc():
         await self.bot.say(embed=embed)
         log.info('{} reset all strikes in {}.'.format(ctx.message.author, server.name))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def quote(self, ctx, user : discord.Member, message_id : int=None):
+        """Quotes a user. Quotes the last message the user sent in the current channel unless an ID is specified."""
+
+        channel = ctx.message.channel
+
+        if message_id == None:
+            async for message in self.bot.logs_from(ctx.message.channel):
+                if message.author == user:
+                    quote = message
+                    break
+
+        elif message_id != None:
+            quote = await self.bot.get_message(channel, message_id)
+
+        else:
+            quote = None
+
+        if quote == None:
+            embed = discord.Embed(description='Quote not found.')
+            embed.colour = 0x1BE118 # lucio green
+            await self.bot.say(embed=embed)
+            
+            return
+
+        embed = discord.Embed(description=quote.content)
+        embed.set_author(name=quote.author.name, icon_url=quote.author.avatar_url)
+        embed.timestamp = quote.timestamp
+        embed.colour = 0x1BE118 # lucio green
+
+        await self.bot.say(embed=embed)
+
 def setup(bot):
     bot.add_cog(Misc(bot))
