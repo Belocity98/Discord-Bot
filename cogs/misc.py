@@ -255,6 +255,8 @@ class Misc():
 
         channel = ctx.message.channel
 
+        quote = None
+
         if message_id == None:
             async for message in self.bot.logs_from(ctx.message.channel):
                 if message.author == user:
@@ -264,14 +266,11 @@ class Misc():
         elif message_id != None:
             quote = await self.bot.get_message(channel, message_id)
 
-        else:
-            quote = None
-
         if quote == None:
             embed = discord.Embed(description='Quote not found.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            
+
             return
 
         embed = discord.Embed(description=quote.content)
