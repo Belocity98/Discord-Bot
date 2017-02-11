@@ -43,7 +43,7 @@ class Admin():
             try:
                 await self.bot.unban(server, ctx.message.author)
             except discord.Forbidden:
-                permissions.append('No permissions in {}.'.format(server.name))
+                permissions.append(f'No permissions in {server.name}.')
             server_invite = await self.create_temporary_invite(server.id)
             embed.add_field(name=server.name, value=server_invite)
         await self.bot.say('\n'.join(permissions), embed=embed)
@@ -74,7 +74,7 @@ class Admin():
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
-            log.info('{} reloaded.'.format(extension_name))
+            log.info(f'{extension_name} reloaded.')
         except ImportError:
             await self.bot.say("Cog not found.")
             return
@@ -85,7 +85,7 @@ class Admin():
         """Loads an extension."""
         try:
             self.bot.load_extension(extension_name)
-            log.info('{} loaded.'.format(extension_name))
+            log.info(f'{extension_name} loaded.')
         except (AttributeError, ImportError) as e:
             await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
@@ -95,11 +95,11 @@ class Admin():
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
-        log.info('{} unloaded.'.format(extension_name))
+        log.info(f'{extension_name} unloaded.')
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, name='logout')
     @checks.is_owner()
-    async def logout(self):
+    async def _logout(self):
         """Turns off the bot."""
         log.info('Bot logging off.')
         await self.bot.logout()

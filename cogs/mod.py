@@ -57,39 +57,45 @@ class Mod():
     async def tempban(self, ctx, user : discord.Member, length : int, reason=None):
         """Temp ban a user for a specified amount of time."""
         max_ban_length = int(self.bot.config["mod"]["max_ban_length"])
+        
         if length > max_ban_length:
-            embed = discord.Embed(description='You cannot ban users for more than {} seconds.'.format(max_ban_length))
+            embed = discord.Embed(description=f'You cannot ban users for more than {max_ban_length} seconds.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
+
         server = ctx.message.server
         author = ctx.message.author
-        embed = discord.Embed(title="{} has been banned.".format(str(user)))
+
+        embed = discord.Embed(title=f"{user.name} has been banned.")
         embed.colour = 0x1BE118 # lucio green
         embed.add_field(name="By", value=str(author))
         embed.add_field(name="For", value=str(length) + " seconds")
         await self.bot.say(embed=embed)
-        log.info('{} banned {} for {} seconds from {}.'.format(author, user, length, server.name))
+
+        log.info(f'{author.name} banned {user.name} for {length} seconds from {server.name}.')
         if reason == None:
             await self.ban_func(server, user, length=length)
         else:
             await self.ban_func(server, user, length=length, message=reason)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit : int):
         """Remove a specified amount of messages from the chat."""
+        channel = ctx.message.channel
+        server = ctx.message.server
+
         delete_limit = int(self.bot.config["mod"]["purge_limit"])
         if limit > delete_limit:
-            embed = discord.Embed(description="Only up to {} messages can be deleted at a time.".format(str(delete_limit)))
+            embed = discord.Embed(description=f"Only up to {delete_limit} messages can be deleted at a time.")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        channel = ctx.message.channel
-        server = ctx.message.server
+
         await self.bot.purge_from(channel, limit=limit)
         author = ctx.message.author
-        log.info('{} purged {} messages from {} in {}.'.format(author, limit, channel.name, server.name))
+        log.info(f'{author.name} purged {limit} messages from {channel.name} in {server.name}.')
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -99,15 +105,18 @@ class Mod():
         channel = ctx.message.channel
         author = ctx.message.author
         members = self.bot.get_all_members()
+
         can_move = channel.permissions_for(server.me).move_members
         if can_move:
+
             lines = []
             for member in members:
                 if member.voice_channel != None:
                     lines.append(member)
+
             for member in lines:
                 await self.bot.move_member(member, author.voice_channel)
-            log.info('{} massmoved all members to {} in {}.'.format(author, channel.name, server.name))
+            log.info(f'{author.name} massmoved all members to {channel.name} in {server.name}.')
 
     @commands.command(pass_context=True)
     @commands.has_permissions(administrator=True)
@@ -115,26 +124,32 @@ class Mod():
         """Mute or unmute all voice connected members of the channel or server."""
         server = ctx.message.server
         members = self.bot.get_all_members()
+
         lines = []
         if destination == "channel":
             for member in members:
                 if member.voice_channel == ctx.message.author.voice_channel:
                     lines.append(member)
+
         elif destination == "server":
             for member in members:
                 if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
                     lines.append(member)
+
         else:
             embed = discord.Embed(description="Destination not recognized. Expected channel/server.")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
+
         if voicestate == "mute":
             for member in lines:
                 await self.bot.server_voice_state(member, mute=True)
+
         elif voicestate == "unmute":
             for member in lines:
                 await self.bot.server_voice_state(member, mute=False)
+
         else:
             embed = discord.Embed(description="Voicestate not recognized. Expected mute/unmute.")
             embed.colour = 0x1BE118 # lucio green
@@ -159,6 +174,7 @@ class Mod():
         db.append(msg.lower())
         banned_chat[server_id] = db
         await self.config.put('banned_chat', banned_chat)
+
         embed = discord.Embed(description='Message banned.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -191,6 +207,7 @@ class Mod():
         db.remove(msg.lower())
         banned_chat[server_id] = db
         await self.config.put('banned_chat', banned_chat)
+
         embed = discord.Embed(description='Message unbanned.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
@@ -208,11 +225,14 @@ class Mod():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
+
         embed.title = 'Banned Messages'
         msgnumber = 1
+
         for item in db:
-            embed.add_field(name='Message {}'.format(msgnumber), value=item)
+            embed.add_field(name=f'Message {msgnumber}', value=item)
             msgnumber += 1
+
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
@@ -295,8 +315,8 @@ class Mod():
         invite = await self.create_temporary_invite(server.id)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
-        embed.add_field(name='Length', value='{} seconds'.format(str(length)))
-        embed.add_field(name='Invite', value="After your ban time is over, click this link to rejoin the server.\nInvite: {}".format(invite))
+        embed.add_field(name='Length', value=f'{length} seconds')
+        embed.add_field(name='Invite', value=f"After your ban time is over, click this link to rejoin the server.\nInvite: {invite}")
         embed.set_footer(text='Banned', icon_url='http://i.imgur.com/wBkQqOp.png')
         embed.colour = 0x1BE118 # lucio green
 
@@ -305,7 +325,7 @@ class Mod():
         await self.bot.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
         await self.bot.unban(server, user)
-        embed = discord.Embed(description="{} has been unbanned.".format(str(user)))
+        embed = discord.Embed(description=f"{user.name} has been unbanned.")
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 

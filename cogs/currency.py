@@ -25,12 +25,12 @@ class Currency():
         currency = self.config.get('currency', {})
         server_id = server.id
         db = currency.get(server_id, {})
-        embed = discord.Embed(title="{}'s Bank Account".format(user.name))
-        embed.description = 'Server: {}'.format(server.name)
+        embed = discord.Embed(title=f"{user.name}'s Bank Account")
+        embed.description = f'Server: {server.name}'
         if user.id not in db:
-            embed.add_field(name=self.currency_name, value='0 {}'.format(self.currency_icon), inline=False)
+            embed.add_field(name=self.currency_name, value=f'0 {self.currency_icon}', inline=False)
         else:
-            embed.add_field(name=self.currency_name, value='{} {}'.format(db[user.id], self.currency_icon), inline=False)
+            embed.add_field(name=self.currency_name, value=f'{db[user.id]} {self.currency_icon}', inline=False)
         embed.colour = 0x1BE118 # lucio green
         return embed
 
@@ -39,7 +39,7 @@ class Currency():
         server_id = server.id
         db = shop.get(server_id, {})
 
-        embed = discord.Embed(title="{}'s Shop".format(server.name))
+        embed = discord.Embed(title=f"{server.name}'s Shop")
         embed.description = 'This server has {} items in the shop.'.format(len(db))
         sortedlist = sorted(db, key=lambda i: int(db[i]))
         sorteddb = OrderedDict()
@@ -50,7 +50,7 @@ class Currency():
         for item in sorteddb:
             roleobj = discord.utils.get(server.roles, id=item)
             itemname = roleobj.name
-            embed.add_field(name='{}'.format(itemname), value='{} {}'.format(sorteddb[item], self.currency_name))
+            embed.add_field(name=f'{itemname}', value=f'{sorteddb[item]} {self.currency_name}')
 
         if len(db) == 0:
             embed.description = 'This server has no items in the shop.'
@@ -143,7 +143,7 @@ class Currency():
             return
         richest_person = server.get_member(max(currencydb, key=currencydb.get))
         richest_person_amt = currencydb[richest_person.id]
-        embed = discord.Embed(description='The richest person on this server is {}, with {} {}.'.format(richest_person.name, richest_person_amt, self.currency_name))
+        embed = discord.Embed(description=f'The richest person on this server is {richest_person.name}, with {richest_person_amt} {self.currency_name}.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
@@ -158,7 +158,7 @@ class Currency():
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
-        embed = discord.Embed(description='{} sent you {} {}!'.format(user.name, amount, self.currency_name))
+        embed = discord.Embed(description=f'{user.name} sent you {amount} {self.currency_name}!')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.send_message(user2, embed=embed)
 
@@ -178,7 +178,7 @@ class Currency():
 
         for key in currencydb:
             total_currency += currencydb[key]
-        embed = discord.Embed(description='The total amount of money on this server is: {} {}.'.format(total_currency, self.currency_name))
+        embed = discord.Embed(description=f'The total amount of money on this server is: {total_currency} {self.currency_name}.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
@@ -346,11 +346,11 @@ class Currency():
 
         if role == None:
             embed = discord.Embed(title='Roles with remove on buy enabled')
-            embed.description = 'There are {} roles with remove on buy enabled in this server.'.format(len(shop_rmonbuy_db))
+            embed.description = f'There are {len(shop_rmonbuy_db)} roles with remove on buy enabled in this server.'
             role_number = 1
             for role in shop_rmonbuy_db:
                 roleobj = discord.utils.get(server.roles, id=role)
-                embed.add_field(name='Role {}'.format(role_number), value='{}'.format(roleobj.name))
+                embed.add_field(name=f'Role {role_number}', value=f'{roleobj.name}')
                 role_number += 1
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
@@ -365,7 +365,7 @@ class Currency():
         if role.id in shop_rmonbuy_db:
             shop_rmonbuy_db.remove(role.id)
             shop[server.id] = shop_rmonbuy_db
-            embed = discord.Embed(description='{} will no longer remove on purchase.'.format(role.name))
+            embed = discord.Embed(description=f'{role.name} will no longer remove on purchase.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.config.put('shop_rmonbuy', shop)
@@ -373,7 +373,7 @@ class Currency():
 
         shop_rmonbuy_db.append(role.id)
         shop[server.id] = shop_rmonbuy_db
-        embed = discord.Embed(description='{} will now remove on purchase.'.format(role.name))
+        embed = discord.Embed(description=f'{role.name} will now remove on purchase.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
         await self.config.put('shop_rmonbuy', shop)
@@ -396,7 +396,7 @@ class Currency():
             role_number = 1
             for role in shop_notify_db:
                 roleobj = discord.utils.get(server.roles, id=role)
-                embed.add_field(name='Role {}'.format(role_number), value='{}'.format(roleobj.name))
+                embed.add_field(name=f'Role {role_number}', value=f'{roleobj.name}')
                 role_number += 1
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
@@ -412,14 +412,14 @@ class Currency():
             shop_notify_db.remove(role.id)
             shop[server.id] = shop_notify_db
             await self.config.put('shop_notify', shop)
-            embed = discord.Embed(description='{} will no longer notify on purchase.'.format(role.name))
+            embed = discord.Embed(description=f'{role.name} will no longer notify on purchase.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
 
         shop_notify_db.append(role.id)
         shop[server.id] = shop_notify_db
-        embed = discord.Embed(description='{} will now notify on purchase.'.format(role.name))
+        embed = discord.Embed(description=f'{role.name} will now notify on purchase.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
         await self.config.put('shop_notify', shop)
@@ -431,7 +431,7 @@ class Currency():
         mine = discord.ChannelPermissions(target=server.owner, overwrite=my_perms)
 
         await self.bot.create_channel(server, 'shop-notify', everyone, mine)
-        log.info('shop-notify channel created in {}.'.format(server.name))
+        log.info(f'shop-notify channel created in {server.name}.')
         return
 
     async def on_member_update(self, before, after):
@@ -455,7 +455,7 @@ class Currency():
         for role in notify_db:
             roleobj = discord.utils.get(server.roles, id=role)
             if roleobj in after.roles:
-                embed = discord.Embed(description='{} ({}) bought {}.'.format(after.name, after, roleobj.name))
+                embed = discord.Embed(description=f'{after.name} ({after}) bought {roleobj.name} in {after.server.name}.')
                 embed.colour = 0x1BE118 # lucio green
                 await self.bot.send_message(shop_notify_channel, embed=embed)
 

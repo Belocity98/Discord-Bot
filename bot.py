@@ -81,7 +81,7 @@ if __name__ == "__main__":
             bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
-            print('Failed to load extension {}\n{}'.format(extension, exc))
+            print(f'Failed to load extension {extension}\n{exc}')
 
     if "discord bot token" in bot.config["token"]:
         print("Bot token not found. Not running.")

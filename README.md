@@ -8,10 +8,10 @@ I add whatever features I please. Make an issue or PR if you want to recommend a
 Commands can also be viewed in Discord by typing `>help`.
 
 **Installation:**
-- Download and install Python 3.5.2 or up.
+- Download and install Python 3.6 or up.
 - `pip3 install -r requirements.txt`
 - Rename `example_config.json` to `config.json` and modify for personal use.
-- Once the above steps are completed, run the bot with `python3 bot.py`
+- Once the above steps are completed, run the bot with `python bot.py`
 
 **Configuration:**
 

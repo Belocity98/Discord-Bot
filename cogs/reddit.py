@@ -37,7 +37,7 @@ class Reddit():
             tmp = len(subs) - amount
             del subs[-tmp:]
             await self.bot.say("\n".join(subs))
-            await self.bot.say("```\nFound {} submissions, printing {}.\n```".format(newsubs, amount))
+            await self.bot.say(f"```\nFound {newsubs} submissions, printing {amount}.\n```")
         else:
             await self.bot.say("Time not recognized. Expected all/year/day/hour.")
 

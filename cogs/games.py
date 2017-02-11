@@ -38,11 +38,11 @@ class Games():
         pot_winning = random.randint(1, self.roulette_max_currency)
         randnumber = random.randrange(6)
         if randnumber == 5:
-            await self.bot.say("{} found a bullet.".format(str(author)))
+            await self.bot.say(f'{author.name} found a bullet.')
             await self.bot.get_cog("Mod").ban_func(server, author, message="Finding a bullet.", length=15)
 
         else:
-            await self.bot.say("{}'s revolver didn't fire.".format(str(author)))
+            await self.bot.say(f"{author.name}'s revolver didn't fire.")
             await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
 
     @commands.command(pass_context=True, no_pm=True)
@@ -63,7 +63,7 @@ class Games():
             return
 
         if (number > roll_chance) or (number < 1):
-            embed = discord.Embed(description='The number entered was not between 1 and {}.'.format(roll_chance))
+            embed = discord.Embed(description=f'The number entered was not between 1 and {roll_chance}.')
             embed.colour = 0x1BE118
             await self.bot.say(embed=embed)
             return
@@ -72,12 +72,12 @@ class Games():
         author = ctx.message.author
         randnumber = random.randint(1, roll_chance)
         if not number == randnumber:
-            embed = discord.Embed(description='{} entered the wrong number! The correct number was {}.'.format(author, randnumber))
+            embed = discord.Embed(description=f'{author.name} entered the wrong number! The correct number was {randnumber}.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
-            await self.bot.get_cog("Mod").ban_func(server, author, message="Number did not match random number. The bot chose {}.".format(randnumber), length=banlength)
+            await self.bot.get_cog("Mod").ban_func(server, author, message=f"Number did not match random number. The bot chose {randnumber}.", length=banlength)
         else:
-            embed = discord.Embed(description='{} entered the correct number!'.format(author))
+            embed = discord.Embed(description=f'{author.name} entered the correct number!')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
@@ -93,12 +93,12 @@ class Games():
         randnumber = random.randint(1, 2)
 
         if randnumber == 1:
-            embed = discord.Embed(description='{} flipped poorly.'.format(author))
+            embed = discord.Embed(description=f'{author.name} flipped poorly.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Mod").ban_func(server, author, message="Flipped poorly.", length=banlength)
         else:
-            embed = discord.Embed(description='{} flipped correctly.'.format(author))
+            embed = discord.Embed(description=f'{author.name} flipped correctly.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Currency").user_add_currency(server, author, pot_winning)
@@ -178,12 +178,12 @@ class Games():
         current_duels[server_id] = db
         await self.config.put('current_duels', current_duels)
 
-        embed = discord.Embed(description="{}, do you accept {}'s duel challenge? (yes/no)".format(being_attacked, challenger))
+        embed = discord.Embed(description=f"{being_attacked.name}, do you accept {challenger.name}'s duel challenge? (yes/no)")
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
         msg = await self.bot.wait_for_message(timeout=45, author=being_attacked)
         if msg == None:
-            embed = discord.Embed(description="{} didn't respond to the duel challenge.".format(being_attacked))
+            embed = discord.Embed(description=f"{being_attacked.name} didn't respond to the duel challenge.")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             current_duels = self.config.get('current_duels', {})
@@ -195,7 +195,7 @@ class Games():
             return
 
         if not self.duel_check(msg):
-            embed = discord.Embed(description='{} did not accept the duel challenge.'.format(being_attacked))
+            embed = discord.Embed(description=f'{being_attacked.name} did not accept the duel challenge.')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             current_duels = self.config.get('current_duels', {})
@@ -206,13 +206,13 @@ class Games():
             await self.config.put('current_duels', current_duels)
             return
 
-        embed = discord.Embed(description='{} accepted the duel challenge!\n{}, pick a number between 1 and {}.'.format(being_attacked, challenger, duelchance))
+        embed = discord.Embed(description=f'{being_attacked.name} accepted the duel challenge!\n{challenger.name}, pick a number between 1 and {duelchance}.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
         challenger_number = await self.bot.wait_for_message(timeout=45, author=challenger, check=self.duel_check_valid_int)
         if challenger_number == None:
-            embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(challenger))
+            embed = discord.Embed(description=f"{challenger.name} didn't choose a number. Ending duel.")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             current_duels = self.config.get('current_duels', {})
@@ -223,7 +223,7 @@ class Games():
             await self.config.put('current_duels', current_duels)
             return
 
-        embed = discord.Embed(description='{}, pick a number between 1 and {}.'.format(being_attacked, duelchance))
+        embed = discord.Embed(description=f'{being_attacked.name}, pick a number between 1 and {duelchance}.')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
@@ -238,7 +238,7 @@ class Games():
                 break
 
         if being_attacked_number == None:
-            embed = discord.Embed(description="{} didn't choose a number. Ending duel.".format(being_attacked))
+            embed = discord.Embed(description=f"{being_attacked.name} didn't choose a number. Ending duel.")
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             current_duels = self.config.get('current_duels', {})
@@ -261,32 +261,32 @@ class Games():
         await self.config.put('current_duels', current_duels)
 
         if challenger_distance < being_attacked_distance:
-            embed = discord.Embed(title='{} won!'.format(challenger))
-            embed.description = 'The random number was {}.'.format(randnumber)
-            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
-            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
+            embed = discord.Embed(title=f'{challenger.name} won!')
+            embed.description = f'The random number was {randnumber}.'
+            embed.add_field(name=f"{challenger.name}'s Distance", value=challenger_distance)
+            embed.add_field(name=f"{being_attacked.name}'s Distance", value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Currency").user_add_currency(server, challenger, pot_winning)
-            await self.bot.get_cog("Mod").ban_func(server, being_attacked, message="Lost a duel to {}.".format(challenger), length=banlength)
+            await self.bot.get_cog("Mod").ban_func(server, being_attacked, message=f"Lost a duel to {challenger.name}.", length=banlength)
             return
         elif challenger_distance == being_attacked_distance:
             embed = discord.Embed(title='There was a draw.')
-            embed.description = 'The random number was {}.'.format(randnumber)
-            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
-            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
+            embed.description = f'The random number was {randnumber}.'
+            embed.add_field(name=f"{challenger.name}'s Distance", value=challenger_distance)
+            embed.add_field(name=f"{being_attacked.name}'s Distance", value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
         else:
-            embed = discord.Embed(title='{} won!'.format(being_attacked))
-            embed.description = 'The random number was {}.'.format(randnumber)
-            embed.add_field(name="{}'s Distance".format(challenger), value=challenger_distance)
-            embed.add_field(name="{}'s Distance".format(being_attacked), value=being_attacked_distance, inline=False)
+            embed = discord.Embed(title=f'{being_attacked.name} won!')
+            embed.description = f'The random number was {randnumber}.'
+            embed.add_field(name=f"{challenger.name}'s Distance", value=challenger_distance)
+            embed.add_field(name=f"{being_attacked.name}'s Distance", value=being_attacked_distance, inline=False)
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             await self.bot.get_cog("Currency").user_add_currency(server, being_attacked, pot_winning)
-            await self.bot.get_cog("Mod").ban_func(server, challenger, message="Lost a duel to {}.".format(being_attacked), length=banlength)
+            await self.bot.get_cog("Mod").ban_func(server, challenger, message=f"Lost a duel to {being_attacked.name}.", length=banlength)
             return
     @duel.command(name='resetstatus', pass_context=True)
     async def duel_resetstatus(self, ctx):
@@ -304,7 +304,7 @@ class Games():
         lottery_status = self.config.get('lottery_status', {})
 
         lottery_status[server.id] = True
-        log.info('Lottery started in {}.'.format(server.name))
+        log.info(f'Lottery started in {server.name}.')
         await self.config.put('lottery_status', lottery_status)
         return
 
@@ -317,7 +317,7 @@ class Games():
         players = {}
         lottery[server.id] = players
         lottery_status[server.id] = False
-        log.info('Lottery stopped in {}.'.format(server.name))
+        log.info(f'Lottery stopped in {server.name}.')
         await self.config.put('lottery_status', lottery_status)
         await self.config.put('lottery', lottery)
         return
@@ -376,11 +376,11 @@ class Games():
 
         jackpot = self.lottery_jackpot(server)
 
-        embed = discord.Embed(description='{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name))
+        embed = discord.Embed(description=f'{winner_obj.name} won the total jackpot of {jackpot} {self.currency_name}!')
         random_double = random.randint(1, 100)
         if random_double == 100:
             jackpot = jackpot * 2
-            embed.description = 'The jackpot was randomly doubled!\n{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name)
+            embed.description = f'The jackpot was randomly doubled!\n{winner_obj.name} won the total jackpot of {jackpot} {self.currency_name}!'
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 
@@ -400,7 +400,7 @@ class Games():
         lottery_status = self.config.get('lottery_status', {})
 
         if amount < self.lottery_min_amt and author.id not in players:
-            embed = discord.Embed(description='You must bet atleast {} {} to enter the lottery!'.format(self.lottery_min_amt, self.currency_name))
+            embed = discord.Embed(description=f'You must bet atleast {self.lottery_min_amt} {self.currency_name} to enter the lottery!')
             embed.colour = 0x1BE118 # lucio green
             await self.bot.say(embed=embed)
             return
@@ -470,7 +470,7 @@ class Games():
 
         jackpot = self.lottery_jackpot(server)
 
-        embed = discord.Embed(description='{} won the total jackpot of {} {}!'.format(winner_obj.name, jackpot, self.currency_name))
+        embed = discord.Embed(description=f'{winner_obj.name} won the total jackpot of {jackpot} {self.currency_name}!')
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
 

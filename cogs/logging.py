@@ -86,7 +86,7 @@ class Logging():
         mine = discord.ChannelPermissions(target=server.owner, overwrite=my_perms)
 
         await self.bot.create_channel(server, 'bot-logging', everyone, mine)
-        log.info('bot-logging channel created in {}.'.format(server.name))
+        log.info(f'bot-logging channel created in {server.name}.')
         return
 
     async def on_message_delete(self, message):
