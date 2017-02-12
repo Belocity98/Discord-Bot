@@ -70,14 +70,11 @@ class Logging():
         logging = self.config.get('logging', {})
         db = logging.get(server.id, {})
 
-        if db == False:
-            return False
-
-        elif db == True:
+        if db == True:
             return True
-
+            
         else:
-            return True
+            return False
 
     async def create_logging_channel(self, server):
         everyone_perms = discord.PermissionOverwrite(read_messages=False)
