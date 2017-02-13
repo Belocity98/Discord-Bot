@@ -450,7 +450,8 @@ class Currency():
         can_make_c = channel.permissions_for(server.me).manage_channels
         shop_notify_channel = discord.utils.find(lambda c: c.name == 'shop-notify', server.channels)
         if shop_notify_channel == None and can_make_c:
-            shop_notify_channel = await self.create_shop_notify_channel(server)
+            if not notify_db:
+                shop_notify_channel = await self.create_shop_notify_channel(server)
 
         if before.server != after.server:
             log.info('Before and after server are not the same.')
