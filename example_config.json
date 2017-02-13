@@ -21,11 +21,6 @@
         "ban_length" : "10"
     },
 
-    "cgg" : {
-        "token" : "cgg token here",
-        "url" : "http://api.champion.gg/"
-    },
-
     "reddit" : {
         "secret" : "secret here",
         "password" : "password here",
