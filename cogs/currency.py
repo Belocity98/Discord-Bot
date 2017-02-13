@@ -436,6 +436,7 @@ class Currency():
 
     async def on_member_update(self, before, after):
         server = after.server
+        channel = after.channel
 
         shoprmonbuy = self.config.get('shop_rmonbuy', {})
         shopnotify = self.config.get('shop_notify', {})

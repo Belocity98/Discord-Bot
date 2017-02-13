@@ -66,7 +66,7 @@ class Logging():
 
         await self.config.put('logging', logging)
 
-    def check_if_logging(self, server):
+    def check_if_logging(self, server, channel):
 
         can_make_c = channel.permissions_for(server.me).manage_channels
         if not can_make_c:
@@ -93,8 +93,9 @@ class Logging():
 
     async def on_message_delete(self, message):
         server = message.server
+        channel = message.channel
 
-        if not self.check_if_logging(server):
+        if not self.check_if_logging(server, channel):
             return
 
         if server == None:
@@ -119,8 +120,9 @@ class Logging():
 
     async def on_message_edit(self, before, after):
         server = before.server
+        channel = after.channel
 
-        if not self.check_if_logging(server):
+        if not self.check_if_logging(server, channel):
             return
 
         if server == None:
