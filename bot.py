@@ -51,6 +51,7 @@ prefixes = config.Config(main_config)
 def get_prefix(bot, message):
     server_prefixes = prefixes.get('prefixes', {})
     if message.server.id not in server_prefixes:
+        return '>'
     else:
         return server_prefixes[message.server.id]
 
