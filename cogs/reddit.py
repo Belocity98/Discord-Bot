@@ -18,7 +18,8 @@ class Reddit():
     @commands.command(pass_context=True)
     @commands.cooldown(1, 15, commands.BucketType.server)
     async def fetchtop(self, ctx, subreddit : str, time : str, amount : int):
-        """Fetch top Reddit posts of a subreddit."""
+        """Fetch top Reddit posts of a subreddit.
+        Valid times: hour, day, year, all"""
         times = ["hour", "day", "year", "all"]
         if time in times:
             subs = []
