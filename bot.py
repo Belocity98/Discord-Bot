@@ -7,6 +7,7 @@ import asyncio
 import logging
 
 from discord.ext import commands
+from cogs.utils import config
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -43,7 +44,18 @@ startup_extensions = [
     "cogs.currency"
 ]
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('>'), description=description, pm_help=True)
+app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+main_config = os.path.join(app_path, 'prefixes.json')
+prefixes = config.Config(main_config)
+
+def get_prefix(bot, message):
+    server_prefixes = prefixes.get('prefixes', {})
+    if message.server.id not in server_prefixes:
+    else:
+        return server_prefixes[message.server.id]
+
+bot = commands.Bot(command_prefix=get_prefix, description=description, pm_help=True)
+bot.prefixes = prefixes
 
 try:
     app_path = os.path.dirname(os.path.abspath(sys.argv[0]))

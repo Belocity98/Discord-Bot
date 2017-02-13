@@ -20,6 +20,8 @@ class Mod():
         self.config = config.Config(cfgfile, loop=bot.loop)
         self.tmp_banned_cache = config.Config(cfgfile2, loop=bot.loop)
 
+        self.prefixes = bot.prefixes
+
     async def create_temporary_invite(self, channel_id):
         http = self.bot.http
         url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
@@ -57,7 +59,7 @@ class Mod():
     async def tempban(self, ctx, user : discord.Member, length : int, reason=None):
         """Temp ban a user for a specified amount of time."""
         max_ban_length = int(self.bot.config["mod"]["max_ban_length"])
-        
+
         if length > max_ban_length:
             embed = discord.Embed(description=f'You cannot ban users for more than {max_ban_length} seconds.')
             embed.colour = 0x1BE118 # lucio green
@@ -235,6 +237,17 @@ class Mod():
 
         embed.colour = 0x1BE118 # lucio green
         await self.bot.say(embed=embed)
+
+    @commands.command(no_pm=True, pass_context=True)
+    @commands.has_permissions(administrator=True)
+    async def setprefix(self, ctx, *, prefix : str):
+        """Sets the prefix for the bot on the current server."""
+
+        server_prefixes = self.prefixes.get('prefixes', {})
+
+        server_prefixes[ctx.message.server.id] = prefix
+
+        await self.prefixes.put('prefixes', server_prefixes)
 
     @commands.command(no_pm=True, pass_context=True)
     @checks.is_owner()
