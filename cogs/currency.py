@@ -445,8 +445,10 @@ class Currency():
         rmonbuy_db = shoprmonbuy.get(server.id, [])
         notify_db = shopnotify.get(server.id, [])
 
+
+        can_make_c = channel.permissions_for(server.me).manage_channels
         shop_notify_channel = discord.utils.find(lambda c: c.name == 'shop-notify', server.channels)
-        if shop_notify_channel == None:
+        if shop_notify_channel == None and can_make_c:
             shop_notify_channel = await self.create_shop_notify_channel(server)
 
         if before.server != after.server:

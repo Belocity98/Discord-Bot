@@ -67,12 +67,17 @@ class Logging():
         await self.config.put('logging', logging)
 
     def check_if_logging(self, server):
+
+        can_make_c = channel.permissions_for(server.me).manage_channels
+        if not can_make_c:
+            return
+
         logging = self.config.get('logging', {})
         db = logging.get(server.id, {})
 
         if db == True:
             return True
-            
+
         else:
             return False
 
