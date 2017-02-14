@@ -45,8 +45,12 @@ class Admin():
                 await self.bot.unban(server, ctx.message.author)
             except discord.Forbidden:
                 permissions.append(f'No permissions in {server.name}.')
-            server_invite = await self.create_temporary_invite(server.id)
-            embed.add_field(name=server.name, value=server_invite)
+            try:
+                server_invite = await self.create_temporary_invite(server.id)
+                embed.add_field(name=server.name, value=server_invite)
+            except discord.Forbidden:
+                permissions.append(f'Cannot create invite in {server.name}.')
+                
         await self.bot.say('\n'.join(permissions), embed=embed)
 
     @commands.command(hidden=True, pass_context=True)
