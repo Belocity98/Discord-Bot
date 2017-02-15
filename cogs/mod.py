@@ -35,9 +35,9 @@ class Mod():
         data = await http.post(url, json=payload, bucket='create_invite')
         return 'http://discord.gg/' + data['code']
 
-    def is_plonked(self, server, member):
-        db = self.config.get('plonks', {}).get(server.id, [])
-        bypass_ignore = member.server_permissions.manage_server
+    def is_plonked(self, guild, member):
+        db = self.config.get('plonks', {}).get(guild.id, [])
+        bypass_ignore = member.guild_permissions.manage_guild
         if not bypass_ignore and member.id in db:
             return True
         return False
@@ -48,13 +48,13 @@ class Mod():
         if checks.is_owner_check(ctx):
             return True
 
-        if msg.server:
-            if self.is_plonked(msg.server, msg.author):
+        if msg.guild:
+            if self.is_plonked(msg.guild, msg.author):
                 return False
 
         return True
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.has_permissions(ban_members=True)
     async def tempban(self, ctx, user : discord.Member, length : int, reason=None):
         """Temp ban a user for a specified amount of time."""
@@ -63,52 +63,52 @@ class Mod():
         if length > max_ban_length:
             embed = discord.Embed(description=f'You cannot ban users for more than {max_ban_length} seconds.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
-        server = ctx.message.server
-        author = ctx.message.author
+        guild = ctx.guild
+        author = ctx.author
 
         embed = discord.Embed(title=f"{user.name} has been banned.")
         embed.colour = 0x1BE118 # lucio green
         embed.add_field(name="By", value=str(author))
         embed.add_field(name="For", value=str(length) + " seconds")
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-        log.info(f'{author.name} banned {user.name} for {length} seconds from {server.name}.')
+        log.info(f'{author.name} banned {user.name} for {length} seconds from {guild.name}.')
         if reason == None:
-            await self.ban_func(server, user, length=length)
+            await self.ban_func(guild, user, length=length)
         else:
-            await self.ban_func(server, user, length=length, message=reason)
+            await self.ban_func(guild, user, length=length, message=reason)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit : int):
         """Remove a specified amount of messages from the chat."""
-        channel = ctx.message.channel
-        server = ctx.message.server
+        channel = ctx.channel
+        guild = ctx.guild
 
         delete_limit = int(self.bot.config["mod"]["purge_limit"])
         if limit > delete_limit:
             embed = discord.Embed(description=f"Only up to {delete_limit} messages can be deleted at a time.")
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         await self.bot.purge_from(channel, limit=limit)
-        author = ctx.message.author
-        log.info(f'{author.name} purged {limit} messages from {channel.name} in {server.name}.')
+        author = ctx.author
+        log.info(f'{author.name} purged {limit} messages from {channel.name} in {guild.name}.')
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def massmove(self, ctx):
         """Move all voice connected users to the author's channel."""
-        server = ctx.message.server
-        channel = ctx.message.channel
-        author = ctx.message.author
+        guild = ctx.guild
+        channel = ctx.channel
+        author = ctx.author
         members = self.bot.get_all_members()
 
-        can_move = channel.permissions_for(server.me).move_members
+        can_move = channel.permissions_for(guild.me).move_members
         if can_move:
 
             lines = []
@@ -118,114 +118,114 @@ class Mod():
 
             for member in lines:
                 await self.bot.move_member(member, author.voice_channel)
-            log.info(f'{author.name} massmoved all members to {channel.name} in {server.name}.')
+            log.info(f'{author.name} massmoved all members to {channel.name} in {guild.name}.')
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def voicestate(self, ctx, destination : str, voicestate : str):
-        """Mute or unmute all voice connected members of the channel or server."""
-        server = ctx.message.server
+        """Mute or unmute all voice connected members of the channel or guild."""
+        guild = ctx.guild
         members = self.bot.get_all_members()
 
         lines = []
         if destination == "channel":
             for member in members:
-                if member.voice_channel == ctx.message.author.voice_channel:
+                if member.voice_channel == ctx.author.voice_channel:
                     lines.append(member)
 
-        elif destination == "server":
+        elif destination == "guild":
             for member in members:
-                if (member.voice_channel != None) and (member.voice_channel != ctx.message.server.afk_channel ):
+                if (member.voice_channel != None) and (member.voice_channel != ctx.guild.afk_channel ):
                     lines.append(member)
 
         else:
-            embed = discord.Embed(description="Destination not recognized. Expected channel/server.")
+            embed = discord.Embed(description="Destination not recognized. Expected channel/guild.")
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         if voicestate == "mute":
             for member in lines:
-                await self.bot.server_voice_state(member, mute=True)
+                await self.bot.guild_voice_state(member, mute=True)
 
         elif voicestate == "unmute":
             for member in lines:
-                await self.bot.server_voice_state(member, mute=False)
+                await self.bot.guild_voice_state(member, mute=False)
 
         else:
             embed = discord.Embed(description="Voicestate not recognized. Expected mute/unmute.")
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(manage_messages=True)
     async def banchat(self, ctx, *, msg : str):
-        """Ban a word or phrase from being entered into the current server."""
+        """Ban a word or phrase from being entered into the current guild."""
 
         banned_chat = self.config.get('banned_chat', {})
-        server_id = ctx.message.server.id
-        db = banned_chat.get(server_id, [])
+        guild_id = ctx.guild.id
+        db = banned_chat.get(guild_id, [])
 
         if msg.lower() in db:
             embed = discord.Embed(description='Message already banned.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         db.append(msg.lower())
-        banned_chat[server_id] = db
+        banned_chat[guild_id] = db
         await self.config.put('banned_chat', banned_chat)
 
         embed = discord.Embed(description='Message banned.')
         embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(manage_messages=True)
     async def unbanchat(self, ctx, *, msg : str):
-        """Unban a word or phrase from being entered into the current server."""
+        """Unban a word or phrase from being entered into the current guild."""
 
         banned_chat = self.config.get('banned_chat', {})
-        server_id = ctx.message.server.id
-        db = banned_chat.get(server_id, [])
+        guild_id = ctx.guild.id
+        db = banned_chat.get(guild_id, [])
 
         if msg == 'all':
             db = []
-            banned_chat[server_id] = db
+            banned_chat[guild_id] = db
             await self.config.put('banned_chat', banned_chat)
 
             embed = discord.Embed(description='Unbanned all messages.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         if msg not in db:
             embed = discord.Embed(description='Message not found in banned messages list.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         db.remove(msg.lower())
-        banned_chat[server_id] = db
+        banned_chat[guild_id] = db
         await self.config.put('banned_chat', banned_chat)
 
         embed = discord.Embed(description='Message unbanned.')
         embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     async def bannedchat(self, ctx):
-        """View list of banned messages on the current server."""
+        """View list of banned messages on the current guild."""
 
         banned_chat = self.config.get('banned_chat', {})
-        server_id = ctx.message.server.id
-        db = banned_chat.get(server_id, [])
+        guild_id = ctx.guild.id
+        db = banned_chat.get(guild_id, [])
 
-        embed = discord.Embed(description='This server currently has {} banned messages.'.format(len(db)))
+        embed = discord.Embed(description='This guild currently has {} banned messages.'.format(len(db)))
         if len(db) > 25:
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         embed.title = 'Banned Messages'
@@ -236,82 +236,82 @@ class Mod():
             msgnumber += 1
 
         embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(administrator=True)
     async def setprefix(self, ctx, *, prefix : str):
-        """Sets the prefix for the bot on the current server."""
+        """Sets the prefix for the bot on the current guild."""
 
-        server_prefixes = self.prefixes.get('prefixes', {})
+        guild_prefixes = self.prefixes.get('prefixes', {})
 
-        server_prefixes[ctx.message.server.id] = prefix
+        guild_prefixes[ctx.guild.id] = prefix
 
-        await self.prefixes.put('prefixes', server_prefixes)
+        await self.prefixes.put('prefixes', guild_prefixes)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @checks.is_owner()
     async def plonk(self, ctx, *, member: discord.Member):
-        """Bans a user from using the bot in a server."""
+        """Bans a user from using the bot in a guild."""
 
         plonks = self.config.get('plonks', {})
-        guild_id = ctx.message.server.id
+        guild_id = ctx.guild.id
         db = plonks.get(guild_id, [])
 
         if member.id in db:
-            embed = discord.Embed(description='That user is already bot banned in this server.')
+            embed = discord.Embed(description='That user is already bot banned in this guild.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         db.append(member.id)
         plonks[guild_id] = db
         await self.config.put('plonks', plonks)
-        embed = discord.Embed(description='%s has been banned from using the bot in this server.' % member)
+        embed = discord.Embed(description='%s has been banned from using the bot in this guild.' % member)
         embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @checks.is_owner()
     async def unplonk(self, ctx, *, member: discord.Member):
         """Unbans a user from using the bot."""
 
         plonks = self.config.get('plonks', {})
-        guild_id = ctx.message.server.id
+        guild_id = ctx.guild.id
         db = plonks.get(guild_id, [])
 
         try:
             db.remove(member.id)
         except ValueError:
-            embed = discord.Embed(description='%s is not banned from using the bot in this server.' % member)
+            embed = discord.Embed(description='%s is not banned from using the bot in this guild.' % member)
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
         else:
             plonks[guild_id] = db
             await self.config.put('plonks', plonks)
-            embed = discord.Embed(description='%s has been unbanned from using the bot in this server.' % member)
+            embed = discord.Embed(description='%s has been unbanned from using the bot in this guild.' % member)
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @checks.is_owner()
     async def plonks(self, ctx):
         """Shows members banned from the bot."""
         plonks = self.config.get('plonks', {})
-        guild = ctx.message.server
+        guild = ctx.guild
         db = plonks.get(guild.id, [])
         members = ', '.join(map(str, filter(None, map(guild.get_member, db))))
         if members:
-            await self.bot.say(members)
+            await ctx.channel.send(members)
         else:
-            embed = discord.Embed(description='No members are banned in this server.')
+            embed = discord.Embed(description='No members are banned in this guild.')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
 
-    async def ban_func(self, server, user, message="No reason given.", length=10):
+    async def ban_func(self, guild, user, message="No reason given.", length=10):
 
         bans = self.tmp_banned_cache.get('bans', {})
-        db = bans.get(server.id, {})
+        db = bans.get(guild.id, {})
         memberinfo = db.get(user.id, {})
 
         buserroles = []
@@ -322,30 +322,30 @@ class Mod():
         memberinfo['nick'] = user.nick
 
         db[user.id] = memberinfo
-        bans[server.id] = db
+        bans[guild.id] = db
         await self.tmp_banned_cache.put('bans', bans)
 
-        invite = await self.create_temporary_invite(server.id)
+        invite = await self.create_temporary_invite(guild.id)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
         embed.add_field(name='Length', value=f'{length} seconds')
-        embed.add_field(name='Invite', value=f"After your ban time is over, click this link to rejoin the server.\nInvite: {invite}")
+        embed.add_field(name='Invite', value=f"After your ban time is over, click this link to rejoin the guild.\nInvite: {invite}")
         embed.set_footer(text='Banned', icon_url='http://i.imgur.com/wBkQqOp.png')
         embed.colour = 0x1BE118 # lucio green
 
-        await self.bot.send_message(user, embed=embed)
+        await user.send(embed=embed)
 
         await self.bot.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
-        await self.bot.unban(server, user)
+        await self.bot.unban(guild, user)
         embed = discord.Embed(description=f"{user.name} has been unbanned.")
         embed.colour = 0x1BE118 # lucio green
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
     async def on_member_join(self, member):
 
         bans = self.tmp_banned_cache.get('bans', {})
-        db = bans.get(member.server.id, {})
+        db = bans.get(member.guild.id, {})
 
         if member.id in db:
 
@@ -353,29 +353,29 @@ class Mod():
 
             role_objects = []
             for role in memberinfo['roles']:
-                role_objects.append(discord.utils.get(member.server.roles, id=role))
+                role_objects.append(discord.utils.get(member.guild.roles, id=role))
 
             await self.bot.add_roles(member, *role_objects)
 
             await self.bot.change_nickname(member, memberinfo['nick'])
 
             del db[member.id]
-            bans[member.server.id] = db
+            bans[member.guild.id] = db
             await self.tmp_banned_cache.put('bans', bans)
 
     async def on_message(self, message):
 
-        if message.server is None:
+        if message.guild is None:
             return
 
         banned_chat = self.config.get('banned_chat', {})
-        server_id = message.server.id
-        banned_chat_list = banned_chat.get(server_id, [])
+        guild_id = message.guild.id
+        banned_chat_list = banned_chat.get(guild_id, [])
 
         if any(word in message.content.lower() for word in banned_chat_list):
-            embed = discord.Embed(description='You used a word or phrase that is banned in this server!')
+            embed = discord.Embed(description='You used a word or phrase that is banned in this guild!')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.send_message(message.author, embed=embed)
+            await message.author.send(embed=embed)
             await self.bot.delete_message(message)
 
 def setup(bot):

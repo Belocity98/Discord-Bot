@@ -15,8 +15,8 @@ class Reddit():
         user_agent='Discord Reddit Bot'
         )
 
-    @commands.command(pass_context=True)
-    @commands.cooldown(1, 15, commands.BucketType.server)
+    @commands.command()
+    @commands.cooldown(1, 15, commands.BucketType.guild)
     async def fetchtop(self, ctx, subreddit : str, time : str, amount : int):
         """Fetch top Reddit posts of a subreddit.
         Valid times: hour, day, year, all"""
@@ -29,18 +29,18 @@ class Reddit():
                 if submission.domain in domains:
                     subs.append(submission.url)
             if len(subs) == 0:
-                await self.bot.say("```\nFound 0 submissions.\n```")
+                await ctx.channel.send("```\nFound 0 submissions.\n```")
                 return
             if amount > 10:
-                await self.bot.say("```\nThat's too many posts to search through!\n```")
+                await ctx.channel.send("```\nThat's too many posts to search through!\n```")
                 return
             newsubs = len(subs)
             tmp = len(subs) - amount
             del subs[-tmp:]
-            await self.bot.say("\n".join(subs))
-            await self.bot.say(f"```\nFound {newsubs} submissions, printing {amount}.\n```")
+            await ctx.channel.send("\n".join(subs))
+            await ctx.channel.send(f"```\nFound {newsubs} submissions, printing {amount}.\n```")
         else:
-            await self.bot.say("Time not recognized. Expected all/year/day/hour.")
+            await ctx.channel.send("Time not recognized. Expected all/year/day/hour.")
 
 
 

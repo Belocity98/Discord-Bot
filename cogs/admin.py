@@ -27,33 +27,33 @@ class Admin():
         data = await http.post(url, json=payload, bucket='create_invite')
         return 'http://discord.gg/' + data['code']
 
-    @commands.command(hidden=True, pass_context=True)
+    @commands.command(hidden=True)
     @checks.is_owner()
     async def invites(self, ctx):
-        """This command lists invites for each server this bot is in."""
-        if len(self.bot.servers) > 25:
-            embed = discord.Embed(description='Too many servers!')
+        """This command lists invites for each guild this bot is in."""
+        if len(self.bot.guilds) > 25:
+            embed = discord.Embed(description='Too many guilds!')
             embed.colour = 0x1BE118 # lucio green
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
-        embed = discord.Embed(title='Server Invites')
-        embed.description = 'Invite for each server the bot is in.'
+        embed = discord.Embed(title='Guild Invites')
+        embed.description = 'Invite for each guild the bot is in.'
         embed.colour = 0x1BE118 # lucio green
         permissions = []
-        for server in self.bot.servers:
+        for guild in self.bot.guilds:
             try:
-                await self.bot.unban(server, ctx.message.author)
+                await self.bot.unban(guild, ctx.author)
             except discord.Forbidden:
-                permissions.append(f'No permissions in {server.name}.')
+                permissions.append(f'No permissions in {guild.name}.')
             try:
-                server_invite = await self.create_temporary_invite(server.id)
-                embed.add_field(name=server.name, value=server_invite)
+                guild_invite = await self.create_temporary_invite(guild.id)
+                embed.add_field(name=guild.name, value=guild_invite)
             except discord.Forbidden:
-                permissions.append(f'Cannot create invite in {server.name}.')
-                
-        await self.bot.say('\n'.join(permissions), embed=embed)
+                permissions.append(f'Cannot create invite in {guild.name}.')
 
-    @commands.command(hidden=True, pass_context=True)
+        await ctx.channel.send('\n'.join(permissions), embed=embed)
+
+    @commands.command(hidden=True)
     @checks.is_owner()
     async def reloadconfig(self, ctx):
         """Reloads the configuration."""
@@ -63,7 +63,7 @@ class Admin():
             json.load(fp)
         log.info('Configuration reloaded.')
 
-    @commands.command(name='reload', hidden=True, pass_context=True)
+    @commands.command(name='reload', hidden=True)
     @checks.is_owner()
     async def _reload(self, ctx, *, extension_name : str):
         """Reloads an extension."""
@@ -74,17 +74,17 @@ class Admin():
                     self.bot.unload_extension(cog)
                     self.bot.load_extension(cog)
                 except (AttributeError, ImportError) as e:
-                    await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+                    await ctx.channel.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
             log.info(f'{extension_name} reloaded.')
         except ImportError:
-            await self.bot.say("Cog not found.")
+            await ctx.channel.send("Cog not found.")
             return
 
-    @commands.command(hidden=True, pass_context=True)
+    @commands.command(hidden=True)
     @checks.is_owner()
     async def load(self, ctx, *, extension_name : str):
         """Loads an extension."""
@@ -92,10 +92,10 @@ class Admin():
             self.bot.load_extension(extension_name)
             log.info(f'{extension_name} loaded.')
         except (AttributeError, ImportError) as e:
-            await self.bot.say("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
+            await ctx.channel.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
 
-    @commands.command(hidden=True, pass_context=True)
+    @commands.command(hidden=True)
     @checks.is_owner()
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
@@ -109,7 +109,7 @@ class Admin():
         log.info('Bot logging off.')
         await self.bot.logout()
 
-    @commands.command(hidden=True, pass_context=True)
+    @commands.command(hidden=True)
     @checks.is_owner()
     async def editprofile(self, ctx, element : str, setting : str):
         if element == "name":

@@ -11,7 +11,7 @@ class Stats():
         self.bot = bot
         self.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent': 'TheTrain2000-i<3uFUYU'})
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def ostats(self, ctx, battletag : str, mode : str):
         """Overwatch statistics for a specified user."""
         url = "https://owapi.net/api/v3/u/" + battletag.replace('#', '-') + "/stats"
@@ -31,18 +31,18 @@ class Stats():
         lines.append('```')
         message = '\n'.join(lines)
         if mode == "competitive":
-            await self.bot.say(message.format(data["us"]["stats"]["competitive"]))
+            await ctx.channel.send(message.format(data["us"]["stats"]["competitive"]))
         elif mode == "quickplay":
-            await self.bot.say(message.format(data["us"]["stats"]["quickplay"]))
+            await ctx.channel.send(message.format(data["us"]["stats"]["quickplay"]))
         else:
-            await self.bot.say("Unknown gamemode.")
+            await ctx.channel.send("Unknown gamemode.")
 
     @commands.command(aliases=['stats'])
-    async def about(self):
+    async def about(self, ctx):
         """Tells you information about the bot itself."""
 
         embed = discord.Embed()
-        embed.title = 'Official Bot Server Invite'
+        embed.title = 'Official Bot Guild Invite'
         embed.url = 'https://discord.gg/Whf6UUk'
         embed.colour = 0x1BE118 # lucio green
 
@@ -51,7 +51,7 @@ class Stats():
         embed.set_author(name=str(owner), icon_url=owner.avatar_url)
 
         # statistics
-        total_members = sum(len(s.members) for s in self.bot.servers)
+        total_members = sum(len(s.members) for s in self.bot.guilds)
         total_online  = sum(1 for m in self.bot.get_all_members() if m.status != discord.Status.offline)
         unique_members = set(self.bot.get_all_members())
         unique_online = sum(1 for m in unique_members if m.status != discord.Status.offline)
@@ -60,9 +60,9 @@ class Stats():
         embed.add_field(name='Members', value=members)
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
-        embed.add_field(name='Servers', value=len(self.bot.servers))
+        embed.add_field(name='guilds', value=len(self.bot.guilds))
 
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Stats(bot))

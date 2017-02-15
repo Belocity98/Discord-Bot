@@ -18,62 +18,65 @@ class Logging():
         cfgfile = os.path.join(app_path, 'logging.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(administrator=True)
     async def enablelogging(self, ctx):
-        """Enable logging for the server."""
-        server = ctx.message.server
+        """Enable logging for the guild."""
+        guild = ctx.guild
 
         logging = self.config.get('logging', {})
-        db = logging.get(server.id, {})
+        db = logging.get(guild.id, {})
 
         if db == True:
             embed = discord.Embed(description='Logging is already enabled!')
             embed.colour = 0x1BE118
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         db = True
         embed = discord.Embed(description='Logging enabled!')
         embed.colour = 0x1BE118
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-        logging[server.id] = db
+        logging[guild.id] = db
 
         await self.config.put('logging', logging)
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(no_pm=True)
     @commands.has_permissions(administrator=True)
     async def disablelogging(self, ctx):
-        """Disable logging for the server."""
-        server = ctx.message.server
+        """Disable logging for the guild."""
+        guild = ctx.guild
 
         logging = self.config.get('logging', {})
-        db = logging.get(server.id, {})
+        db = logging.get(guild.id, {})
 
         if db == False:
             embed = discord.Embed(description='Logging is already disabled!')
             embed.colour = 0x1BE118
-            await self.bot.say(embed=embed)
+            await ctx.channel.send(embed=embed)
             return
 
         db = False
         embed = discord.Embed(description='Logging disabled!')
         embed.colour = 0x1BE118
-        await self.bot.say(embed=embed)
+        await ctx.channel.send(embed=embed)
 
-        logging[server.id] = db
+        logging[guild.id] = db
 
         await self.config.put('logging', logging)
 
-    def check_if_logging(self, server, channel):
+    def check_if_logging(self, guild, channel):
 
-        can_make_c = channel.permissions_for(server.me).manage_channels
+        if guild == None:
+            return
+
+        can_make_c = channel.permissions_for(guild.me).manage_channels
         if not can_make_c:
             return
 
         logging = self.config.get('logging', {})
-        db = logging.get(server.id, {})
+        db = logging.get(guild.id, {})
 
         if db == True:
             return True
@@ -81,29 +84,29 @@ class Logging():
         else:
             return False
 
-    async def create_logging_channel(self, server):
+    async def create_logging_channel(self, guild):
         everyone_perms = discord.PermissionOverwrite(read_messages=False)
         my_perms = discord.PermissionOverwrite(read_messages=True)
-        everyone = discord.ChannelPermissions(target=server.default_role, overwrite=everyone_perms)
-        mine = discord.ChannelPermissions(target=server.owner, overwrite=my_perms)
+        everyone = discord.ChannelPermissions(target=guild.default_role, overwrite=everyone_perms)
+        mine = discord.ChannelPermissions(target=guild.owner, overwrite=my_perms)
 
-        await self.bot.create_channel(server, 'bot-logging', everyone, mine)
-        log.info(f'bot-logging channel created in {server.name}.')
+        await self.bot.create_channel(guild, 'bot-logging', everyone, mine)
+        log.info(f'bot-logging channel created in {guild.name}.')
         return
 
     async def on_message_delete(self, message):
-        server = message.server
+        guild = message.guild
         channel = message.channel
 
-        if not self.check_if_logging(server, channel):
+        if not self.check_if_logging(guild, channel):
             return
 
-        if server == None:
+        if guild == None:
             return
 
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
+        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
         if logging_channel == None:
-            await self.create_logging_channel(server)
+            await self.create_logging_channel(guild)
 
         else:
             embed = discord.Embed(description=message.content)
@@ -114,25 +117,25 @@ class Logging():
                 embed.set_image(url=message.attachments[0]['proxy_url'])
             if len(message.embeds) != 0:
                 embed = discord.Embed.from_data(message.embeds[0])
-                await self.bot.send_message(logging_channel, content="**Message Deleted**", embed=embed)
+                await logging_channel.send(content="**Message Deleted**", embed=embed)
                 return
-            await self.bot.send_message(logging_channel, embed=embed)
+            await logging_channel.send(embed=embed)
 
     async def on_message_edit(self, before, after):
-        server = before.server
+        guild = before.guild
         channel = after.channel
 
-        if not self.check_if_logging(server, channel):
+        if not self.check_if_logging(guild, channel):
             return
 
-        if server == None:
+        if guild == None:
             return
 
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', server.channels)
+        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
         if logging_channel == None:
-            await self.create_logging_channel(server)
+            await self.create_logging_channel(guild)
             return
-        if before.author == before.server.me:
+        if before.author == before.guild.me:
             return
         if before.content == after.content:
             return
@@ -143,7 +146,7 @@ class Logging():
             embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
             embed.colour = 0x1BE118 # lucio green
             embed.set_author(name=before.author, icon_url=before.author.avatar_url)
-            await self.bot.send_message(logging_channel, embed=embed)
+            await logging_channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
