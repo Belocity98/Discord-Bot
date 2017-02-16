@@ -49,7 +49,7 @@ class Admin():
                 guild_invite = await self.create_temporary_invite(guild.id)
                 embed.add_field(name=guild.name, value=guild_invite)
             except discord.Forbidden:
-                permissions.append(f'Cannot create invite in {guild.name}.')
+                embed.add_field(name=guild.name, value='No Invite')
 
         await ctx.channel.send('\n'.join(permissions), embed=embed)
 
