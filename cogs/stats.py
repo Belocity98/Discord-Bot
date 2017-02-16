@@ -60,7 +60,7 @@ class Stats():
         embed.add_field(name='Members', value=members)
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
-        embed.add_field(name='guilds', value=len(self.bot.guilds))
+        embed.add_field(name='Guilds', value=len(self.bot.guilds))
 
         await ctx.channel.send(embed=embed)
 
