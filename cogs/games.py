@@ -124,15 +124,6 @@ class Games():
         else:
             return False
 
-    def duel_check_valid_int(self, msg):
-        try:
-            msg = int(msg.content)
-        except ValueError:
-            return False
-        if (msg > self.duelchance) or (msg < 1):
-            return False
-        return True
-
     @commands.group(no_pm=True,invoke_without_command=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def duel(self, ctx, user : discord.Member):
@@ -147,6 +138,40 @@ class Games():
         guild = ctx.guild
         guild_id = guild.id
         db = current_duels.get(guild_id, {})
+
+        def challenger_check(m):
+            return m.author.id == challenger.id
+
+        def being_attacked_check(m):
+            return m.author.id == being_attacked.id
+
+        def duel_check_valid_int_challenger(msg):
+
+            if m.author.id != challenger.id:
+                return False
+
+            try:
+                msg = int(msg.content)
+            except ValueError:
+                return False
+            if (msg > self.duelchance) or (msg < 1):
+                return False
+
+            return True
+
+        def duel_check_valid_int_being_attacked(msg):
+
+            if m.author.id != being_attacked.id:
+                return False
+
+            try:
+                msg = int(msg.content)
+            except ValueError:
+                return False
+            if (msg > self.duelchance) or (msg < 1):
+                return False
+
+            return True
 
         if being_attacked.status == 'offline':
             embed = discord.Embed(description="You cannot start a duel with an offline user!")
@@ -181,7 +206,7 @@ class Games():
         embed = discord.Embed(description=f"{being_attacked.name}, do you accept {challenger.name}'s duel challenge? (yes/no)")
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
-        msg = await self.bot.wait_for('message', timeout=45, author=being_attacked)
+        msg = await self.bot.wait_for('message', timeout=45, check=being_attacked_check)
         if msg == None:
             embed = discord.Embed(description=f"{being_attacked.name} didn't respond to the duel challenge.")
             embed.colour = 0x1BE118 # lucio green
@@ -210,7 +235,7 @@ class Games():
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
 
-        challenger_number = await self.bot.wait_for('message', timeout=45, author=challenger, check=self.duel_check_valid_int)
+        challenger_number = await self.bot.wait_for('message', timeout=45, check=duel_check_valid_int_challenger)
         if challenger_number == None:
             embed = discord.Embed(description=f"{challenger.name} didn't choose a number. Ending duel.")
             embed.colour = 0x1BE118 # lucio green
@@ -228,7 +253,7 @@ class Games():
         await ctx.channel.send(embed=embed)
 
         while True:
-            being_attacked_number = await self.bot.wait_for('message', timeout=45, author=being_attacked, check=self.duel_check_valid_int)
+            being_attacked_number = await self.bot.wait_for('message', timeout=45, check=duel_check_valid_int_being_attacked)
             if challenger_number.content == being_attacked_number.content:
                 embed = discord.Embed(description="Number cannot be the same as opponent's number. Please re-enter your number.")
                 embed.colour = 0x1BE118 # lucio green
