@@ -42,7 +42,7 @@ class Admin():
         permissions = []
         for guild in self.bot.guilds:
             try:
-                await self.bot.unban(guild, ctx.author)
+                await guild.unban(ctx.author)
             except discord.Forbidden:
                 permissions.append(f'No permissions in {guild.name}.')
             try:
