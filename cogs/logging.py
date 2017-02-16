@@ -85,12 +85,13 @@ class Logging():
             return False
 
     async def create_logging_channel(self, guild):
-        everyone_perms = discord.PermissionOverwrite(read_messages=False)
-        my_perms = discord.PermissionOverwrite(read_messages=True)
-        everyone = discord.ChannelPermissions(target=guild.default_role, overwrite=everyone_perms)
-        mine = discord.ChannelPermissions(target=guild.owner, overwrite=my_perms)
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.owner: discord.PermissionOverwrite(read_messages=True)
+        }
 
-        await self.bot.create_channel(guild, 'bot-logging', everyone, mine)
+        await guild.create_text_channel('bot-logging', overwrites=overwrites)
+
         log.info(f'bot-logging channel created in {guild.name}.')
         return
 

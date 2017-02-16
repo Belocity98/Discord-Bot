@@ -425,12 +425,12 @@ class Currency():
         await self.config.put('shop_notify', shop)
 
     async def create_shop_notify_channel(self, guild):
-        everyone_perms = discord.PermissionOverwrite(read_messages=False)
-        my_perms = discord.PermissionOverwrite(read_messages=True)
-        everyone = discord.ChannelPermissions(target=guild.default_role, overwrite=everyone_perms)
-        mine = discord.ChannelPermissions(target=guild.owner, overwrite=my_perms)
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.owner: discord.PermissionOverwrite(read_messages=True)
+        }
 
-        await self.bot.create_channel(guild, 'shop-notify', everyone, mine)
+        await guild.create_text_channel('shop-notify', overwrites=overwrites)
         log.info(f'shop-notify channel created in {guild.name}.')
         return
 

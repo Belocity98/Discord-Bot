@@ -376,7 +376,7 @@ class Mod():
             embed = discord.Embed(description='You used a word or phrase that is banned in this guild!')
             embed.colour = 0x1BE118 # lucio green
             await message.author.send(embed=embed)
-            await self.bot.delete_message(message)
+            await message.delete()
 
 def setup(bot):
     bot.add_cog(Mod(bot))
