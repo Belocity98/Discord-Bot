@@ -50,10 +50,10 @@ prefixes = config.Config(main_config)
 
 def get_prefix(bot, message):
     server_prefixes = prefixes.get('prefixes', {})
-    if message.server.id not in server_prefixes:
+    if message.guild.id not in server_prefixes:
         return '>'
     else:
-        return server_prefixes[message.server.id]
+        return server_prefixes[message.guild.id]
 
 bot = commands.Bot(command_prefix=get_prefix, description=description, pm_help=True)
 bot.prefixes = prefixes
@@ -71,19 +71,19 @@ except:
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(game=discord.Game(name=">help"))
+    await bot.change_presence(game=discord.Game(name=">help | >invite"))
     print('Logged in as')
-    print('Name: ' + bot.user.name)
-    print('ID: '+ bot.user.id)
+    print(f'Name: {bot.user.name}')
+    print(f'ID: {bot.user.id}')
     print('------')
 
 @bot.event
 async def on_command_error(exc, ctx):
     e = getattr(exc, 'original', exc)
     if isinstance(e, (commands.MissingRequiredArgument, commands.CommandNotFound, commands.CommandOnCooldown, discord.Forbidden)):
-        await bot.send_message(ctx.message.channel, str(e))
+        await bot.send_message(ctx.channel, str(e))
     elif isinstance(e, commands.CheckFailure):
-        await bot.send_message(ctx.message.channel, 'You do not have permission to do that.')
+        await bot.send_message(ctx.channel, 'You do not have permission to do that.')
     else:
         tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
         print(tb)
