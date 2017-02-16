@@ -68,7 +68,14 @@ class Stats():
     async def invite(self, ctx):
         """Sends an invite link to invite the bot to a server."""
 
-        await ctx.author.send('https://discordapp.com/oauth2/authorize?client_id=257198307137421312&scope=bot&permissions=1573121151')
+        server_amt = len(self.bot.guilds)
+        your_server = server_amt + 1
+        server_info = f'This bot is in {server_amt} servers, your server could be number {your_server}!'
+
+        embed = discord.Embed(title=server_info)
+        embed.colour = 0x1BE118 # lucio green
+        embed.description = '[Invitation Link](https://discordapp.com/oauth2/authorize?client_id=257198307137421312&scope=bot&permissions=1573121151)'
+        await ctx.author.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Stats(bot))
