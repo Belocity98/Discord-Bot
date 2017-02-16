@@ -22,16 +22,6 @@ class Mod():
 
         self.prefixes = bot.prefixes
 
-    async def create_temporary_invite(self, channel_id):
-        http = self.bot.http
-        url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
-        payload = {
-            'max_age' : 0,
-            'max_uses' : 1,
-            'temporary' : False,
-            'unique' : True
-        }
-
         data = await http.post(url, json=payload, bucket='create_invite')
         return 'http://discord.gg/' + data['code']
 
@@ -325,7 +315,7 @@ class Mod():
         bans[guild.id] = db
         await self.tmp_banned_cache.put('bans', bans)
 
-        invite = await self.create_temporary_invite(guild.id)
+        invite = await guild.create_invite(unique=True, max_uses=1)
         embed = discord.Embed(description='**You have been banned!**')
         embed.add_field(name='Reason', value=message)
         embed.add_field(name='Length', value=f'{length} seconds')
