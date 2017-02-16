@@ -71,7 +71,7 @@ except:
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(game=discord.Game(name=">help"))
+    await bot.change_presence(game=discord.Game(name=">help | >invite"))
     print('Logged in as')
     print(f'Name: {bot.user.name}')
     print(f'ID: {bot.user.id}')
