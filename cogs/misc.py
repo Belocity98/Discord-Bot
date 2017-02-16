@@ -81,13 +81,13 @@ class Misc():
 
         lie_channel = discord.utils.find(lambda c: c.name == 'lie-channel', guild.channels)
         if lie_channel == None:
-            print("Lie channel not found. Returning.")
+            ctx.channel.send('Lie channel not found.\nCreate a channel called `lie-channel` to enable this feature.')
             return
 
         embed = discord.Embed(description=f"{user.name} is lying? What are they lying about?\nReply with their lie.")
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
-        lie = await self.bot.wait_for('message', timeout=60, author=ctx.author, channel=ctx.channel)
+        lie = await self.bot.wait_for('message', timeout=60, author=author, channel=ctx.channel)
 
         embed = discord.Embed(title=f'{user.name} was caught lying!')
         embed.description = f'Exposed by: {author.name}'
