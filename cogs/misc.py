@@ -94,7 +94,7 @@ class Misc():
 
         embed = discord.Embed(title=f'{user.name} was caught lying!')
         embed.description = f'Exposed by: {author.name}'
-        embed.timestamp = ctx.message.timestamp
+        embed.timestamp = ctx.message.created_at
         embed.add_field(name='Lie', value=lie.content)
         embed.colour = 0x1BE118 # lucio green
 
