@@ -64,5 +64,11 @@ class Stats():
 
         await ctx.channel.send(embed=embed)
 
+    @commands.command(pass_context=True)
+    async def invite(self, ctx):
+        """Sends an invite link to invite the bot to a server."""
+
+        await self.bot.send_message(ctx.message.author, 'https://discordapp.com/oauth2/authorize?client_id=257198307137421312&scope=bot&permissions=1573121151')
+
 def setup(bot):
     bot.add_cog(Stats(bot))
