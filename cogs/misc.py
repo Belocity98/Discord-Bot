@@ -85,7 +85,7 @@ class Misc():
             return
 
         def author_check(m):
-            return m.author.id == user.id
+            return m.author.id == author.id
 
         embed = discord.Embed(description=f"{user.name} is lying? What are they lying about?\nReply with their lie.")
         embed.colour = 0x1BE118 # lucio green
