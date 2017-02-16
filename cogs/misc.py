@@ -84,10 +84,13 @@ class Misc():
             ctx.channel.send('Lie channel not found.\nCreate a channel called `lie-channel` to enable this feature.')
             return
 
+        def author_check(m):
+            return m.author.id == user.id
+
         embed = discord.Embed(description=f"{user.name} is lying? What are they lying about?\nReply with their lie.")
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
-        lie = await self.bot.wait_for('message', timeout=60, author=author, channel=ctx.channel)
+        lie = await self.bot.wait_for('message', timeout=60, check=author_check)
 
         embed = discord.Embed(title=f'{user.name} was caught lying!')
         embed.description = f'Exposed by: {author.name}'
