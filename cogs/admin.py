@@ -15,9 +15,6 @@ class Admin():
         self.bot = bot
 
 
-        data = await http.post(url, json=payload, bucket='create_invite')
-        return 'http://discord.gg/' + data['code']
-
     @commands.command(hidden=True)
     @checks.is_owner()
     async def invites(self, ctx):

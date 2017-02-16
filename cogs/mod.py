@@ -22,9 +22,6 @@ class Mod():
 
         self.prefixes = bot.prefixes
 
-        data = await http.post(url, json=payload, bucket='create_invite')
-        return 'http://discord.gg/' + data['code']
-
     def is_plonked(self, guild, member):
         db = self.config.get('plonks', {}).get(guild.id, [])
         bypass_ignore = member.guild_permissions.manage_guild
