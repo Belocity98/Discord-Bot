@@ -14,15 +14,6 @@ class Admin():
     def __init__(self, bot):
         self.bot = bot
 
-    async def create_temporary_invite(self, channel_id):
-        http = self.bot.http
-        url = '{0.CHANNELS}/{1}/invites'.format(http, channel_id)
-        payload = {
-            'max_age' : 0,
-            'max_uses' : 1,
-            'temporary' : False,
-            'unique' : True
-        }
 
         data = await http.post(url, json=payload, bucket='create_invite')
         return 'http://discord.gg/' + data['code']
@@ -46,7 +37,7 @@ class Admin():
             except discord.Forbidden:
                 permissions.append(f'No permissions in {guild.name}.')
             try:
-                guild_invite = await self.create_temporary_invite(guild.id)
+                guild_invite = await guild.create_invite(unique=True, max_uses=1)
                 embed.add_field(name=guild.name, value=guild_invite)
             except discord.Forbidden:
                 embed.add_field(name=guild.name, value='No Invite')
