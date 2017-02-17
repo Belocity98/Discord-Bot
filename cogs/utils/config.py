@@ -43,7 +43,12 @@ class Config:
 
     def get(self, key, *args):
         """Retrieves a config entry."""
-        return self._db.get(key, *args)
+        retrieval = self._db.get(key, *args)
+
+        if retrieval.isdigit():
+            return int(retrieval)
+
+        return retrieval
 
     async def put(self, key, value, *args):
         """Edits a config entry."""
