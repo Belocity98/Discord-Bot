@@ -25,7 +25,7 @@ class Logging():
         guild = ctx.guild
 
         logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        db = logging.get(str(guild.id), {})
 
         if db == True:
             embed = discord.Embed(description='Logging is already enabled!')
@@ -49,7 +49,7 @@ class Logging():
         guild = ctx.guild
 
         logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        db = logging.get(str(guild.id), {})
 
         if db == False:
             embed = discord.Embed(description='Logging is already disabled!')
@@ -76,7 +76,7 @@ class Logging():
             return
 
         logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        db = logging.get(str(guild.id), {})
 
         if db == True:
             return True

@@ -25,7 +25,7 @@ class Misc():
         strikes = self.config.get('strikes', {})
         guild_id = guild.id
 
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
         strikeamt = int(self.bot.config["strikes"]["amount"])
         banlength = int(self.bot.config["strikes"]["ban_length"])
 
@@ -113,7 +113,7 @@ class Misc():
 
         strikes = self.config.get('strikes', {})
         guild_id = ctx.guild.id
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
 
         if user.bot == True:
             embed = discord.Embed(description="Don't try to strike a lowly bot!")
@@ -148,7 +148,7 @@ class Misc():
 
         guild_id = guild.id
         strikes = self.config.get('strikes', {})
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
 
         if user.id not in db:
             embed = discord.Embed(description=f'{user.name} has 0 strikes.')
@@ -174,7 +174,7 @@ class Misc():
 
         strikes = self.config.get('strikes', {})
         guild_id = ctx.guild.id
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
 
         if user.bot == True:
             embed = discord.Embed(description="Don't try to strike a lowly bot!")
@@ -219,7 +219,7 @@ class Misc():
 
         strikes = self.config.get('strikes', {})
         guild_id = ctx.guild.id
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
 
         if user.bot == True:
             embed = discord.Embed(description="Don't try to strike a lowly bot!")
@@ -263,7 +263,7 @@ class Misc():
         strikes = self.config.get('strikes', {})
         guild_id = ctx.guild.id
 
-        db = strikes.get(guild_id, {})
+        db = strikes.get(str(guild_id), {})
         db = {}
         strikes[guild_id] = db
         await self.config.put('strikes', strikes)
