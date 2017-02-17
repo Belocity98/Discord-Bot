@@ -283,7 +283,7 @@ class Misc():
         quote = None
 
         if message_id == None:
-            async for message in self.bot.logs_from(ctx.channel):
+            async for message in ctx.channel.history:
                 if message.author == user:
                     quote = message
                     break
