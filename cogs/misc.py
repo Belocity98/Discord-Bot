@@ -70,7 +70,7 @@ class Misc():
         permissions = discord.Permissions()
         color = discord.Color(value=0).orange()
 
-        await self.bot.create_role(guild, color=color, name=name, hoist=True, mentionable=True, permissions=permissions)
+        await guild.create_role(color=color, name=name, hoist=True, mentionable=True, permissions=permissions)
 
     @commands.command(no_pm=True)
     @commands.cooldown(1, 10, commands.BucketType.guild)

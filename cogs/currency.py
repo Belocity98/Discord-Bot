@@ -330,7 +330,7 @@ class Currency():
             currencydb[author.id] = 0
             return
         await self.user_add_currency(guild, author, shopdb[role.id]/2)
-        await self.bot.remove_roles(author, role)
+        await author.remove_roles(role)
 
     @shop.command(name='removeonbuy', no_pm=True)
     @commands.has_permissions(manage_guild=True)
@@ -466,7 +466,7 @@ class Currency():
         for role in rmonbuy_db:
             roleobj = discord.utils.get(guild.roles, id=role)
             if roleobj in after.roles:
-                await self.bot.remove_roles(after, roleobj)
+                await after.remove_roles(roleobj)
 
 
 def setup(bot):

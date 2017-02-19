@@ -82,7 +82,7 @@ class Mod():
             await ctx.channel.send(embed=embed)
             return
 
-        await self.bot.purge_from(channel, limit=limit)
+        await channel.purge(limit=limit)
         author = ctx.author
         log.info(f'{author.name} purged {limit} messages from {channel.name} in {guild.name}.')
 
@@ -104,7 +104,7 @@ class Mod():
                     lines.append(member)
 
             for member in lines:
-                await self.bot.move_member(member, author.voice_channel)
+                await member.edit(voice_channel=author.voice_channel)
             log.info(f'{author.name} massmoved all members to {channel.name} in {guild.name}.')
 
     @commands.command()
@@ -324,7 +324,7 @@ class Mod():
 
         await guild.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
-        await guild.unban(guild, user)
+        await guild.unban(user)
         embed = discord.Embed(description=f"{user.name} has been unbanned.")
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
@@ -344,7 +344,7 @@ class Mod():
 
             await member.add_roles(*role_objects)
 
-            await self.bot.change_nickname(member, memberinfo['nick'])
+            await member.edit(nick=memberinfo['nick'])
 
             del db[member.id]
             bans[member.guild.id] = db
