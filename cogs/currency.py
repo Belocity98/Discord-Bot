@@ -304,7 +304,7 @@ class Currency():
             await ctx.channel.send(embed=embed)
             return
         await self.user_remove_currency(guild, author, shopdb[role.id])
-        await self.bot.add_roles(author, role)
+        await author.add_roles(role)
 
     @shop.command(name='sell', no_pm=True)
     async def shop_sell(self, ctx, role : discord.Role):

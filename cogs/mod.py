@@ -342,7 +342,7 @@ class Mod():
             for role in memberinfo['roles']:
                 role_objects.append(discord.utils.get(member.guild.roles, id=role))
 
-            await self.bot.add_roles(member, *role_objects)
+            await member.add_roles(*role_objects)
 
             await self.bot.change_nickname(member, memberinfo['nick'])
 
