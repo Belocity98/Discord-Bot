@@ -114,6 +114,7 @@ class Logging():
             embed.colour = 0x1BE118 # lucio green
             embed.set_author(name=message.author, icon_url=message.author.avatar_url)
             embed.set_footer(text="Message Deleted", icon_url='http://i.imgur.com/ulgDAMM.png')
+            embed.timestamp = message.created_at
             if len(message.attachments) != 0:
                 embed.set_image(url=message.attachments[0]['proxy_url'])
             if len(message.embeds) != 0:
@@ -145,6 +146,7 @@ class Logging():
             embed.add_field(name="Before Content", value=before.content, inline=False)
             embed.add_field(name='After Content', value=after.content, inline=False)
             embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
+            embed.timestamp = after.edited_timestamp
             embed.colour = 0x1BE118 # lucio green
             embed.set_author(name=before.author, icon_url=before.author.avatar_url)
             await logging_channel.send(embed=embed)
