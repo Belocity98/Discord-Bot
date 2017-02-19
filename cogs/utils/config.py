@@ -45,7 +45,24 @@ class Config:
         """Retrieves a config entry."""
         key = str(key)
 
-        return self._db.get(key, *args)
+        tmp_db = self._db.get(key, *args)
+
+        def str_to_int(dictionary):
+            for key in dictionary:
+                if isinstance(key, str):
+                    if key.isdigit():
+                        popped_key = dictionary.pop(key)
+                        if isinstance(popped_key, dict):
+                            str_to_int(popped_key)
+
+                        dictionary[int(key)] = popped_key
+
+            return dictionary
+
+
+        tmp_db = str_to_int(tmp_db)
+
+        return tmp_db
 
     async def put(self, key, value, *args):
         """Edits a config entry."""
