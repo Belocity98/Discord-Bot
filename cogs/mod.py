@@ -43,7 +43,7 @@ class Mod():
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def tempban(self, ctx, user : discord.Member, length : int, reason=None):
+    async def tempban(self, ctx, user : discord.Member, length : int, *, reason=None):
         """Temp ban a user for a specified amount of time."""
         max_ban_length = int(self.bot.config["mod"]["max_ban_length"])
 
