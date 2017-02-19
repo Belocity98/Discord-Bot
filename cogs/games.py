@@ -137,7 +137,7 @@ class Games():
         being_attacked = user
         guild = ctx.guild
         guild_id = guild.id
-        db = current_duels.get(str(guild_id), {})
+        db = current_duels.get(guild_id, {})
 
         def challenger_check(m):
             return m.author.id == challenger.id
@@ -212,7 +212,7 @@ class Games():
             embed.colour = 0x1BE118 # lucio green
             await ctx.channel.send(embed=embed)
             current_duels = self.config.get('current_duels', {})
-            db = current_duels.get(str(guild_id), {})
+            db = current_duels.get(guild_id, {})
             db[challenger.id] = False
             db[being_attacked.id] = False
             current_duels[guild_id] = db
@@ -224,7 +224,7 @@ class Games():
             embed.colour = 0x1BE118 # lucio green
             await ctx.channel.send(embed=embed)
             current_duels = self.config.get('current_duels', {})
-            db = current_duels.get(str(guild_id), {})
+            db = current_duels.get(guild_id, {})
             db[challenger.id] = False
             db[being_attacked.id] = False
             current_duels[guild_id] = db
@@ -241,7 +241,7 @@ class Games():
             embed.colour = 0x1BE118 # lucio green
             await ctx.channel.send(embed=embed)
             current_duels = self.config.get('current_duels', {})
-            db = current_duels.get(str(guild_id), {})
+            db = current_duels.get(guild_id, {})
             db[challenger.id] = False
             db[being_attacked.id] = False
             current_duels[guild_id] = db
@@ -267,7 +267,7 @@ class Games():
             embed.colour = 0x1BE118 # lucio green
             await ctx.channel.send(embed=embed)
             current_duels = self.config.get('current_duels', {})
-            db = current_duels.get(str(guild_id), {})
+            db = current_duels.get(guild_id, {})
             db[challenger.id] = False
             db[being_attacked.id] = False
             current_duels[guild_id] = db
@@ -279,7 +279,7 @@ class Games():
         being_attacked_distance = abs(randnumber - int(being_attacked_number.content))
 
         current_duels = self.config.get('current_duels', {})
-        db = current_duels.get(str(guild_id), {})
+        db = current_duels.get(guild_id, {})
         db[challenger.id] = False
         db[being_attacked.id] = False
         current_duels[guild_id] = db
@@ -317,7 +317,7 @@ class Games():
     async def duel_resetstatus(self, ctx):
         guild_id = ctx.guild.id
         current_duels = self.config.get('current_duels', {})
-        db = current_duels.get(str(guild_id), {})
+        db = current_duels.get(guild_id, {})
         db = {}
         current_duels[guild_id] = db
         await self.config.put('current_duels', current_duels)
@@ -337,7 +337,7 @@ class Games():
         lottery_status = self.config.get('lottery_status', {})
 
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         players = {}
         lottery[guild.id] = players
@@ -349,7 +349,7 @@ class Games():
 
     def lottery_jackpot(self, guild):
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         jackpot = 0
         for player in players:
@@ -384,7 +384,7 @@ class Games():
         await asyncio.sleep(self.lottery_time)
 
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         if len(players) < 3:
             embed = discord.Embed(description='Not enough players entered the lottery! Returning money...')
@@ -420,7 +420,7 @@ class Games():
         author = ctx.author
 
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         lottery_status = self.config.get('lottery_status', {})
 
@@ -488,7 +488,7 @@ class Games():
             return
 
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         winner_id = random.choice(list(players.keys()))
         winner_obj = guild.get_member(winner_id)
@@ -523,7 +523,7 @@ class Games():
             return
 
         lottery = self.config.get('lottery', {})
-        players = lottery.get(str(guild.id), {})
+        players = lottery.get(guild.id, {})
 
         embed = discord.Embed(description='Returning money...')
         embed.colour = 0x1BE118 # lucio green

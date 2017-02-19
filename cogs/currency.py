@@ -24,7 +24,7 @@ class Currency():
     def user_bank_embed(self, guild, user):
         currency = self.config.get('currency', {})
         guild_id = guild.id
-        db = currency.get(str(guild_id), {})
+        db = currency.get(guild_id, {})
         embed = discord.Embed(title=f"{user.name}'s Bank Account")
         embed.description = f'Guild: {guild.name}'
         if user.id not in db:
@@ -37,7 +37,7 @@ class Currency():
     def get_shop_embed(self, guild):
         shop = self.config.get('shop', {})
         guild_id = guild.id
-        db = shop.get(str(guild_id), {})
+        db = shop.get(guild_id, {})
 
         embed = discord.Embed(title=f"{guild.name}'s Shop")
         embed.description = 'This guild has {} items in the shop.'.format(len(db))
@@ -61,7 +61,7 @@ class Currency():
     async def user_add_currency(self, guild, user, amount):
         currency = self.config.get('currency', {})
         guild_id = guild.id
-        db = currency.get(str(guild_id), {})
+        db = currency.get(guild_id, {})
         if amount < 0:
             return
         if user.id not in db:
@@ -74,7 +74,7 @@ class Currency():
     async def user_set_currency(self, guild, user, amount):
         currency = self.config.get('currency', {})
         guild_id = guild.id
-        db = currency.get(str(guild_id), {})
+        db = currency.get(guild_id, {})
         if amount < 0:
             return
         db[user.id] = amount
@@ -85,7 +85,7 @@ class Currency():
     async def user_remove_currency(self, guild, user, amount):
         currency = self.config.get('currency', {})
         guild_id = guild.id
-        db = currency.get(str(guild_id), {})
+        db = currency.get(guild_id, {})
         if amount < 0:
             return False
         if user.id not in db:
@@ -102,7 +102,7 @@ class Currency():
     async def user_transfer_currency(self, guild, user1, user2, amount):
         currency = self.config.get('currency', {})
         guild_id = guild.id
-        db = currency.get(str(guild_id), {})
+        db = currency.get(guild_id, {})
         if amount < 0:
             return False
         if user1.id not in db:
@@ -135,7 +135,7 @@ class Currency():
         guild = ctx.guild
 
         currency = self.config.get('currency', {})
-        currencydb = currency.get(str(guild.id), {})
+        currencydb = currency.get(guild.id, {})
         if len(currencydb) == 0:
             embed = discord.Embed(description='Nobody on this guild has any currency!')
             embed.colour = 0x1BE118 # lucio green
@@ -168,7 +168,7 @@ class Currency():
         guild = ctx.guild
 
         currency = self.config.get('currency', {})
-        currencydb = currency.get(str(guild.id), {})
+        currencydb = currency.get(guild.id, {})
         total_currency = 0
         if len(currencydb) == 0:
             embed = discord.Embed(description='Nobody on this guild has any currency!')
@@ -219,7 +219,7 @@ class Currency():
         """Resets all currency for a guild."""
         guild = ctx.guild
         currency = self.config.get('currency', {})
-        db = currency.get(str(guild.id), {})
+        db = currency.get(guild.id, {})
         db = {}
         currency[guild.id] = db
         await self.config.put('currency', currency)
@@ -236,7 +236,7 @@ class Currency():
         """Command for adding a role to the shop."""
         guild = ctx.guild
         shop = self.config.get('shop', {})
-        db = shop.get(str(guild.id), {})
+        db = shop.get(guild.id, {})
 
         if len(db) >= 25:
             log.info('There cannot be more than 25 items in the shop.')
@@ -252,7 +252,7 @@ class Currency():
         """Command for removing a role from the shop."""
         guild = ctx.guild
         shop = self.config.get('shop', {})
-        db = shop.get(str(guild.id), {})
+        db = shop.get(guild.id, {})
         if role.id in db:
             del db[role.id]
         shop[guild.id] = db
@@ -265,7 +265,7 @@ class Currency():
         guild = ctx.guild
         shop = self.config.get('shop', {})
         guild_id = guild.id
-        db = shop.get(str(guild.id), {})
+        db = shop.get(guild.id, {})
         if amount < 0:
             return
         if role.id in db:
@@ -280,9 +280,9 @@ class Currency():
         author = ctx.author
 
         shop = self.config.get('shop', {})
-        shopdb = shop.get(str(guild.id), {})
+        shopdb = shop.get(guild.id, {})
         currency = self.config.get('currency', {})
-        currencydb = currency.get(str(guild.id), {})
+        currencydb = currency.get(guild.id, {})
         if role in author.roles:
             embed = discord.Embed(description='You already have that role!')
             embed.colour = 0x1BE118 # lucio green
@@ -313,9 +313,9 @@ class Currency():
         author = ctx.author
 
         shop = self.config.get('shop', {})
-        shopdb = shop.get(str(guild.id), {})
+        shopdb = shop.get(guild.id, {})
         currency = self.config.get('currency', {})
-        currencydb = currency.get(str(guild.id), {})
+        currencydb = currency.get(guild.id, {})
         if role not in author.roles:
             embed = discord.Embed(description='You cannot sell a role that you do not have!')
             embed.colour = 0x1BE118 # lucio green
@@ -339,10 +339,10 @@ class Currency():
         guild = ctx.guild
 
         shopitems = self.config.get('shop', {})
-        itemsdb = shopitems.get(str(guild.id), {})
+        itemsdb = shopitems.get(guild.id, {})
 
         shop = self.config.get('shop_rmonbuy', {})
-        shop_rmonbuy_db = shop.get(str(guild.id), [])
+        shop_rmonbuy_db = shop.get(guild.id, [])
 
         if role == None:
             embed = discord.Embed(title='Roles with remove on buy enabled')
@@ -385,10 +385,10 @@ class Currency():
         guild = ctx.guild
 
         shopitems = self.config.get('shop', {})
-        itemsdb = shopitems.get(str(guild.id), {})
+        itemsdb = shopitems.get(guild.id, {})
 
         shop = self.config.get('shop_notify', {})
-        shop_notify_db = shop.get(str(guild.id), [])
+        shop_notify_db = shop.get(guild.id, [])
 
         if role == None:
             embed = discord.Embed(title='Roles with Notify Enabled')
@@ -442,9 +442,9 @@ class Currency():
         shopnotify = self.config.get('shop_notify', {})
         shopitems = self.config.get('shop', {})
 
-        items_db = shopitems.get(str(guild.id), {})
-        rmonbuy_db = shoprmonbuy.get(str(guild.id), [])
-        notify_db = shopnotify.get(str(guild.id), [])
+        items_db = shopitems.get(guild.id, {})
+        rmonbuy_db = shoprmonbuy.get(guild.id, [])
+        notify_db = shopnotify.get(guild.id, [])
 
 
         can_make_c = channel.permissions_for(guild.me).manage_channels

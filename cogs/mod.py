@@ -23,7 +23,7 @@ class Mod():
         self.prefixes = bot.prefixes
 
     def is_plonked(self, guild, member):
-        db = self.config.get('plonks', {}).get(str(guild.id), [])
+        db = self.config.get('plonks', {}).get(guild.id, [])
         bypass_ignore = member.guild_permissions.manage_guild
         if not bypass_ignore and member.id in db:
             return True
@@ -152,7 +152,7 @@ class Mod():
 
         banned_chat = self.config.get('banned_chat', {})
         guild_id = ctx.guild.id
-        db = banned_chat.get(str(guild_id), [])
+        db = banned_chat.get(guild_id, [])
 
         if msg.lower() in db:
             embed = discord.Embed(description='Message already banned.')
@@ -175,7 +175,7 @@ class Mod():
 
         banned_chat = self.config.get('banned_chat', {})
         guild_id = ctx.guild.id
-        db = banned_chat.get(str(guild_id), [])
+        db = banned_chat.get(guild_id, [])
 
         if msg == 'all':
             db = []
@@ -207,7 +207,7 @@ class Mod():
 
         banned_chat = self.config.get('banned_chat', {})
         guild_id = ctx.guild.id
-        db = banned_chat.get(str(guild_id), [])
+        db = banned_chat.get(guild_id, [])
 
         embed = discord.Embed(description='This guild currently has {} banned messages.'.format(len(db)))
         if len(db) > 25:
@@ -243,7 +243,7 @@ class Mod():
 
         plonks = self.config.get('plonks', {})
         guild_id = ctx.guild.id
-        db = plonks.get(str(guild_id), [])
+        db = plonks.get(guild_id, [])
 
         if member.id in db:
             embed = discord.Embed(description='That user is already bot banned in this guild.')
@@ -265,7 +265,7 @@ class Mod():
 
         plonks = self.config.get('plonks', {})
         guild_id = ctx.guild.id
-        db = plonks.get(str(guild_id), [])
+        db = plonks.get(guild_id, [])
 
         try:
             db.remove(member.id)
@@ -286,7 +286,7 @@ class Mod():
         """Shows members banned from the bot."""
         plonks = self.config.get('plonks', {})
         guild = ctx.guild
-        db = plonks.get(str(guild.id), [])
+        db = plonks.get(guild.id, [])
         members = ', '.join(map(str, filter(None, map(guild.get_member, db))))
         if members:
             await ctx.channel.send(members)
@@ -298,7 +298,7 @@ class Mod():
     async def ban_func(self, guild, user, message="No reason given.", length=10):
 
         bans = self.tmp_banned_cache.get('bans', {})
-        db = bans.get(str(guild.id), {})
+        db = bans.get(guild.id, {})
         memberinfo = db.get(user.id, {})
 
         buserroles = []
@@ -357,7 +357,7 @@ class Mod():
 
         banned_chat = self.config.get('banned_chat', {})
         guild_id = message.guild.id
-        banned_chat_list = banned_chat.get(str(guild_id), [])
+        banned_chat_list = banned_chat.get(guild_id, [])
 
         if any(word in message.content.lower() for word in banned_chat_list):
             embed = discord.Embed(description='You used a word or phrase that is banned in this guild!')
