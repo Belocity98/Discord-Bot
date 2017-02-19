@@ -1,3 +1,4 @@
+import datetime
 import discord
 import asyncio
 import logging
@@ -141,15 +142,60 @@ class Logging():
             return
         if before.content == after.content:
             return
-        else:
-            embed = discord.Embed()
-            embed.add_field(name="Before Content", value=before.content, inline=False)
-            embed.add_field(name='After Content', value=after.content, inline=False)
-            embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
-            embed.timestamp = after.edited_timestamp
-            embed.colour = 0x1BE118 # lucio green
-            embed.set_author(name=before.author, icon_url=before.author.avatar_url)
-            await logging_channel.send(embed=embed)
+
+        embed = discord.Embed()
+        embed.add_field(name="Before Content", value=before.content, inline=False)
+        embed.add_field(name='After Content', value=after.content, inline=False)
+        embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
+        embed.timestamp = after.edited_timestamp
+        embed.colour = 0x1BE118 # lucio green
+        embed.set_author(name=before.author, icon_url=before.author.avatar_url)
+
+        await logging_channel.send(embed=embed)
+
+    async def on_channel_delete(self, channel):
+        guild = channel.guild
+
+        if not self.check_if_logging(guild, channel):
+            return
+
+        if guild == None:
+            return
+
+        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
+        if logging_channel == None:
+            await self.create_logging_channel(guild)
+            return
+
+        embed = discord.Embed()
+        embed.description = f'**{channel.name}** deleted.'
+        embed.set_footer(text="Channel Deleted", icon_url='http://i.imgur.com/ulgDAMM.png')
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.colour = 0x1BE118 # lucio green
+
+        await logging_channel.send(embed=embed)
+
+    async def on_channel_create(self, channel):
+        guild = channel.guild
+
+        if not self.check_if_logging(guild, channel):
+            return
+
+        if guild == None:
+            return
+
+        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
+        if logging_channel == None:
+            await self.create_logging_channel(guild)
+            return
+
+        embed = discord.Embed()
+        embed.description = f'**{channel.name}** created.'
+        embed.set_footer(text="Channel Created", icon_url='http://i.imgur.com/ZNzc9gM.png')
+        embed.timestamp = datetime.datetime.utcnow()
+        embed.colour = 0x1BE118 # lucio green
+
+        await logging_channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
