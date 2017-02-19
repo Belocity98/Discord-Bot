@@ -14,33 +14,6 @@ class Admin():
     def __init__(self, bot):
         self.bot = bot
 
-
-    @commands.command(hidden=True)
-    @checks.is_owner()
-    async def invites(self, ctx):
-        """This command lists invites for each guild this bot is in."""
-        if len(self.bot.guilds) > 25:
-            embed = discord.Embed(description='Too many guilds!')
-            embed.colour = 0x1BE118 # lucio green
-            await ctx.channel.send(embed=embed)
-            return
-        embed = discord.Embed(title='Guild Invites')
-        embed.description = 'Invite for each guild the bot is in.'
-        embed.colour = 0x1BE118 # lucio green
-        permissions = []
-        for guild in self.bot.guilds:
-            try:
-                await guild.unban(ctx.author)
-            except discord.Forbidden:
-                permissions.append(f'No permissions in {guild.name}.')
-            try:
-                guild_invite = await guild.create_invite(unique=True, max_uses=1)
-                embed.add_field(name=guild.name, value=guild_invite)
-            except discord.Forbidden:
-                embed.add_field(name=guild.name, value='No Invite')
-
-        await ctx.channel.send('\n'.join(permissions), embed=embed)
-
     @commands.command(hidden=True)
     @checks.is_owner()
     async def reloadconfig(self, ctx):
