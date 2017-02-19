@@ -322,9 +322,9 @@ class Mod():
 
         await user.send(embed=embed)
 
-        await self.bot.ban(user, delete_message_days=0)
+        await guild.ban(user, delete_message_days=0)
         await asyncio.sleep(length)
-        await self.bot.unban(guild, user)
+        await guild.unban(guild, user)
         embed = discord.Embed(description=f"{user.name} has been unbanned.")
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
