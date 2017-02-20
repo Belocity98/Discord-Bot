@@ -80,7 +80,7 @@ async def on_ready():
 @bot.event
 async def on_command_error(exc, ctx):
     e = getattr(exc, 'original', exc)
-    if isinstance(e, (commands.MissingRequiredArgument, commands.CommandNotFound, commands.CommandOnCooldown, discord.Forbidden)):
+    if isinstance(e, (commands.MissingRequiredArgument, commands.CommandOnCooldown, discord.Forbidden)):
         await ctx.channel.send(str(e))
     elif isinstance(e, commands.CheckFailure):
         await ctx.channel.send('You do not have permission to do that.')
