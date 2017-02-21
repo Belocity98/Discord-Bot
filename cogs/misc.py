@@ -4,7 +4,6 @@ import sys
 import os
 import logging
 
-from cleverbot import Cleverbot
 from discord.ext import commands
 from .utils import checks, config
 from datetime import datetime, timezone
@@ -43,16 +42,6 @@ class Misc():
             return True
 
         return False
-
-    @commands.command(no_pm=True, name='c')
-    @commands.cooldown(1, 3, commands.BucketType.guild)
-    async def cleverbot(self, ctx, *, msg : str):
-        """Talk with Cleverbot."""
-        try:
-            response = self.cb.ask(msg)
-            await ctx.channel.send(response)
-        except:
-            pass
 
     @commands.command(no_pm=True)
     @commands.has_permissions(manage_roles=True)
