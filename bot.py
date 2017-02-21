@@ -55,7 +55,7 @@ def get_prefix(bot, message):
     else:
         return server_prefixes[message.guild.id]
 
-bot = commands.Bot(command_prefix=get_prefix, description=description, pm_help=True)
+bot = commands.Bot(command_prefix=get_prefix, description=description)
 bot.prefixes = prefixes
 
 try:
