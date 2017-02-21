@@ -16,7 +16,7 @@ class Reddit():
         )
 
     @commands.command()
-    @commands.cooldown(1, 15, commands.BucketType.guild)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def fetchtop(self, ctx, subreddit : str, time : str, amount : int):
         """Fetch top Reddit posts of a subreddit.
         Valid times: hour, day, year, all"""
