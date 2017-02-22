@@ -18,8 +18,6 @@ class Misc():
         cfgfile = os.path.join(app_path, 'misc.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
-        self.cb = Cleverbot('discord-bot')
-
     async def check_strikes(self, guild, user):
         strikes = self.config.get('strikes', {})
         guild_id = guild.id
