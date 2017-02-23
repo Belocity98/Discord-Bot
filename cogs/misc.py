@@ -18,7 +18,7 @@ class Misc():
         cfgfile = os.path.join(app_path, 'misc.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
-    async def check_strikes(self, guild, user):
+    async def check_strikes(self, guild, user, ctx):
         strikes = self.config.get('strikes', {})
         guild_id = guild.id
 
@@ -113,7 +113,7 @@ class Misc():
             db[user.id] += 1
             strikes[guild_id] = db
             await self.config.put('strikes', strikes)
-            strike_check = await self.check_strikes(guild, user)
+            strike_check = await self.check_strikes(guild, user, ctx)
             if strike_check == False:
                 embed = discord.Embed(description=f'{user.name} now has {db[user.id]} strikes.')
                 if db[user.id] == 1:
@@ -180,7 +180,7 @@ class Misc():
             db[user.id] += amount
             strikes[guild_id] = db
             await self.config.put('strikes', strikes)
-            strike_check = await self.check_strikes(guild, user)
+            strike_check = await self.check_strikes(guild, user, ctx)
             if strike_check == False:
                 embed = discord.Embed(description=f'{user.name} now has {db[user.id]} strikes.')
                 if db[user.id] == 1:
