@@ -270,13 +270,13 @@ class Misc():
         quote = None
 
         if message_id == None:
-            async for message in ctx.channel.history:
+            async for message in ctx.channel.history():
                 if message.author == user:
                     quote = message
                     break
 
         elif message_id != None:
-            quote = await self.bot.get_message(channel, message_id)
+            quote = await channel.get_message(message_id)
 
         if quote == None:
             embed = discord.Embed(description='Quote not found.')
@@ -287,7 +287,7 @@ class Misc():
 
         embed = discord.Embed(description=quote.content)
         embed.set_author(name=quote.author.name, icon_url=quote.author.avatar_url)
-        embed.timestamp = quote.timestamp
+        embed.timestamp = quote.created_at
         embed.colour = 0x1BE118 # lucio green
 
         await ctx.channel.send(embed=embed)
