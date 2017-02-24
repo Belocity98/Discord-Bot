@@ -70,10 +70,16 @@ class Mod():
 
     @commands.command(no_pm=True)
     @commands.has_permissions(manage_messages=True)
-    async def purge(self, ctx, limit : int):
-        """Remove a specified amount of messages from the chat."""
+    async def purge(self, ctx, limit : int, user : discord.Member=None):
+        """Remove a specified amount of messages from the chat. User is optional."""
         channel = ctx.channel
         guild = ctx.guild
+
+        def user_check(msg):
+            if user != None:
+                return msg.author == user
+
+            return True
 
         delete_limit = int(self.bot.config["mod"]["purge_limit"])
         if limit > delete_limit:
@@ -82,7 +88,7 @@ class Mod():
             await ctx.channel.send(embed=embed)
             return
 
-        await channel.purge(limit=limit)
+        await channel.purge(limit=limit, check=user_check)
         author = ctx.author
         log.info(f'{author.name} purged {limit} messages from {channel.name} in {guild.name}.')
 
