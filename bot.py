@@ -28,7 +28,7 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-description = "A general bot for personal use."
+description = "A all-purpose Discord chat bot with no voice support."
 
 # Yes, I took RoboDanny's file structure.
 
