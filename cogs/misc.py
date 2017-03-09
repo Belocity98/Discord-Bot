@@ -540,6 +540,8 @@ class Misc():
 
     @commands.command()
     async def xkcd(self, ctx, number=None):
+        """Sends the link of a random xkcd comic to the chat.
+        if a number is specified, send the comic referring to that number."""
 
         rng = randint(1, xkcd.getLatestComicNum())
 
