@@ -1,5 +1,6 @@
 # Credit to Danny for the Google command. https://github.com/Rapptz/RoboDanny/blob/master/cogs/buttons.py#L78-L315
 
+import urbandict
 import discord
 import asyncio
 import logging
@@ -556,6 +557,19 @@ class Misc():
             await ctx.channel.send(f'{comicurl}')
         except:
             pass
+
+    @commands.command()
+    async def urband(self, ctx, *, word : str):
+        """Sends the definition of a word from the UrbanDictionary."""
+
+        word_list = urbandict.define(word)
+
+        embed = discord.Embed(title=word_list[0]['word'])
+        embed.description = word_list[0]['def']
+
+        embed.colour = 0x1BE118 # lucio green
+
+        await ctx.channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Misc(bot))
