@@ -49,6 +49,10 @@ class Currency():
 
         for item in sorteddb:
             roleobj = discord.utils.get(guild.roles, id=int(item))
+
+            if not roleobj:
+                continue
+
             itemname = roleobj.name
             embed.add_field(name=f'{itemname}', value=f'{sorteddb[item]} {self.currency_name}')
 
