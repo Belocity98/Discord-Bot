@@ -14,6 +14,17 @@ class Admin():
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(no_pm=True)
+    @checks.is_owner()
+    async def broadcast(self, ctx, *, message : str):
+        """Command to broadcast a message to all the servers the bot is in."""
+        for guild in self.bot.guilds:
+            try:
+                await guild.default_channel.send(message)
+            except:
+                pass
+
+
     @commands.command(hidden=True)
     @checks.is_owner()
     async def reloadconfig(self, ctx):

@@ -1,0 +1,28 @@
+2017-03-09 10:47:42;INFO;on_ready has successfully been registered as an event
+2017-03-09 10:47:42;INFO;on_command_error has successfully been registered as an event
+2017-03-09 10:47:42;INFO;logging in using static token
+2017-03-09 10:47:43;INFO;Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6
+2017-03-09 10:47:43;INFO;sent the identify payload to create the websocket
+2017-03-09 10:48:30;INFO;cogs.admin reloaded.
+2017-03-09 10:53:06;INFO;cogs.admin reloaded.
+2017-03-09 10:58:09;INFO;cogs.admin reloaded.
+2017-03-09 10:58:46;INFO;Bot logging off.
+2017-03-09 10:58:46;INFO;Websocket closed with 1000 (), cannot reconnect.
+2017-03-09 10:58:46;ERROR;Attempting a reconnect in 1.80s
+Traceback (most recent call last):
+  File "C:\Users\Tyler\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\gateway.py", line 410, in poll_event
+    msg = yield from self.recv()
+  File "C:\Users\Tyler\AppData\Local\Programs\Python\Python36-32\lib\site-packages\websockets\protocol.py", line 298, in recv
+    raise ConnectionClosed(self.close_code, self.close_reason)
+websockets.exceptions.ConnectionClosed: WebSocket connection is closed: code = 1000, no reason.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Tyler\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 388, in connect
+    yield from self._connect()
+  File "C:\Users\Tyler\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\client.py", line 351, in _connect
+    yield from self.ws.poll_event()
+  File "C:\Users\Tyler\AppData\Local\Programs\Python\Python36-32\lib\site-packages\discord\gateway.py", line 418, in poll_event
+    raise ConnectionClosed(e, shard_id=self.shard_id) from e
+discord.errors.ConnectionClosed: WebSocket connection is closed: code = 1000, no reason.
