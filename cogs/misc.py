@@ -550,8 +550,6 @@ class Misc():
 
         comicurl = comic.getImageLink()
 
-        print(comicurl)
-
         try:
             await ctx.channel.send(f'{comicurl}')
         except:
