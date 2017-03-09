@@ -386,6 +386,10 @@ class Games():
         lottery = self.config.get('lottery', {})
         players = lottery.get(guild.id, {})
 
+        lottery_status = self.config.get('lottery_status', {})
+        if guild.id not in lottery_status:
+            return
+
         if len(players) < 3:
             embed = discord.Embed(description='Not enough players entered the lottery! Returning money...')
             embed.colour = 0x1BE118 # lucio green
