@@ -4,10 +4,12 @@ import discord
 import asyncio
 import logging
 import aiohttp
+import xkcd
 import sys
 import os
 
 from lxml import etree
+from random import randint
 from discord.ext import commands
 from .utils import checks, config
 from urllib.parse import parse_qs
@@ -535,6 +537,25 @@ class Misc():
                 msg = entries[0]
 
             await channel.send(msg)
+
+    @commands.command()
+    async def xkcd(self, ctx, number=None):
+
+        rng = randint(1, xkcd.getLatestComicNum())
+
+        if number:
+            comic = xkcd.getComic(number)
+        else:
+            comic = xkcd.getComic(rng)
+
+        comicurl = comic.getImageLink()
+
+        print(comicurl)
+
+        try:
+            await ctx.channel.send(f'{comicurl}')
+        except:
+            pass
 
 def setup(bot):
     bot.add_cog(Misc(bot))
