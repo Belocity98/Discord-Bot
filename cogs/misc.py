@@ -544,12 +544,10 @@ class Misc():
         """Sends the link of a random xkcd comic to the chat.
         if a number is specified, send the comic referring to that number."""
 
-        rng = randint(1, xkcd.getLatestComicNum())
-
         if number:
             comic = xkcd.getComic(number)
         else:
-            comic = xkcd.getComic(rng)
+            comic = xkcd.getRandomComic()
 
         comicurl = comic.getImageLink()
 
