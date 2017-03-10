@@ -553,8 +553,12 @@ class Misc():
 
         comicurl = comic.getImageLink()
 
+        embed = discord.Embed(description=f'[Image Link]({comicurl})')
+        embed.set_image(url=comicurl)
+        embed.colour = 0x1BE118 # lucio green
+
         try:
-            await ctx.channel.send(f'{comicurl}')
+            await ctx.channel.send(embed=embed)
         except:
             pass
 
