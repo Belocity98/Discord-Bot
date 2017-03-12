@@ -30,6 +30,8 @@ logger.addHandler(ch)
 
 description = "A all-purpose Discord chat bot with no voice support."
 
+log = logging.getLogger(__name__)
+
 # Yes, I took RoboDanny's file structure.
 
 # this specifies what extensions to load when the bot starts up
@@ -81,9 +83,9 @@ async def on_ready():
 async def on_command_error(exc, ctx):
     e = getattr(exc, 'original', exc)
     if isinstance(e, (commands.MissingRequiredArgument, commands.CommandOnCooldown, discord.Forbidden)):
-        await ctx.channel.send(str(e))
+        log.info(str(e))
     elif isinstance(e, commands.CheckFailure):
-        await ctx.channel.send('You do not have permission to do that.')
+        log.info('Permission denied.')
     else:
         tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
         print(tb)
@@ -94,9 +96,9 @@ if __name__ == "__main__":
             bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
-            print(f'Failed to load extension {extension}\n{exc}')
+            log.info(f'Failed to load extension {extension}\n{exc}')
 
     if "discord bot token" in bot.config["token"]:
-        print("Bot token not found. Not running.")
+        log.info("Bot token not found. Not running.")
     else:
         bot.run(bot.config["token"])
