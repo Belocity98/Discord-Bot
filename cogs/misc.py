@@ -592,9 +592,10 @@ class Misc():
                     discrim_users.append(f'{member.name}#{member.discriminator}')
 
         total_matches = len(discrim_users)
+        discrim_users = list(set(discrim_users))
 
         if total_matches == 0:
-            embed.description = 'No matches found in this server.'
+            embed.description = 'No matches found.'
             await ctx.send(embed=embed)
             return
 
@@ -602,10 +603,11 @@ class Misc():
         if total_matches > 10:
             extra = total_matches - 10
 
-        embed.description = '\n'.join(list(set(discrim_users)))
+
+        embed.description = '\n'.join(discrim_users)
 
         if extra:
-            embed.description += f'\n\nAnd {extra} more.'
+            embed.description = '\n'.join(discrim_users) + f'\n\nAnd {extra} more.'
 
         await ctx.send(embed=embed)
 
