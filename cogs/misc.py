@@ -603,11 +603,10 @@ class Misc():
         if total_matches > 10:
             extra = total_matches - 10
 
-
-        embed.description = '\n'.join(discrim_users)
-
         if extra:
             embed.description = '\n'.join(discrim_users[:10]) + f'\n\nAnd {extra} more.'
+        else:
+            embed.description = '\n'.join(discrim_users)
 
         await ctx.send(embed=embed)
 
