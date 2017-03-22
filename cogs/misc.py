@@ -573,5 +573,42 @@ class Misc():
 
         await ctx.channel.send(embed=embed)
 
+    @commands.command(no_pm=True)
+    async def discrimsearch(self, ctx, discrim : str=None):
+        """Sends the first 10 discrims found of the given discrim.
+
+        If no discrim is provided, author's discrim is used."""
+
+        embed = discord.Embed()
+        embed.colour = 0x1BE118 # lucio green
+
+        if not discrim:
+            discrim = ctx.author.discriminator
+
+        discrim_users = []
+        for member in ctx.guild.members:
+            if member.discriminator == discrim:
+                discrim_users.append(f'{member.name}#{member.discriminator}')
+
+        total_matches = len(discrim_users)
+
+        if total_matches == 0:
+            embed.description = 'No matches found in this server.'
+            await ctx.send(embed=embed)
+            return
+
+        extra = None
+        if total_matches > 10:
+            extra = total_matches - 10
+
+        embed.description = '\n'.join(discrim_users)
+
+        if extra:
+            embed.description += f'\n\nAnd {extra} more.'
+
+        await ctx.send(embed=embed)
+
+
+
 def setup(bot):
     bot.add_cog(Misc(bot))
