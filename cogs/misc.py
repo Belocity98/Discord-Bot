@@ -586,9 +586,10 @@ class Misc():
             discrim = ctx.author.discriminator
 
         discrim_users = []
-        for member in ctx.guild.members:
-            if member.discriminator == discrim:
-                discrim_users.append(f'{member.name}#{member.discriminator}')
+        for guild in self.bot.guilds:
+            for member in guild.members:
+                if member.discriminator == discrim:
+                    discrim_users.append(f'{member.name}#{member.discriminator}')
 
         total_matches = len(discrim_users)
 
@@ -601,7 +602,7 @@ class Misc():
         if total_matches > 10:
             extra = total_matches - 10
 
-        embed.description = '\n'.join(discrim_users)
+        embed.description = '\n'.join(list(set(discrim_users)))
 
         if extra:
             embed.description += f'\n\nAnd {extra} more.'
