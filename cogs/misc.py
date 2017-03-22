@@ -591,8 +591,8 @@ class Misc():
                 if member.discriminator == discrim:
                     discrim_users.append(f'{member.name}#{member.discriminator}')
 
-        total_matches = len(discrim_users)
         discrim_users = list(set(discrim_users))
+        total_matches = len(discrim_users)
 
         if total_matches == 0:
             embed.description = 'No matches found.'
