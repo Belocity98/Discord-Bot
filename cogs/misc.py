@@ -607,7 +607,7 @@ class Misc():
         embed.description = '\n'.join(discrim_users)
 
         if extra:
-            embed.description = '\n'.join(discrim_users) + f'\n\nAnd {extra} more.'
+            embed.description = '\n'.join(discrim_users[:10]) + f'\n\nAnd {extra} more.'
 
         await ctx.send(embed=embed)
 
