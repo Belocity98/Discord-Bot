@@ -53,7 +53,7 @@ class Stats():
         # statistics
         total_members = sum(len(s.members) for s in self.bot.guilds)
         total_online  = sum(1 for m in self.bot.get_all_members() if m.status != discord.Status.offline)
-        unique_members = set(self.bot.get_all_members())
+        unique_members = len(self.bot.users)
         unique_online = sum(1 for m in unique_members if m.status != discord.Status.offline)
 
         members = '%s total\n%s online\n%s unique\n%s unique online' % (total_members, total_online, len(unique_members), unique_online)
