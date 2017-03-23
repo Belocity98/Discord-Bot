@@ -52,15 +52,13 @@ class Stats():
 
         # statistics
         total_members = sum(len(s.members) for s in self.bot.guilds)
-        total_online  = sum(1 for m in self.bot.get_all_members() if m.status != discord.Status.offline)
         unique_members = len(self.bot.users)
-        unique_online = sum(1 for m in self.bot.users if m.status != discord.Status.offline)
 
-        members = '%s total\n%s online\n%s unique\n%s unique online' % (total_members, total_online, len(unique_members), unique_online)
+        members = '%s total\n%s unique' % (total_members, unique_online)
         embed.add_field(name='Members', value=members)
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
-        embed.add_field(name='Guilds', value=len(self.bot.guilds))
+        embed.add_field(name='Servers', value=len(self.bot.guilds))
 
         await ctx.channel.send(embed=embed)
 
