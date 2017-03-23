@@ -54,7 +54,7 @@ class Stats():
         total_members = sum(len(s.members) for s in self.bot.guilds)
         unique_members = len(self.bot.users)
 
-        members = '%s total\n%s unique' % (total_members, unique_online)
+        members = '%s total\n%s unique' % (total_members, unique_members)
         embed.add_field(name='Members', value=members)
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
