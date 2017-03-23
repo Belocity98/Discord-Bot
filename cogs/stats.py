@@ -7,12 +7,16 @@ import aiohttp
 import os
 
 from discord.ext import commands
+from collections import Counter
 
 class Stats():
 
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent': 'TheTrain2000-i<3uFUYU'})
+
+    async def on_command(self, ctx):
+        self.bot.commands_used[ctx.command.qualified_name] += 1
 
     @commands.command()
     async def ostats(self, ctx, battletag : str, mode : str):
@@ -87,6 +91,7 @@ class Stats():
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
         embed.add_field(name='Servers', value=len(self.bot.guilds))
+        embed.add_field(name='Commands Run', value=sum(self.bot.commands_used.values()))
 
         await ctx.channel.send(embed=embed)
 
@@ -104,4 +109,5 @@ class Stats():
         await ctx.author.send(embed=embed)
 
 def setup(bot):
+    bot.commands_used = Counter()
     bot.add_cog(Stats(bot))
