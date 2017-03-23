@@ -1,5 +1,6 @@
 ﻿import discord
 import traceback
+import datetime
 import os
 import sys
 import json
@@ -77,7 +78,10 @@ async def on_ready():
     print('Logged in as')
     print(f'Name: {bot.user.name}')
     print(f'ID: {bot.user.id}')
+    print(f'Lib Ver: {discord.__version__}')
     print('------')
+    if not hasattr(bot, 'uptime'):
+        bot.uptime = datetime.datetime.utcnow()
 
 @bot.event
 async def on_command_error(exc, ctx):

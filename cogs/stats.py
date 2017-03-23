@@ -1,3 +1,6 @@
+# Thanks to Danny (Rapptz on GitHub) for the uptime information.
+
+import datetime
 import discord
 import json
 import aiohttp
@@ -37,6 +40,30 @@ class Stats():
         else:
             await ctx.channel.send("Unknown gamemode.")
 
+    def get_bot_uptime(self, *, brief=False):
+        now = datetime.datetime.utcnow()
+        delta = now - self.bot.uptime
+        hours, remainder = divmod(int(delta.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        days, hours = divmod(hours, 24)
+
+        if not brief:
+            if days:
+                fmt = '{d} days, {h} hours, {m} minutes, and {s} seconds'
+            else:
+                fmt = '{h} hours, {m} minutes, and {s} seconds'
+        else:
+            fmt = '{h}h {m}m {s}s'
+            if days:
+                fmt = '{d}d ' + fmt
+
+        return fmt.format(d=days, h=hours, m=minutes, s=seconds)
+
+    @commands.command()
+    async def uptime(self, ctx):
+        """Tells you how long the bot has been up for."""
+        await ctx.send('Uptime: **{}**'.format(self.get_bot_uptime()))
+
     @commands.command(aliases=['stats'])
     async def about(self, ctx):
         """Tells you information about the bot itself."""
@@ -56,6 +83,7 @@ class Stats():
 
         members = '%s total\n%s unique' % (total_members, unique_members)
         embed.add_field(name='Members', value=members)
+        embed.add_field(name='Uptime', value=self.get_bot_uptime(brief=True))
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
         embed.add_field(name='Servers', value=len(self.bot.guilds))
