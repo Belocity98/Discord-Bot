@@ -26,6 +26,16 @@ class Misc():
         cfgfile = os.path.join(app_path, 'misc.json')
         self.config = config.Config(cfgfile, loop=bot.loop)
 
+    @commands.command()
+    async def ping(self, ctx):
+        x = await ctx.send('Ping!')
+        time = datetime.now()
+        await x.edit(content='`...`')
+        difference = (datetime.now() - time).total_seconds() * 1000
+        difference = difference/2
+        difference = str(round(difference, 2))
+        await x.edit(content=f'Pong! `{difference} ms.`')
+
     async def check_strikes(self, guild, user, ctx):
         strikes = self.config.get('strikes', {})
         guild_id = guild.id
