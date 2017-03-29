@@ -147,7 +147,7 @@ class Logging():
         embed.add_field(name="Before Content", value=before.content, inline=False)
         embed.add_field(name='After Content', value=after.content, inline=False)
         embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
-        embed.timestamp = after.edited_timestamp
+        embed.timestamp = after.edited_at
         embed.colour = 0x1BE118 # lucio green
         embed.set_author(name=before.author, icon_url=before.author.avatar_url)
 
