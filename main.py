@@ -1,11 +1,14 @@
-﻿import discord
 import traceback
 import datetime
-import os
-import sys
-import json
+import discord
+import aiohttp
 import asyncio
 import logging
+import json
+import sys
+import os
+
+
 
 from discord.ext import commands
 from cogs.utils import config
@@ -29,9 +32,10 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 logger.addHandler(ch)
 
-description = "A all-purpose Discord chat bot with no voice support."
+description = "General purpose Discord chat bot. Includes moderation and fun commands."
 
 log = logging.getLogger(__name__)
+logging.getLogger('discord.http').setLevel(logging.CRITICAL)
 
 # Yes, I took RoboDanny's file structure.
 
@@ -44,33 +48,24 @@ startup_extensions = [
     "cogs.admin",
     "cogs.reddit",
     "cogs.logging",
-    "cogs.currency"
+    "cogs.currency",
+    "cogs.settings",
+    "cogs.events"
 ]
 
 app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-main_config = os.path.join(app_path, 'prefixes.json')
-prefixes = config.Config(main_config)
+data = os.path.join(app_path, 'data.json')
+data_base = config.Config(data)
 
 def get_prefix(bot, message):
-    server_prefixes = prefixes.get('prefixes', {})
-    if message.guild.id not in server_prefixes:
+    server_data = data_base.get(message.guild.id, {})
+    if 'prefix' not in server_data:
         return '>'
     else:
-        return server_prefixes[message.guild.id]
+        return server_data['prefix']
 
 bot = commands.Bot(command_prefix=get_prefix, description=description)
-bot.prefixes = prefixes
-
-try:
-    app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-    tmp_file = os.path.join(app_path, 'config.json')
-    with open(tmp_file) as fp:
-        bot.config = json.load(fp)
-except:
-    app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-    tmp_file = os.path.join(app_path, 'example_config.json')
-    with open(tmp_file) as fp:
-        bot.config = json.load(fp)
+bot.db = data_base
 
 @bot.event
 async def on_ready():
@@ -94,6 +89,7 @@ async def on_command_error(exc, ctx):
         tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
         print(tb)
 
+credentials = config.Config(os.path.join(app_path, 'credentials.json'))
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
@@ -101,8 +97,4 @@ if __name__ == "__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             log.info(f'Failed to load extension {extension}\n{exc}')
-
-    if "discord bot token" in bot.config["token"]:
-        log.info("Bot token not found. Not running.")
-    else:
-        bot.run(bot.config["token"])
+    bot.run(credentials['token'])
