@@ -335,26 +335,6 @@ class Mod():
         embed.colour = 0x1BE118 # lucio green
         await ctx.channel.send(embed=embed)
 
-    async def on_member_join(self, member):
-
-        bans = self.tmp_banned_cache.get('bans', {})
-        db = bans.get(member.guild.id, {})
-
-        if member.id in db:
-
-            memberinfo = db.get(member.id, {})
-
-            role_objects = []
-            for role in memberinfo['roles']:
-                role_objects.append(discord.utils.get(member.guild.roles, id=role))
-
-            await member.add_roles(*role_objects)
-
-            await member.edit(nick=memberinfo['nick'])
-
-            del db[member.id]
-            bans[member.guild.id] = db
-            await self.tmp_banned_cache.put('bans', bans)
 
     async def on_message(self, message):
 

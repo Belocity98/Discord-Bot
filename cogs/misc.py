@@ -639,17 +639,6 @@ class Misc():
         all_autoassigns[server.id] = role.id
         await self.config.put('autoassign_roles', all_autoassigns)
 
-    async def on_member_join(self, member):
-        autoassigns = self.config.get('autoassign_roles', {})
-
-        server = member.server
-
-        if server.id in autoassigns:
-            role = discord.utils.get(server.roles, id=autoassigns[server.id])
-            if not role:
-                return
-
-            await member.add_roles(role)
 
 def setup(bot):
     bot.add_cog(Misc(bot))
