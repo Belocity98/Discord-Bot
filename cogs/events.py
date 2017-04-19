@@ -1,3 +1,4 @@
+import datetime
 import discord
 
 class Events():
@@ -17,32 +18,170 @@ class Events():
         return True
 
     async def on_member_join(self, member):
+
+        guild = member.guild
         server_db = self.db.get(member.guild.id, {})
         preserved_roles = server_db.get('preserved_roles', {})
+        autoassign_role = server_db.get('autoassign_role', None)
+        autoassign_role = discord.utils.get(guild.roles, id=autoassign_role)
+
+        roles_to_add = []
+
+        roles_to_add.append(autoassign_role)
 
         if member.id in preserved_roles:
-            roles = []
-            for role_id in preserved_roles[member.id]:
-                roles.append(discord.utils.get(member.guild.roles, id=role_id))
+            role_ids = preserved_roles[member.id]
+            for role in role_ids:
+                roles_to_add.append(discord.utils.get(guild.roles, id=role))
 
-            preserved_roles = server_db.get('preserved_roles', {})
             del preserved_roles[member.id]
             server_db['preserved_roles'] = preserved_roles
-            await self.db.put(member.guild.id, server_db)
+            await self.db.put(guild.id, server_db)
 
-            await member.add_roles(*roles)
+        try:
+            await member.add_roles(*roles_to_add)
+        except:
+            pass
 
     async def on_member_remove(self, member):
         server_db = self.db.get(member.guild.id, {})
-        preserved_roles = server_db.get('preserved_roles', {})
 
-        try:
-            if server_db['role_preserve']:
-                preserved_roles[member.id] = [r.id for r in member.roles]
-                server_db['preserved_roles'] = preserved_roles
-                await self.db.put(member.guild.id, server_db)
-        except KeyError:
-            pass
+        preserved_roles = server_db.get('preserved_roles', {})
+        role_preserve = server_db.get('role_preserve', False)
+
+        if role_preserve:
+            preserved_roles[member.id] = [r.id for r in member.roles]
+            server_db['preserved_roles'] = preserved_roles
+            await self.db.put(member.guild.id, server_db)
+
+    async def on_message_delete(self, message):
+
+        guild = message.guild
+
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
+        status = logging.get('status', False)
+        log_channel = logging.get('channel', '')
+        log_channel = discord.utils.get(guild.text_channels, id=log_channel)
+
+        if not log_channel:
+            return
+
+        if 'deleted_messages' in events and status:
+            embed = self.create_message_embed(message, 'deleted')
+            await log_channel.send(embed=embed)
+
+    async def on_message_edit(self, before, after):
+
+        if before.content == after.content:
+            return
+
+        guild = before.guild
+
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
+        status = logging.get('status', False)
+        log_channel = logging.get('channel', '')
+        log_channel = discord.utils.get(guild.text_channels, id=log_channel)
+
+        if not log_channel:
+            return
+
+        if 'edited_messages' in events and status:
+            embed = self.create_message_embed(before, 'edited', after_msg=after)
+            await log_channel.send(embed=embed)
+
+    async def on_channel_delete(self, channel):
+
+        guild = channel.guild
+
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
+        status = logging.get('status', False)
+        log_channel = logging.get('channel', '')
+        log_channel = discord.utils.get(guild.text_channels, id=log_channel)
+
+        if not log_channel:
+            return
+
+        if 'deleted_channels' in events and status:
+            embed = discord.Embed()
+            embed.color = 0xba0000
+
+            channel_type = 'Text' if isinstance(channel, discord.TextChannel) else 'Voice'
+
+            embed.set_footer(text='Channel Deleted', icon_url='http://i.imgur.com/Yt5YHzv.png')
+            embed.timestamp = datetime.datetime.utcnow()
+
+            embed.title = channel.name
+            embed.description = f'**Type:** {channel_type}\n' \
+                                f'**ID:** {channel.id}'
+
+            if channel.topic:
+                embed.add_field(name='Topic', value=channel.topic, inline=False)
+
+            await log_channel.send(embed=embed)
+
+    async def on_channel_create(self, channel):
+
+        guild = channel.guild
+
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
+        status = logging.get('status', False)
+        log_channel = logging.get('channel', '')
+        log_channel = discord.utils.get(guild.text_channels, id=log_channel)
+
+        if not log_channel:
+            return
+
+        if 'created_channels' in events and status:
+            embed = discord.Embed()
+            embed.color = 0x01a004
+
+            channel_type = 'Text' if isinstance(channel, discord.TextChannel) else 'Voice'
+
+            embed.set_footer(text='Channel Created', icon_url='http://i.imgur.com/gUgzCDp.png')
+            embed.timestamp = datetime.datetime.utcnow()
+
+            embed.title = channel.name
+            embed.description = f'**Type:** {channel_type}\n' \
+                                f'**ID:** {channel.id}'
+
+            if channel.topic:
+                embed.add_field(name='Topic', value=channel.topic, inline=False)
+
+            await log_channel.send(embed=embed)
+
+
+
+    def create_message_embed(self, message, event, after_msg=None):
+        author = message.author
+
+        embed = discord.Embed()
+        embed.color = 0xe00000 if event is 'deleted' else 0x0065d1
+
+        a_url = author.avatar_url_as(format='png')
+
+        embed.timestamp = datetime.datetime.utcnow() if event is 'deleted' else after_msg.edited_at
+
+        footer_text = 'Message Deleted' if event is 'deleted' else 'Message Edited'
+        icon_url = 'http://i.imgur.com/Yt5YHzv.png' if event is 'deleted' else 'http://i.imgur.com/3H8z4nW.png'
+
+        embed.set_footer(text=footer_text, icon_url=icon_url)
+        embed.set_author(name=author.name, icon_url=a_url)
+
+        if event == 'edited':
+            embed.add_field(name='Before', value=message.content)
+            embed.add_field(name='After', value=after_msg.content, inline=False)
+        else:
+            embed.description = message.content
+
+        return embed
 
 def setup(bot):
     bot.add_cog(Events(bot))
