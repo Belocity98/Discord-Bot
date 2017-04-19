@@ -1,4 +1,5 @@
-# Thanks to Danny (Rapptz on GitHub) for the uptime information.
+# Thanks to Danny (Rapptz on GitHub) for most of this cog.
+# Especially the uptime and socket stats information.
 
 import datetime
 import discord
@@ -17,6 +18,18 @@ class Stats():
     async def on_command(self, ctx):
         self.bot.commands_used[ctx.command.qualified_name] += 1
 
+    async def on_socket_response(self, msg):
+        self.bot.socket_stats[msg.get('t')] += 1
+
+    @commands.command(hidden=True)
+    async def socketstats(self, ctx):
+        delta = datetime.datetime.utcnow() - self.bot.uptime
+        minutes = delta.total_seconds() / 60
+        total = sum(self.bot.socket_stats.values())
+        cpm = total / minutes
+
+        fmt = '%s socket events observed (%.2f/minute):\n%s'
+        await ctx.send(fmt % (total, cpm, self.bot.socket_stats))
 
     def get_bot_uptime(self, *, brief=False):
         now = datetime.datetime.utcnow()
@@ -84,4 +97,5 @@ class Stats():
 
 def setup(bot):
     bot.commands_used = Counter()
+    bot.socket_stats = Counter()
     bot.add_cog(Stats(bot))
