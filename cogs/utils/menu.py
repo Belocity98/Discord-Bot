@@ -23,7 +23,6 @@ class Menu:
             ('🇭', self.show_home),
             ('🎦', self.view_settings),
             ('🔴', self.modify_settings),
-            ('🔄', self.assign_defaults),
             ('❓', self.show_help),
             ('❌', self.exit_menu)
         ]
@@ -31,7 +30,9 @@ class Menu:
         self.modification_emojis = [
             ('🇭', self.show_home),
             ('🇵', self.change_prefix),
+            ('🇦', self.change_autoassign),
             ('🇷', self.change_rolepreserve),
+            ('🇱', self.change_logging),
             ('❌', self.exit_menu)
         ]
 
@@ -54,27 +55,83 @@ class Menu:
         await prompt.delete()
 
     async def change_rolepreserve(self):
-        prompt = await self.channel.send('Enter `True` or `False` to enable/disable role preserving.')
-        try:
-            resp = await self.bot.wait_for('message', check=self.prompt_check, timeout=120)
-        except asyncio.TimeoutError:
-            await prompt.delete()
-            return
-
         server_db = self.db.get(self.guild.id, {})
-        if 't' in resp.content.lower():
-            server_db['role_preserve'] = True
-        else:
-            server_db['role_preserve'] = False
+        role_preserve = server_db.get('role_preserve', False)
+
+        role_preserve = not role_preserve
+
+        if not role_preserve:
+            status = await self.channel.send('Role preserving **DISABLED**.')
 
             p_users = server_db.get('preserved_roles', {})
             p_users = {}
             server_db['preserved_roles'] = p_users
+        else:
+            status = await self.channel.send('Role preserving **ENABLED**.')
+
+        server_db['role_preserve'] = role_preserve
 
         await self.db.put(self.guild.id, server_db)
 
-        await resp.delete()
+    async def change_autoassign(self):
+        server_db = self.db.get(self.guild.id, {})
+        autoassign = server_db.get('autoassign_role', None)
+
+        roles_dict = {}
+        for i, item in enumerate(self.guild.roles):
+            roles_dict[i] = item.name
+        del roles_dict[0]
+
+        message = ['Enter the number or the name of the role to be autoassigned.']
+        for key, val in roles_dict.items():
+            message.append(f'{key}. {val}')
+
+        prompt = await self.channel.send('\n'.join(message))
+
+        try:
+            resp = await self.bot.wait_for('message', check=self.prompt_check, timeout=120)
+        except asyncio.TimeoutError:
+            return
+
+        if resp.content.isdigit():
+            index = int(resp.content)
+            if index not in roles_dict.keys():
+                await self.channel.send('Number not valid.')
+                return
+
+            role = discord.utils.get(self.guild.roles, name=roles_dict[index])
+
+        else:
+            name = resp.content
+            if name not in roles_dict.values():
+                await self.channel.send('Name not valid.')
+                return
+            role = discord.utils.get(self.guild.roles, name=name)
+
         await prompt.delete()
+        await resp.delete()
+
+        server_db['autoassign_role'] = role.id
+
+        await self.db.put(self.guild.id, server_db)
+
+    async def change_logging(self):
+        server_db = self.db.get(self.guild.id, {})
+        logging_dict = server_db.get('logging', {})
+        logging = logging_dict.get('status', False)
+
+        logging = not logging
+
+        if not logging:
+            status = await self.channel.send('Logging **DISABLED**.')
+        else:
+            status = await self.channel.send('Logging **ENABLED**.')
+
+        logging_dict['status'] = logging
+        server_db['logging'] = logging_dict
+
+        await self.db.put(self.guild.id, server_db)
+
 
     async def show_home(self, initial=False):
 
@@ -106,38 +163,32 @@ class Menu:
 
     async def view_settings(self):
         server_db = self.db.get(self.guild.id, {})
+        logging_dict = server_db.get('logging', {})
 
-        if 'prefix' not in server_db:
-            await self.assign_defaults()
+        prefix = server_db.get('prefix', '>')
+        role_preserve = server_db.get('role_preserve', False)
 
-        prefix = server_db['prefix']
-        role_preserve = server_db['role_preserve']
-        autoassign_role = server_db['autoassign_role']
+        autoassign_role = server_db.get('autoassign_role', None)
+        autoassign_role = discord.utils.get(self.guild.roles, id=autoassign_role)
+        autoassign_role = autoassign_role.name if autoassign_role else 'None'
+
+        logging = logging_dict.get('status', False)
 
         self.embed.description = f'**Prefix:** {prefix}' \
                                 f'\n**Role Preserve:** {role_preserve}' \
-                                f'\n**AutoAssign Role:** {autoassign_role}'
+                                f'\n**AutoAssign Role:** {autoassign_role}' \
+                                f'\n**Logging:** {logging}'
 
     async def show_help(self):
         self.embed.description = '🇭 - Go Home' \
                                 '\n🎦 - View Current Settings' \
                                 '\n🔴 - Modify Settings' \
-                                '\n🔄 - Restore Default Settings' \
                                 '\n❓ - Show this Page' \
                                 '\n❌ - Exit the Settings Menu'
 
     async def exit_menu(self):
         self.active = False
         await self.message.delete()
-
-    async def assign_defaults(self):
-        server_db = self.db.get(self.guild.id, {})
-
-        server_db['prefix'] = '>'
-        server_db['role_preserve'] = False
-        server_db['autoassign_role'] = None
-
-        await self.db.put(self.guild.id, server_db)
 
     async def update_embed(self):
         try:
@@ -151,7 +202,8 @@ class Menu:
 
         self.embed.description = '🇭 - Go Home' \
                             '\n🇵 - Change Bot Prefix' \
-                            '\n🇷 - Change Role Preserve' \
+                            '\n🇷 - Toggle Role Preserve' \
+                            '\n🇱 - Toggle Logging' \
                             '\n❌ - Exit the Settings Menu'
 
     def react_check(self, reaction, user):
