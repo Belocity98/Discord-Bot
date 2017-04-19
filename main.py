@@ -59,10 +59,7 @@ data_base = config.Config(data)
 
 def get_prefix(bot, message):
     server_data = data_base.get(message.guild.id, {})
-    if 'prefix' not in server_data:
-        return '>'
-    else:
-        return server_data['prefix']
+    return server_data.get('prefix', '>')
 
 bot = commands.Bot(command_prefix=get_prefix, description=description)
 bot.db = data_base
