@@ -4,7 +4,6 @@ import discord
 import aiohttp
 import asyncio
 import logging
-import json
 import sys
 import os
 
@@ -50,7 +49,8 @@ startup_extensions = [
     "cogs.logging",
     "cogs.currency",
     "cogs.settings",
-    "cogs.events"
+    "cogs.events",
+    "cogs.nsfw"
 ]
 
 app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -66,6 +66,7 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=get_prefix, description=description)
 bot.db = data_base
+bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent' : 'Wumpus Bot'})
 
 @bot.event
 async def on_ready():
@@ -89,7 +90,7 @@ async def on_command_error(exc, ctx):
         tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
         print(tb)
 
-credentials = config.Config(os.path.join(app_path, 'credentials.json'))
+bot.credentials = config.Config(os.path.join(app_path, 'credentials.json'))
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
@@ -97,4 +98,4 @@ if __name__ == "__main__":
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             log.info(f'Failed to load extension {extension}\n{exc}')
-    bot.run(credentials['token'])
+    bot.run(bot.credentials['token'])

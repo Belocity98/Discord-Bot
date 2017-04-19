@@ -7,6 +7,15 @@ class Events():
 
         self.db = bot.db
 
+    def __global_check(self, ctx):
+        server_db = self.db.get(ctx.guild.id, {})
+        disabled_cmds = server_db.get('disabled_cmds', [])
+
+        if ctx.command.name in disabled_cmds:
+            return False
+
+        return True
+
     async def on_member_join(self, member):
         server_db = self.db.get(member.guild.id, {})
         preserved_roles = server_db.get('preserved_roles', {})
