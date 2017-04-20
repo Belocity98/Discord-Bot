@@ -61,7 +61,7 @@ class Stats():
 
         embed = discord.Embed()
         embed.title = 'Official Bot Guild Invite'
-        embed.url = 'https://discord.gg/Whf6UUk'
+        embed.url = 'https://discord.gg/xbBmYcq'
         embed.colour = 0x1BE118 # lucio green
 
         owner = await self.bot.get_user_info(self.bot.config['your_user_id'])
