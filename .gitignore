@@ -55,3 +55,4 @@ config.json
 # Not Being Used
 music.py
 run.bat
+credentials.json

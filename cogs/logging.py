@@ -1,201 +1,146 @@
-import datetime
 import discord
-import asyncio
-import logging
-import os
-import sys
 
 from discord.ext import commands
-from .utils import config
-
-log = logging.getLogger(__name__)
+from .utils import checks
 
 class Logging():
 
     def __init__(self, bot):
         self.bot = bot
 
-        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-        cfgfile = os.path.join(app_path, 'logging.json')
-        self.config = config.Config(cfgfile, loop=bot.loop)
+        self.db = bot.db
 
-    @commands.command(no_pm=True)
-    @commands.has_permissions(administrator=True)
-    async def enablelogging(self, ctx):
-        """Enable logging for the guild."""
+    @commands.group(name='log', no_pm=True, invoke_without_command=True)
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def _log(self, ctx):
         guild = ctx.guild
 
-        logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        embed = discord.Embed()
+        embed.color = 0xc542f4
 
-        if db == True:
-            embed = discord.Embed(description='Logging is already enabled!')
-            embed.colour = 0x1BE118
-            await ctx.channel.send(embed=embed)
-            return
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
+        log_channel = logging.get('channel', '')
+        log_channel = discord.utils.get(guild.text_channels, id=log_channel)
 
-        db = True
-        embed = discord.Embed(description='Logging enabled!')
-        embed.colour = 0x1BE118
-        await ctx.channel.send(embed=embed)
+        embed.title = 'Logging'
+        embed.description = f'**Logging Channel:** {log_channel.name}\n' if log_channel else 'Logging Channel: None\n'
+        embed.description += '**Events being logged:**\n'
+        embed.description += '\n'.join(events) if events else 'Not logging any events.'
 
-        logging[guild.id] = db
+        await ctx.send(embed=embed)
 
-        await self.config.put('logging', logging)
-
-    @commands.command(no_pm=True)
-    @commands.has_permissions(administrator=True)
-    async def disablelogging(self, ctx):
-        """Disable logging for the guild."""
+    @_log.command(no_pm=True, name='mark')
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def _mark(self, ctx):
         guild = ctx.guild
 
-        logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        channel = logging.get('channel', '')
 
-        if db == False:
-            embed = discord.Embed(description='Logging is already disabled!')
-            embed.colour = 0x1BE118
-            await ctx.channel.send(embed=embed)
-            return
+        channel = ctx.channel.id
 
-        db = False
-        embed = discord.Embed(description='Logging disabled!')
-        embed.colour = 0x1BE118
-        await ctx.channel.send(embed=embed)
+        logging['channel'] = channel
+        server_db['logging'] = logging
+        await self.db.put(guild.id, server_db)
 
-        logging[guild.id] = db
+        await ctx.send(f'Logging channel set to {ctx.channel.name}.')
 
-        await self.config.put('logging', logging)
+    @_log.group(no_pm=True, name='messages', aliases=['message'])
+    async def l_message(self, ctx):
+        """Subcommand group for logging messages."""
 
-    def check_if_logging(self, guild, channel):
+    @_log.group(no_pm=True, name='channels', aliases=['channel'])
+    async def l_channel(self, ctx):
+        """Subcommand group for logging channels."""
 
-        if guild == None:
-            return
+    @l_message.command(no_pm=True, name='deleted')
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def m_deleted(self, ctx):
+        guild = ctx.guild
 
-        can_make_c = channel.permissions_for(guild.me).manage_channels
-        if not can_make_c:
-            return
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
 
-        logging = self.config.get('logging', {})
-        db = logging.get(guild.id, {})
+        events.append('deleted_messages') if 'deleted_messages' not in events else events.remove('deleted_messages')
 
-        if db == True:
-            return True
+        status = '**ENABLED**' if 'deleted_messages' in events else '**DISABLED**'
 
-        else:
-            return False
+        await ctx.send(f'Logging deleted messages {status}.')
 
-    async def create_logging_channel(self, guild):
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            guild.owner: discord.PermissionOverwrite(read_messages=True)
-        }
+        logging['events'] = events
+        server_db['logging'] = logging
 
-        await guild.create_text_channel('bot-logging', overwrites=overwrites)
+        await self.db.put(guild.id, server_db)
 
-        log.info(f'bot-logging channel created in {guild.name}.')
-        return
+    @l_message.command(no_pm=True, name='edited')
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def m_edited(self, ctx):
+        guild = ctx.guild
 
-    async def on_message_delete(self, message):
-        guild = message.guild
-        channel = message.channel
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
 
-        if not self.check_if_logging(guild, channel):
-            return
+        events.append('edited_messages') if 'edited_messages' not in events else events.remove('edited_messages')
 
-        if guild == None:
-            return
+        status = '**ENABLED**' if 'edited_messages' in events else '**DISABLED**'
 
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
-        if logging_channel == None:
-            await self.create_logging_channel(guild)
+        await ctx.send(f'Logging edited messages {status}.')
 
-        else:
-            embed = discord.Embed(description=message.content)
-            embed.colour = 0x1BE118 # lucio green
-            embed.set_author(name=message.author, icon_url=message.author.avatar_url)
-            embed.set_footer(text="Message Deleted", icon_url='http://i.imgur.com/ulgDAMM.png')
-            embed.timestamp = message.created_at
-            if len(message.attachments) != 0:
-                embed.set_image(url=message.attachments[0]['proxy_url'])
-            if len(message.embeds) != 0:
-                embed = discord.Embed.from_data(message.embeds[0])
-                await logging_channel.send(content="**Message Deleted**", embed=embed)
-                return
-            await logging_channel.send(embed=embed)
+        logging['events'] = events
+        server_db['logging'] = logging
 
-    async def on_message_edit(self, before, after):
-        guild = before.guild
-        channel = after.channel
+        await self.db.put(guild.id, server_db)
 
-        if not self.check_if_logging(guild, channel):
-            return
+    @l_channel.command(no_pm=True, name='deleted')
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def c_deleted(self, ctx):
+        guild = ctx.guild
 
-        if guild == None:
-            return
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
 
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
-        if logging_channel == None:
-            await self.create_logging_channel(guild)
-            return
-        if before.author == before.guild.me:
-            return
-        if before.content == after.content:
-            return
+        events.append('deleted_channels') if 'deleted_channels' not in events else events.remove('deleted_channels')
 
-        embed = discord.Embed()
-        embed.add_field(name="Before Content", value=before.content, inline=False)
-        embed.add_field(name='After Content', value=after.content, inline=False)
-        embed.set_footer(text="Message Edited", icon_url='http://i.imgur.com/zWTQEYe.png')
-        embed.timestamp = after.edited_at
-        embed.colour = 0x1BE118 # lucio green
-        embed.set_author(name=before.author, icon_url=before.author.avatar_url)
+        status = '**ENABLED**' if 'deleted_channels' in events else '**DISABLED**'
 
-        await logging_channel.send(embed=embed)
+        await ctx.send(f'Logging deleted channels {status}.')
 
-    async def on_channel_delete(self, channel):
-        guild = channel.guild
+        logging['events'] = events
+        server_db['logging'] = logging
 
-        if not self.check_if_logging(guild, channel):
-            return
+        await self.db.put(guild.id, server_db)
 
-        if guild == None:
-            return
+    @l_channel.command(no_pm=True, name='created')
+    @commands.has_permissions(manage_guild=True)
+    @checks.doing_logging()
+    async def c_created(self, ctx):
+        guild = ctx.guild
 
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
-        if logging_channel == None:
-            await self.create_logging_channel(guild)
-            return
+        server_db = self.db.get(guild.id, {})
+        logging = server_db.get('logging', {})
+        events = logging.get('events', [])
 
-        embed = discord.Embed()
-        embed.description = f'**{channel.name}** deleted.'
-        embed.set_footer(text="Channel Deleted", icon_url='http://i.imgur.com/ulgDAMM.png')
-        embed.timestamp = datetime.datetime.utcnow()
-        embed.colour = 0x1BE118 # lucio green
+        events.append('created_channels') if 'created_channels' not in events else events.remove('created_channels')
 
-        await logging_channel.send(embed=embed)
+        status = '**ENABLED**' if 'created_channels' in events else '**DISABLED**'
 
-    async def on_channel_create(self, channel):
-        guild = channel.guild
+        await ctx.send(f'Logging created channels {status}.')
 
-        if not self.check_if_logging(guild, channel):
-            return
+        logging['events'] = events
+        server_db['logging'] = logging
 
-        if guild == None:
-            return
-
-        logging_channel = discord.utils.find(lambda c: c.name == 'bot-logging', guild.channels)
-        if logging_channel == None:
-            await self.create_logging_channel(guild)
-            return
-
-        embed = discord.Embed()
-        embed.description = f'**{channel.name}** created.'
-        embed.set_footer(text="Channel Created", icon_url='http://i.imgur.com/ZNzc9gM.png')
-        embed.timestamp = datetime.datetime.utcnow()
-        embed.colour = 0x1BE118 # lucio green
-
-        await logging_channel.send(embed=embed)
+        await self.db.put(guild.id, server_db)
 
 def setup(bot):
     bot.add_cog(Logging(bot))

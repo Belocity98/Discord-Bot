@@ -34,7 +34,7 @@ class Config:
         with open(temp, 'w', encoding='utf-8') as tmp:
             json.dump(self._db.copy(), tmp, ensure_ascii=True, cls=self.encoder, separators=(',', ':'))
 
-        # automatically move the file
+        # atomically move the file
         os.replace(temp, self.name)
 
     async def save(self):
@@ -43,43 +43,23 @@ class Config:
 
     def get(self, key, *args):
         """Retrieves a config entry."""
-        key = str(key)
-
-        tmp_db = self._db.get(key, *args)
-
-        def str_to_int(dictionary):
-            for key in dictionary:
-                if isinstance(key, str):
-                    if key.isdigit():
-                        popped_key = dictionary.pop(key)
-                        if isinstance(popped_key, dict):
-                            str_to_int(popped_key)
-
-                        dictionary[int(key)] = popped_key
-
-            return dictionary
-
-
-        tmp_db = str_to_int(tmp_db)
-
-        return tmp_db
+        return self._db.get(str(key), *args)
 
     async def put(self, key, value, *args):
         """Edits a config entry."""
-
-        self._db[key] = value
+        self._db[str(key)] = value
         await self.save()
 
     async def remove(self, key):
         """Removes a config entry."""
-        del self._db[key]
+        del self._db[str(key)]
         await self.save()
 
     def __contains__(self, item):
         return item in self._db
 
     def __getitem__(self, item):
-        return self._db[item]
+        return self._db[str(item)]
 
     def __len__(self):
         return len(self._db)
