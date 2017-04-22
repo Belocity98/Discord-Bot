@@ -60,7 +60,7 @@ class Mod():
     async def purge(self, ctx, limit : int=10):
         """Deletes messages from the channel."""
 
-        limit = limit += 1
+        limit += 1
 
         if limit > 100 or limit < 1:
             await ctx.send('Invalid limit!')
