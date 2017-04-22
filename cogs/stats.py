@@ -96,7 +96,9 @@ class Stats():
         embed.url = 'https://discord.gg/xbBmYcq'
         embed.colour = 0x1BE118 # lucio green
 
-        owner = await self.bot.get_user_info(self.bot.config['your_user_id'])
+        owner_id = self.bot.db.get('owner', 183389299524239361)
+
+        owner = await self.bot.get_user_info(owner_id)
 
         embed.set_author(name=str(owner), icon_url=owner.avatar_url)
 
