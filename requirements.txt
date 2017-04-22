@@ -8,3 +8,4 @@ lxml==3.7.3
 urbandict==0.5
 xkcd==2.4.1
 validators==0.11.3
+html2text==2016.9.19

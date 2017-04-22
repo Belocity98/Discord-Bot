@@ -10,6 +10,7 @@ import sys
 import os
 
 from lxml import etree
+from html2text import html2text
 from discord.ext import commands
 from urllib.parse import parse_qs
 from datetime import datetime, timezone
@@ -20,6 +21,10 @@ class Misc():
 
     def __init__(self, bot):
         self.bot = bot
+
+        self.session = bot.session
+
+        self.quote_api = r"http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1"
 
     @commands.command()
     async def ping(self, ctx):
@@ -39,18 +44,18 @@ class Misc():
 
         quote = None
 
-        if message_id == None:
+        if not message_id:
             async for message in ctx.channel.history():
                 if message.author == user:
                     quote = message
                     break
 
-        elif message_id != None:
+        elif message_id:
             quote = await channel.get_message(message_id)
 
-        if quote == None:
+        if not quote:
             embed = discord.Embed(description='Quote not found.')
-            embed.colour = 0x1BE118 # lucio green
+            embed.colour = 0x42c2f4
             await ctx.channel.send(embed=embed)
 
             return
@@ -58,7 +63,7 @@ class Misc():
         embed = discord.Embed(description=quote.content)
         embed.set_author(name=quote.author.name, icon_url=quote.author.avatar_url)
         embed.timestamp = quote.created_at
-        embed.colour = 0x1BE118 # lucio green
+        embed.colour = 0x42c2f4
 
         await ctx.channel.send(embed=embed)
 
@@ -104,7 +109,7 @@ class Misc():
 
         embed = discord.Embed(description=f'[Image Link]({comicurl})')
         embed.set_image(url=comicurl)
-        embed.colour = 0x1BE118 # lucio green
+        embed.colour = 0x42c2f4
 
         try:
             await ctx.channel.send(embed=embed)
@@ -112,7 +117,7 @@ class Misc():
             pass
 
     @commands.command()
-    async def urband(self, ctx, *, word : str):
+    async def urban(self, ctx, *, word : str):
         """Sends the definition of a word from the UrbanDictionary."""
 
         word_list = urbandict.define(word)
@@ -120,11 +125,27 @@ class Misc():
         embed = discord.Embed(title=word_list[0]['word'])
         embed.description = word_list[0]['def']
 
-        embed.colour = 0x1BE118 # lucio green
+        embed.colour = 0x42c2f4
 
-        await ctx.channel.send(embed=embed)
+        await ctx.send(embed=embed)
 
+    @commands.command()
+    async def inspire(self, ctx):
+        """Sends a random quote."""
 
+        async with self.session.get(self.quote_api) as rawdata:
+            resp = await rawdata.json()
+
+        quote_data = resp[0]
+        title = quote_data['title']
+        content = html2text(quote_data['content'])
+
+        embed = discord.Embed()
+        embed.colour = 0x42c2f4
+        embed.description = f'**{content}**'
+        embed.description += f'\n- {title}'
+
+        await ctx.send(embed=embed)
 
     def parse_google_card(self, node):
         if node is None:
