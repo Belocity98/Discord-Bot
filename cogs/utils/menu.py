@@ -33,6 +33,7 @@ class Menu:
             ('🇦', self.change_autoassign),
             ('🇷', self.change_rolepreserve),
             ('🇱', self.change_logging),
+            ('🇺', self.change_units),
             ('❌', self.exit_menu)
         ]
 
@@ -80,7 +81,7 @@ class Menu:
         roles_dict = {}
         for i, item in enumerate(self.guild.roles):
             roles_dict[i] = item.name
-        del roles_dict[0]
+        roles_dict[0] = None
 
         message = ['Enter the number or the name of the role to be autoassigned.']
         for key, val in roles_dict.items():
@@ -111,7 +112,7 @@ class Menu:
         await prompt.delete()
         await resp.delete()
 
-        server_db['autoassign_role'] = role.id
+        server_db['autoassign_role'] = role.id if role else None
 
         await self.db.put(self.guild.id, server_db)
 
@@ -130,6 +131,21 @@ class Menu:
         logging_dict['status'] = logging
         server_db['logging'] = logging_dict
 
+        await self.db.put(self.guild.id, server_db)
+
+    async def change_units(self):
+        server_db = self.db.get(self.guild.id, {})
+        units = server_db.get('units', 'imperial')
+
+        if units == 'imperial':
+            units = 'metric'
+            await self.channel.send('Units changed to **metric**.')
+
+        elif units == 'metric':
+            units = 'imperial'
+            await self.channel.send('Units changed to **imperial**.')
+
+        server_db['units'] = units
         await self.db.put(self.guild.id, server_db)
 
 
@@ -174,10 +190,14 @@ class Menu:
 
         logging = logging_dict.get('status', False)
 
+        units = server_db.get('units', 'imperial').title()
+
         self.embed.description = f'**Prefix:** {prefix}' \
                                 f'\n**Role Preserve:** {role_preserve}' \
                                 f'\n**AutoAssign Role:** {autoassign_role}' \
-                                f'\n**Logging:** {logging}'
+                                f'\n**Logging:** {logging}' \
+                                f'\n**Units:** {units}'
+
 
     async def show_help(self):
         self.embed.description = '🇭 - Go Home' \
@@ -202,8 +222,10 @@ class Menu:
 
         self.embed.description = '🇭 - Go Home' \
                             '\n🇵 - Change Bot Prefix' \
+                            '\n🇦 - Change Autoassign Role' \
                             '\n🇷 - Toggle Role Preserve' \
                             '\n🇱 - Toggle Logging' \
+                            '\n🇺 - Toggle Units' \
                             '\n❌ - Exit the Settings Menu'
 
     def react_check(self, reaction, user):
