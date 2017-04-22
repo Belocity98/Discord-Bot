@@ -15,11 +15,43 @@ class Stats():
     def __init__(self, bot):
         self.bot = bot
 
+        self.discord_cdn = r'https://cdn.discordapp.com'
+
     async def on_command(self, ctx):
         self.bot.commands_used[ctx.command.qualified_name] += 1
 
     async def on_socket_response(self, msg):
         self.bot.socket_stats[msg.get('t')] += 1
+
+    @commands.command(no_pm=True)
+    async def serverinfo(self, ctx):
+        """Shows info for the current server."""
+
+        guild = ctx.guild
+
+        owner = guild.owner
+
+        embed = discord.Embed()
+        embed.color = 0xf2a60e
+
+        mfa = True if guild.mfa_level == 1 else False
+
+        icon_url = f'{self.discord_cdn}/icons/{guild.id}/{guild.icon}'
+
+        embed.title = guild.name
+        embed.description = f'**Owner:** {owner.name}' \
+                            f'\n**Server ID:** {guild.id}' \
+                            f'\n**2FA:** {mfa}' \
+                            f'\n**Members:** {guild.member_count}'
+
+        if guild.afk_channel:
+            embed.description += f'\n**AFK Channel:** {guild.afk_channel.name}\n**AFK Timeout:** {guild.afk_timeout}'
+
+        embed.set_thumbnail(url=icon_url)
+
+        embed.timestamp = guild.created_at
+
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
     async def socketstats(self, ctx):
