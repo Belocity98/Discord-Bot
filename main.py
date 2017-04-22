@@ -50,7 +50,8 @@ startup_extensions = [
     'cogs.currency',
     'cogs.settings',
     'cogs.events',
-    'cogs.nsfw'
+    'cogs.nsfw',
+    'cogs.weather'
 ]
 
 app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
