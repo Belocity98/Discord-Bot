@@ -32,6 +32,23 @@ class Misc():
 
         await ctx.send(message.replace('@everyone', '@\u200beveryone').replace('@here', '@\u200bhere'))
 
+    @commands.command(no_pm=True)
+    async def avatar(self, ctx, member : discord.Member):
+        """Sends the current avatar of the member."""
+
+        await ctx.channel.trigger_typing()
+
+        embed = discord.Embed()
+        embed.colour = 0x42c2f4
+
+        a_url = member.avatar_url_as(format=None, size=1024)
+
+        embed.description = f'[Link]({a_url})'
+        embed.set_image(url=a_url)
+
+        await ctx.send(embed=embed)
+
+    @commands.command()
     async def ping(self, ctx):
         x = await ctx.send('Ping!')
         time = datetime.now()
