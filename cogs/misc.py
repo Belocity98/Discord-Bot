@@ -27,6 +27,11 @@ class Misc():
         self.quote_api = r"http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1"
 
     @commands.command()
+    async def echo(self, ctx, *, message : str):
+        """Echos a message."""
+
+        await ctx.send(message.replace('@everyone', '@\u200beveryone').replace('@here', '@\u200bhere'))
+
     async def ping(self, ctx):
         x = await ctx.send('Ping!')
         time = datetime.now()
