@@ -40,14 +40,12 @@ logging.getLogger('discord.http').setLevel(logging.CRITICAL)
 
 # this specifies what extensions to load when the bot starts up
 startup_extensions = [
-    'cogs.games',
     'cogs.mod',
     'cogs.misc',
     'cogs.stats',
     'cogs.admin',
     'cogs.reddit',
     'cogs.logging',
-    'cogs.currency',
     'cogs.settings',
     'cogs.events',
     'cogs.nsfw',
