@@ -36,6 +36,8 @@ class Logging():
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def _mark(self, ctx):
+        """Marks a channel as the logging channel."""
+
         guild = ctx.guild
 
         server_db = self.db.get(guild.id, {})
