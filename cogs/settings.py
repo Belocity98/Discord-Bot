@@ -4,7 +4,7 @@ from discord.ext import commands
 from .utils import checks
 from .utils.menu import Menu
 
-class Settings():
+class Settings:
 
     def __init__(self, bot):
         self.bot = bot

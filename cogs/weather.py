@@ -2,7 +2,7 @@ import discord
 
 from discord.ext import commands
 
-class Weather():
+class Weather:
 
     def __init__(self, bot):
         self.bot = bot

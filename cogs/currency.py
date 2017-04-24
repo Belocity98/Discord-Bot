@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
-class Currency():
+class Currency:
 
     def __init__(self, bot):
         self.bot = bot

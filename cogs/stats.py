@@ -10,7 +10,7 @@ import os
 from discord.ext import commands
 from collections import Counter
 
-class Stats():
+class Stats:
 
     def __init__(self, bot):
         self.bot = bot

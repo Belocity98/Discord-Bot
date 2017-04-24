@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 
 log = logging.getLogger(__name__)
 
-class Misc():
+class Misc:
 
     def __init__(self, bot):
         self.bot = bot

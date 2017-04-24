@@ -10,7 +10,7 @@ from .utils import config
 
 log = logging.getLogger(__name__)
 
-class Games():
+class Games:
 
     def __init__(self, bot):
         self.bot = bot

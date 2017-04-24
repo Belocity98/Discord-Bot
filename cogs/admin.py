@@ -9,7 +9,7 @@ from .utils import checks
 
 log = logging.getLogger(__name__)
 
-class Admin():
+class Admin:
 
     def __init__(self, bot):
         self.bot = bot

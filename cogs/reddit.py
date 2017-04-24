@@ -4,7 +4,7 @@ import validators
 
 from discord.ext import commands
 
-class Reddit():
+class Reddit:
 
     def __init__(self, bot):
         self.bot = bot

@@ -5,7 +5,7 @@ from discord.ext import commands
 from random import randint
 from .utils import checks
 
-class NSFW():
+class NSFW:
 
     def __init__(self, bot):
         self.bot = bot

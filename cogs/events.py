@@ -1,7 +1,7 @@
 import datetime
 import discord
 
-class Events():
+class Events:
 
     def __init__(self, bot):
         self.bot = bot
