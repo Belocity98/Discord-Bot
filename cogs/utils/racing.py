@@ -58,7 +58,7 @@ class Racing:
 
         old_pos = self.positions[uid]
 
-        step = randint(-1, self.rand_step)
+        step = randint(0, self.rand_step)
 
         self.positions[uid] += step
 
