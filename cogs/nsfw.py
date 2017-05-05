@@ -46,34 +46,6 @@ class NSFW:
 
         await searching.edit(content=' ', embed=embed)
 
-    @nsfw.command(no_pm=True, name='enable')
-    @commands.has_permissions(manage_guild=True)
-    async def n_enable(self, ctx):
-        """Enables nsfw command for this channel."""
-        server_db = self.db.get(ctx.guild.id, {})
-        nsfw_channels = server_db.get('nsfw_channels', [])
-
-        nsfw_channels.append(ctx.channel.id)
-
-        server_db['nsfw_channels'] = nsfw_channels
-        await self.db.put(ctx.guild.id, server_db)
-
-        await ctx.send('👍')
-
-    @nsfw.command(no_pm=True, name='disable')
-    @commands.has_permissions(manage_guild=True)
-    async def n_disable(self, ctx):
-        """Disables nsfw command for this channel."""
-        server_db = self.db.get(ctx.guild.id, {})
-        nsfw_channels = server_db.get('nsfw_channels', [])
-
-        nsfw_channels.remove(ctx.channel.id)
-
-        server_db['nsfw_channels'] = nsfw_channels
-        await self.db.put(ctx.guild.id, server_db)
-
-        await ctx.send('👍')
-
     async def api_call(self, request, format, query, limit):
         url = f'{self.api_url}{request}.{format}?q={query}&limit={limit}&key={self.api_key}'
 

@@ -10,10 +10,7 @@ def is_owner_check(ctx):
     return ctx.author.id == ctx.bot.db['owner']
 
 def is_nsfw_check(ctx):
-    server_db = ctx.bot.db.get(ctx.guild.id, {})
-    nsfw_channels = server_db.get('nsfw_channels', [])
-
-    return ctx.channel.id in nsfw_channels
+    return isinstance(ctx.channel, discord.TextChannel) and ctx.channel.is_nsfw()
 
 def do_logging_check(ctx):
     server_db = ctx.bot.db.get(ctx.guild.id, {})
