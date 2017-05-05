@@ -15,6 +15,7 @@ class Games:
 
     @commands.command()
     async def race(self, ctx):
+        """Enters you for a horse race."""
 
         if ctx.channel.id in self.active_race_channels:
             return
