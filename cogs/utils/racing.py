@@ -14,6 +14,15 @@ class Racing:
         self.message = message
         self.channel = message.channel
 
+        self.race_cars = [
+            183389299524239361 # Tyler's ID
+            #256534094819622912 # Jarrod's ID
+        ]
+        self.car_step = 7
+
+        self.horse_emoji = '\N{HORSE RACING}'
+        self.car_emoji = '\N{RACING CAR}'
+
         self.rand_step = 3
         self.track_length = 30
 
@@ -38,7 +47,7 @@ class Racing:
             name = f'{user.name}\'s Horse'
 
             track_list = list(track)
-            track_list[0] = '\N{HORSE RACING}'
+            track_list[0] = self.horse_emoji if user.id not in self.race_cars else self.car_emoji
 
             track = ''.join(track_list)
 
@@ -58,7 +67,7 @@ class Racing:
 
         old_pos = self.positions[uid]
 
-        step = randint(0, self.rand_step)
+        step = randint(0, self.rand_step) if user.id not in self.race_cars else randint(2, self.car_step)
 
         self.positions[uid] += step
 
@@ -72,10 +81,10 @@ class Racing:
         track_list[old_pos] = '-'
 
         try:
-            track_list[new_pos] = '\N{HORSE RACING}'
+            track_list[new_pos] = self.horse_emoji if uid not in self.race_cars else self.car_emoji
         except IndexError:
             new_pos = self.track_length - 1
-            track_list[new_pos] = '\N{HORSE RACING}'
+            track_list[new_pos] = self.horse_emoji if uid not in self.race_cars else self.car_emoji
 
         self.tracks[uid] = ''.join(track_list)
 
