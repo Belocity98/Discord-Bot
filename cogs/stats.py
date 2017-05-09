@@ -92,7 +92,7 @@ class Stats:
         """Tells you information about the bot itself."""
 
         embed = discord.Embed()
-        embed.title = 'Official Bot Guild Invite'
+        embed.title = 'Official Bot Server Invite'
         embed.url = 'https://discord.gg/xbBmYcq'
         embed.colour = 0x1BE118 # lucio green
 
@@ -101,6 +101,7 @@ class Stats:
         owner = await self.bot.get_user_info(owner_id)
 
         embed.set_author(name=str(owner), icon_url=owner.avatar_url)
+        embed.set_thumbnail(url='http://i.imgur.com/vXHZs0H.png')
 
         # statistics
         total_members = sum(len(s.members) for s in self.bot.guilds)
