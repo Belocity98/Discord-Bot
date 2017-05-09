@@ -6,7 +6,7 @@ from random import randint
 
 class Racing:
 
-    def __init__(self, bot, message : discord.Message, users : list):
+    def __init__(self, bot, message : discord.Message, users : list, race_cars : list=[]):
         self.bot = bot
 
         self.users = users
@@ -14,10 +14,7 @@ class Racing:
         self.message = message
         self.channel = message.channel
 
-        self.race_cars = [
-            183389299524239361 # Tyler's ID
-            #256534094819622912 # Jarrod's ID
-        ]
+        self.race_cars = race_cars
         self.car_step = 7
 
         self.horse_emoji = '\N{HORSE RACING}'
