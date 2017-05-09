@@ -42,11 +42,11 @@ class Mod:
         await ctx.send(embed=public_embed)
         await member.send(embed=user_embed)
 
-        await member.ban(delete_message_days=0)
+        await member.ban(reason=reason, delete_message_days=0)
 
         await asyncio.sleep(length)
 
-        await member.unban()
+        await member.unban(reason='Softban time expired.')
 
     @commands.command(no_pm=True)
     @commands.has_permissions(kick_members=True)
