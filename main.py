@@ -79,7 +79,7 @@ async def on_ready():
         bot.uptime = datetime.datetime.utcnow()
 
 @bot.event
-async def on_command_error(exc, ctx):
+async def on_command_error(ctx, exc):
     e = getattr(exc, 'original', exc)
     if isinstance(e, (commands.MissingRequiredArgument, commands.CommandOnCooldown, discord.Forbidden)):
         log.info(str(e))
