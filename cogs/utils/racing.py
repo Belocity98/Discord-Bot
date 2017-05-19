@@ -16,7 +16,7 @@ class Racing:
 
         self.horse_emoji = '\N{HORSE RACING}'
 
-        self.rand_step = 3
+        self.rand_step = 4
         self.track_length = 30
 
         self.positions = {}
