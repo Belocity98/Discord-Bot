@@ -14,6 +14,8 @@ class Mod:
 
         self.db = bot.db
 
+        self.active_bans = 0
+
     @commands.command(no_pm=True)
     @commands.has_permissions(ban_members=True)
     async def softban(self, ctx, member : discord.Member, length : int, *, reason : str='No reason given.'):
@@ -43,10 +45,18 @@ class Mod:
         await member.send(embed=user_embed)
 
         await member.ban(reason=reason, delete_message_days=0)
+        self.active_bans += 1
 
         await asyncio.sleep(length)
 
+        self.active_bans -= 1
         await member.unban(reason='Softban time expired.')
+
+    @commands.command()
+    @checks.is_owner()
+    async def activebans(self, ctx):
+        """Views the amount of active softbans."""
+        await ctx.send(self.active_bans)
 
     @commands.command(no_pm=True)
     @commands.has_permissions(kick_members=True)
