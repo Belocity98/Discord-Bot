@@ -32,7 +32,7 @@ class Racing:
 
         embed.title = 'Horse Racing'
 
-        track = self.horse_emoji + ('-' * self.track_length-1)
+        track = self.horse_emoji + ('-' * (self.track_length-1))
 
         for i, user in enumerate(self.users):
             name = f'{user.name}\'s Horse'
