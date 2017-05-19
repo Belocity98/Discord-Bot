@@ -2,7 +2,6 @@ import traceback
 import datetime
 import discord
 import aiohttp
-import asyncio
 import logging
 import sys
 import os
