@@ -28,21 +28,14 @@ class Racing:
         """Gets the inital embed for the track."""
 
         embed = discord.Embed()
-        embed.color = 0x019608
+        embed.colour = 0x019608
 
         embed.title = 'Horse Racing'
 
-        track = ''
-        for i in range(self.track_length):
-            track += '-'
+        track = self.horse_emoji + ('-' * self.track_length-1)
 
         for i, user in enumerate(self.users):
             name = f'{user.name}\'s Horse'
-
-            track_list = list(track)
-            track_list[0] = self.horse_emoji
-
-            track = ''.join(track_list)
 
             embed.add_field(name=name, value='|' + track + '|', inline=False)
             self.tracks[user.id] = track
