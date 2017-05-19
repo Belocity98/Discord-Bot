@@ -44,7 +44,7 @@ class Racing:
 
             track = ''.join(track_list)
 
-            embed.add_field(name=name, value='|' + track + '|')
+            embed.add_field(name=name, value='|' + track + '|', inline=False)
             self.tracks[user.id] = track
             self.positions[user.id] = 0
 
