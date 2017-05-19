@@ -13,11 +13,14 @@ class Games:
         self.active_race_channels = []
         self.racers = {}
 
-    @commands.group(no_pm=True, invoke_without_command=True)
+    @commands.command(no_pm=True)
     async def race(self, ctx):
         """Enters you for a horse race."""
 
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except:
+            pass # couldn't delete user's message
 
         if ctx.channel.id in self.active_race_channels:
             return
