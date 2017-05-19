@@ -50,7 +50,7 @@ class Racing:
 
         return embed
 
-    async def move_horse(self, index):
+    def move_horse(self, index):
         """Randomly moves a horse on the track."""
 
         uid = list(self.positions.keys())[index]
@@ -93,7 +93,7 @@ class Racing:
 
         self.active = True
 
-    async def check_for_winner(self):
+    def check_for_winner(self):
         """Checks all the horses for a winner."""
 
         winners = []
@@ -127,9 +127,9 @@ class Racing:
         embed = self.game_board.embeds[0]
 
         for i, field in enumerate(embed.fields):
-            val = await self.move_horse(i)
+            val = self.move_horse(i)
 
-            embed.set_field_at(i, name=field.name, value='|' + val + '|')
+            embed.set_field_at(i, name=field.name, value='|' + val + '|', inline=False)
 
         await self.game_board.edit(content=' ', embed=embed)
 
@@ -141,6 +141,6 @@ class Racing:
         while self.active:
             await asyncio.sleep(3)
             await self.update_track()
-            winners = await self.check_for_winner()
+            winners = self.check_for_winner()
             if winners:
                 await self.end_racing(winners)
