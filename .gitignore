@@ -57,3 +57,5 @@ music.py
 run.bat
 credentials.json
 data.json
+*.xml
+.idea/Discord-Bot.iml
