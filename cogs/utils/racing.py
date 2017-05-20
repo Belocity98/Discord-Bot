@@ -4,6 +4,7 @@ import datetime
 
 from random import randint
 
+
 class Racing:
 
     def __init__(self, bot, message : discord.Message, users : list):
@@ -23,6 +24,9 @@ class Racing:
         self.tracks = {}
 
         self.active = False
+
+        self.game_board = discord.Embed()
+        self.start_time = datetime.datetime.now()
 
     def get_track_embed(self):
         """Gets the inital embed for the track."""
@@ -78,10 +82,10 @@ class Racing:
     async def start_racing(self):
         """Sends the racetrack and begins the race."""
 
-        em = self.get_track_embed
+        em = self.get_track_embed()
         self.game_board = await self.channel.send(embed=em)
 
-        self.starttime = datetime.datetime.now()
+        self.start_time = datetime.datetime.now()
 
         self.active = True
 
@@ -102,7 +106,7 @@ class Racing:
         self.active = False
         endtime = datetime.datetime.now()
 
-        delta = endtime - self.starttime
+        delta = endtime - self.start_time
         seconds = round(delta.total_seconds(), 2)
 
         members = self.message.guild.members
