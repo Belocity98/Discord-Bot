@@ -49,7 +49,6 @@ class Racing:
         uid = list(self.positions.keys())[index]
 
         user = discord.utils.get(self.message.guild.members, id=uid)
-        name = f'{user.name}#{user.discriminator}\'s Horse'
 
         old_pos = self.positions[uid]
 
@@ -79,7 +78,7 @@ class Racing:
     async def start_racing(self):
         """Sends the racetrack and begins the race."""
 
-        em = self.get_track_embed()
+        em = self.get_track_embed
         self.game_board = await self.channel.send(embed=em)
 
         self.starttime = datetime.datetime.now()
