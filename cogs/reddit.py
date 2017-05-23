@@ -88,7 +88,11 @@ class Reddit:
                     channel_id = server_feeds['channel']
 
                     server_obj = discord.utils.get(self.bot.guilds, id=int(server_id))
+                    if not server_obj:
+                        continue
                     channel_obj = discord.utils.get(server_obj.text_channels, id=int(channel_id))
+                    if not channel_obj:
+                        continue
 
                     if subreddit in following and old_name != name:
                         await channel_obj.send(embed=embed)
