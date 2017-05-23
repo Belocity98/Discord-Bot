@@ -4,6 +4,7 @@ import validators
 
 from discord.ext import commands
 
+
 class Reddit:
 
     def __init__(self, bot):
@@ -33,7 +34,7 @@ class Reddit:
         self.feed_checker.cancel()
 
     async def check_feeds(self):
-        while not self.bot.is_closed:
+        while True:
 
             await asyncio.sleep(10)
             feeds = self.db.get('feeds', [])
@@ -42,6 +43,7 @@ class Reddit:
                 continue
 
             for subreddit in feeds:
+
                 resp = await self.api_call(subreddit, 'new')
                 if not resp['data']['children']:
                     continue
