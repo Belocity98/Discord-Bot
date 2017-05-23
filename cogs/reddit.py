@@ -33,7 +33,7 @@ class Reddit:
         self.feed_checker.cancel()
 
     async def check_feeds(self):
-        while not self.bot.is_closed():
+        while not self.bot.is_closed:
 
             await asyncio.sleep(10)
             feeds = self.db.get('feeds', [])
