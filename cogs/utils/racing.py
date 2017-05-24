@@ -25,9 +25,6 @@ class Racing:
 
         self.active = False
 
-        self.game_board = discord.Message()
-        self.start_time = datetime.datetime.now()
-
     def get_track_embed(self):
         """Gets the inital embed for the track."""
 
