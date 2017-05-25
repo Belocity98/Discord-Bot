@@ -49,8 +49,6 @@ class Racing:
 
         uid = list(self.positions.keys())[index]
 
-        user = discord.utils.get(self.message.guild.members, id=uid)
-
         old_pos = self.positions[uid]
 
         step = randint(0, self.rand_step)
