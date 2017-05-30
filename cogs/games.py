@@ -12,20 +12,33 @@ class Games:
 
         self.min_racers = 3
 
-        self.fast_racers = []
+        self.car_racers = []
+        self.comet_racers = []
 
         self.active_race_channels = []
         self.racers = {}
 
-    @commands.command(no_pm=True)
+    @commands.command(no_pm=True, hidden=True)
     @checks.is_owner()
-    async def fastracer(self, ctx, user : discord.Member):
-        """Toggles whether a person is a fast racer or not."""
+    async def carracer(self, ctx, user : discord.Member):
+        """Toggles whether a person is a car racer or not."""
 
-        if user.id in self.fast_racers:
-            self.fast_racers.remove(user.id)
+        if user.id in self.car_racers:
+            self.car_racers.remove(user.id)
         else:
-            self.fast_racers.append(user.id)
+            self.car_racers.append(user.id)
+
+        await ctx.send('👌')
+
+    @commands.command(no_pm=True, hidden=True)
+    @checks.is_owner()
+    async def cometracer(self, ctx, user : discord.Member):
+        """Toggles whether a person is a comet racer or not."""
+
+        if user.id in self.comet_racers:
+            self.comet_racers.remove(user.id)
+        else:
+            self.comet_racers.append(user.id)
 
         await ctx.send('👌')
 
