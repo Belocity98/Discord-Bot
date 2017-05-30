@@ -11,10 +11,20 @@ class Games:
 
         self.min_racers = 3
 
-        self.fast_racers = [257198307137421312, 102645408223731712, 214796473689178133]
+        self.fast_racers = []
 
         self.active_race_channels = []
         self.racers = {}
+
+    @commands.command(no_pm=True)
+    @checks.is_owner()
+    async def fastracer(self, ctx, user : discord.Member):
+        """Toggles whether a person is a fast racer or not."""
+
+        if user.id in self.fast_racers:
+            self.fast_racers.remove(user.id)
+        else:
+            self.fast_racers.append(user.id)
 
     @commands.command(no_pm=True)
     async def race(self, ctx):
