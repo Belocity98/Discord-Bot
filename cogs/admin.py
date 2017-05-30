@@ -3,26 +3,20 @@ import os
 import sys
 import logging
 import json
+import inspect
+import datetime
 
+from collections import Counter
 from discord.ext import commands
 from .utils import checks
 
 log = logging.getLogger(__name__)
 
+
 class Admin:
 
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(no_pm=True)
-    @checks.is_owner()
-    async def broadcast(self, ctx, *, message : str):
-        """Command to broadcast a message to all the servers the bot is in."""
-        for guild in self.bot.guilds:
-            try:
-                await guild.default_channel.send(message)
-            except:
-                pass
 
     @commands.command(hidden=True)
     @checks.is_owner()
@@ -87,6 +81,37 @@ class Admin:
             await self.bot.edit_profile(username=setting)
         else:
             return
+
+    @commands.command(hidden=True)
+    @checks.is_owner()
+    async def debug(self, ctx, *, code: str):
+        """Evaluates code."""
+
+        code = code.strip('` ')
+        python = '```py\n{}\n```'
+        result = None
+
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'message': ctx.message,
+            'server': ctx.message.server,
+            'channel': ctx.message.channel,
+            'author': ctx.message.author
+        }
+
+        env.update(globals())
+
+        try:
+            result = eval(code, env)
+            if inspect.isawaitable(result):
+                result = await result
+        except Exception as e:
+            await ctx.send(python.format(type(e).__name__ + ': ' + str(e)))
+            return
+
+        await ctx.send(python.format(result))
+
 
 def setup(bot):
     bot.add_cog(Admin(bot))
