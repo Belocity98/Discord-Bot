@@ -7,7 +7,7 @@ from random import randint
 
 class Racing:
 
-    def __init__(self, bot, message : discord.Message, users : list):
+    def __init__(self, bot, message : discord.Message, users: list, fast_peeps: list=[]):
         self.bot = bot
 
         self.users = users
@@ -16,8 +16,13 @@ class Racing:
         self.channel = message.channel
 
         self.horse_emoji = '\N{HORSE RACING}'
+        self.car_emoji = '\N{RACING CAR}'
+
+        self.fast_peeps = fast_peeps
 
         self.rand_step = 4
+        self.car_step = 6
+
         self.track_length = 30
 
         self.positions = {}
@@ -33,9 +38,12 @@ class Racing:
 
         embed.title = 'Horse Racing'
 
-        track = self.horse_emoji + ('-' * (self.track_length-1))
-
         for i, user in enumerate(self.users):
+
+            if user.id in self.fast_peeps:
+                track = self.car_emoji + ('-' * (self.track_length - 1))
+            else:
+                track = self.horse_emoji + ('-' * (self.track_length - 1))
 
             name = user.nick if user.nick is not None else user.name
 
@@ -54,7 +62,10 @@ class Racing:
 
         old_pos = self.positions[uid]
 
-        step = randint(0, self.rand_step)
+        if uid in self.fast_peeps:
+            step = randint(0, self.car_step)
+        else:
+            step = randint(0, self.rand_step)
 
         self.positions[uid] += step
 
@@ -68,10 +79,16 @@ class Racing:
         track_list[old_pos] = '-'
 
         try:
-            track_list[new_pos] = self.horse_emoji
+            if uid in self.fast_peeps:
+                track_list[new_pos] = self.car_emoji
+            else:
+                track_list[new_pos] = self.horse_emoji
         except IndexError:
             new_pos = self.track_length - 1
-            track_list[new_pos] = self.horse_emoji
+            if uid in self.fast_peeps:
+                track_list[new_pos] = self.car_emoji
+            else:
+                track_list[new_pos] = self.horse_emoji
 
         self.tracks[uid] = ''.join(track_list)
 
