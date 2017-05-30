@@ -63,7 +63,7 @@ class Racing:
         old_pos = self.positions[uid]
 
         if uid in self.fast_peeps:
-            step = randint(0, self.car_step)
+            step = randint(3, self.car_step)
         else:
             step = randint(0, self.rand_step)
 
