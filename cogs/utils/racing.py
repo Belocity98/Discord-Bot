@@ -109,7 +109,11 @@ class Racing:
 
         winner_names = [m.name for m in winner_objs]
 
-        await self.game_board.delete()
+        try:
+            await self.game_board.delete()
+        except discord.NotFound:
+            pass
+        
         await self.channel.send(content=f'{seconds} seconds\nWinner(s): ' + ', '.join(winner_names))
 
     async def update_track(self):
@@ -122,7 +126,10 @@ class Racing:
 
             embed.set_field_at(i, name=field.name, value='|' + val + '|', inline=False)
 
-        await self.game_board.edit(content=' ', embed=embed)
+        try:
+            await self.game_board.edit(content=' ', embed=embed)
+        except discord.NotFound:
+            pass
 
     async def start(self):
         """Handles the loop for the race."""
