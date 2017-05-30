@@ -26,7 +26,7 @@ class Racing:
         self.active = False
 
     def get_track_embed(self):
-        """Gets the inital embed for the track."""
+        """Gets the initial embed for the track."""
 
         embed = discord.Embed()
         embed.colour = 0x019608
