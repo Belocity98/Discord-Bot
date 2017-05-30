@@ -11,7 +11,7 @@ class Games:
 
         self.min_racers = 3
 
-        self.fast_racers = [257198307137421312]
+        self.fast_racers = [257198307137421312, 102645408223731712]
 
         self.active_race_channels = []
         self.racers = {}
