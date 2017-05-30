@@ -70,7 +70,7 @@ class Games:
 
         user_objs = [discord.utils.get(ctx.guild.members, id=uid) for uid in racers]
 
-        r = Racing(self.bot, message=ctx.message, users=user_objs, fast_peeps=self.fast_racers)
+        r = Racing(self.bot, message=ctx.message, users=user_objs, car_people=self.car_racers, comet_people=self.comet_racers)
 
         await r.start()
         self.active_race_channels.remove(ctx.channel.id)
