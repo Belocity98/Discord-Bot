@@ -2,6 +2,7 @@ import discord
 
 from discord.ext import commands
 from .utils.racing import Racing
+from .utils import checks
 
 
 class Games:
@@ -25,6 +26,8 @@ class Games:
             self.fast_racers.remove(user.id)
         else:
             self.fast_racers.append(user.id)
+
+        await ctx.send('👌')
 
     @commands.command(no_pm=True)
     async def race(self, ctx):
