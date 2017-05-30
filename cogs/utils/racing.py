@@ -113,7 +113,7 @@ class Racing:
             await self.game_board.delete()
         except discord.NotFound:
             pass
-        
+
         await self.channel.send(content=f'{seconds} seconds\nWinner(s): ' + ', '.join(winner_names))
 
     async def update_track(self):
@@ -129,7 +129,7 @@ class Racing:
         try:
             await self.game_board.edit(content=' ', embed=embed)
         except discord.NotFound:
-            pass
+            self.game_board = await self.channel.send(embed=embed)
 
     async def start(self):
         """Handles the loop for the race."""
