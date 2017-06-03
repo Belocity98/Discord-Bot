@@ -1,6 +1,7 @@
 import discord
 import asyncio
 
+
 class Menu:
 
     def __init__(self, bot, message):
@@ -34,6 +35,7 @@ class Menu:
             ('🇷', self.change_rolepreserve),
             ('🇱', self.change_logging),
             ('🇺', self.change_units),
+            ('🇻', self.change_vc_text),
             ('❌', self.exit_menu)
         ]
 
@@ -133,6 +135,20 @@ class Menu:
 
         await self.db.put(self.guild.id, server_db)
 
+    async def change_vc_text(self):
+        server_db = self.db.get(self.guild.id, {})
+        status = server_db.get('text_vc_channels', False)
+
+        status = not status
+
+        if status:
+            await self.channel.send('Text channels for voice **ENABLED**.')
+        else:
+            await self.channel.send('Text channels for voice **DISABLED**.')
+
+        server_db['text_vc_channels'] = status
+        await self.db.put(self.guild.id, server_db)
+
     async def change_units(self):
         server_db = self.db.get(self.guild.id, {})
         units = server_db.get('units', 'imperial')
@@ -147,7 +163,6 @@ class Menu:
 
         server_db['units'] = units
         await self.db.put(self.guild.id, server_db)
-
 
     async def show_home(self, initial=False):
 
@@ -226,6 +241,7 @@ class Menu:
                             '\n🇷 - Toggle Role Preserve' \
                             '\n🇱 - Toggle Logging' \
                             '\n🇺 - Toggle Units' \
+                            '\n🇻 - Toggle text channels for voice' \
                             '\n❌ - Exit the Settings Menu'
 
     def react_check(self, reaction, user):

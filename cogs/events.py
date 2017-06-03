@@ -157,7 +157,54 @@ class Events:
 
             await log_channel.send(embed=embed)
 
+    async def on_voice_state_update(self, member, before, after):
+        """Used for detecting whether a user joins/leaves a voice channel.
+        
+            Useful for text voice channels."""
 
+        guild = member.guild
+
+        server_db = self.db.get(guild.id, {})
+        status = server_db.get('text_vc_channels', False)
+
+        if not status:
+            return
+
+        b_channel = before.channel
+        a_channel = after.channel
+
+        if b_channel and a_channel:
+            if a_channel.id == b_channel.id:
+                return
+
+        default_overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            guild.me: discord.PermissionOverwrite(read_messages=True)
+        }
+
+        if b_channel:
+            b_txt_name = 'vc_' + b_channel.name.replace(' ', '_').lower()
+            b_txt_chan = discord.utils.get(guild.text_channels, name=b_txt_name)
+
+            if not b_txt_chan:
+                try:
+                    b_txt_chan = await guild.create_text_channel(name=b_txt_name, overwrites=default_overwrites)
+                except discord.Forbidden:
+                    return
+
+            await b_txt_chan.set_permissions(member, overwrite=None)
+
+        if a_channel:
+            a_txt_name = 'vc_' + a_channel.name.replace(' ', '_').lower()
+            a_txt_chan = discord.utils.get(guild.text_channels, name=a_txt_name)
+
+            if not a_txt_chan:
+                try:
+                    a_txt_chan = await guild.create_text_channel(name=a_txt_name, overwrites=default_overwrites)
+                except discord.Forbidden:
+                    return
+
+            await a_txt_chan.set_permissions(member, overwrite=discord.PermissionOverwrite(read_messages=True))
 
     def create_message_embed(self, message, event, after_msg=None):
         author = message.author
@@ -182,6 +229,7 @@ class Events:
             embed.description = message.content
 
         return embed
+
 
 def setup(bot):
     bot.add_cog(Events(bot))
