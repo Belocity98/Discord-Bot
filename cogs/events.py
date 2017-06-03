@@ -162,6 +162,9 @@ class Events:
         
             Useful for text voice channels."""
 
+        if member.bot:
+            return
+
         guild = member.guild
 
         server_db = self.db.get(guild.id, {})
