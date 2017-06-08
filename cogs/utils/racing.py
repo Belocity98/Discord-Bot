@@ -7,7 +7,7 @@ from random import randint
 
 class Racing:
 
-    def __init__(self, bot, message : discord.Message, users: list, car_people: list=[], comet_people: list=[]):
+    def __init__(self, bot, message : discord.Message, users: list, custom_emojis: dict={}):
         self.bot = bot
 
         self.users = users
@@ -16,11 +16,8 @@ class Racing:
         self.channel = message.channel
 
         self.horse_emoji = '\N{HORSE RACING}'
-        self.car_emoji = '\N{RACING CAR}'
-        self.comet_emoji = '\N{COMET}'
 
-        self.car_people = car_people
-        self.comet_people = comet_people
+        self.custom_emojis = custom_emojis
 
         self.rand_step = 4
         self.car_step = 6
@@ -43,10 +40,8 @@ class Racing:
 
         for i, user in enumerate(self.users):
 
-            if user.id in self.car_people:
-                track = self.car_emoji + ('-' * (self.track_length - 1))
-            elif user.id in self.comet_people:
-                track = self.comet_emoji + ('-' * (self.track_length - 1))
+            if user.id in self.custom_emojis:
+                track = self.custom_emojis[user.id] + ('-' * (self.track_length - 1))
             else:
                 track = self.horse_emoji + ('-' * (self.track_length - 1))
 
@@ -67,12 +62,7 @@ class Racing:
 
         old_pos = self.positions[uid]
 
-        if uid in self.car_people:
-            step = randint(3, self.car_step)
-        elif uid in self.comet_people:
-            step = randint(7, self.comet_step)
-        else:
-            step = randint(0, self.rand_step)
+        step = randint(0, self.rand_step)
 
         self.positions[uid] += step
 
@@ -86,18 +76,14 @@ class Racing:
         track_list[old_pos] = '-'
 
         try:
-            if uid in self.car_people:
-                track_list[new_pos] = self.car_emoji
-            elif uid in self.comet_people:
-                track_list[new_pos] = self.comet_emoji
+            if uid in self.custom_emojis:
+                track_list[new_pos] = self.custom_emojis[uid]
             else:
                 track_list[new_pos] = self.horse_emoji
         except IndexError:
             new_pos = self.track_length - 1
-            if uid in self.car_people:
-                track_list[new_pos] = self.car_emoji
-            elif uid in self.comet_people:
-                track_list[new_pos] = self.comet_emoji
+            if uid in self.custom_emojis:
+                track_list[new_pos] = self.custom_emojis[uid]
             else:
                 track_list[new_pos] = self.horse_emoji
 

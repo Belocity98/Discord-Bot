@@ -12,40 +12,23 @@ class Games:
 
         self.min_racers = 3
 
-        self.car_racers = []
-        self.comet_racers = []
+        self.custom_emojis = {}
 
         self.active_race_channels = []
         self.racers = {}
 
-    @commands.command(no_pm=True, hidden=True)
-    @checks.is_owner()
-    async def carracer(self, ctx, user : discord.Member):
-        """Toggles whether a person is a car racer or not."""
+    @commands.command(no_pm=True)
+    async def myhorse(self, ctx, emoji: discord.Emoji):
+        """Changes the emoji for your horse."""
 
-        if user.id in self.car_racers:
-            self.car_racers.remove(user.id)
-        else:
-            self.car_racers.append(user.id)
-
-        await ctx.send('👌')
-
-    @commands.command(no_pm=True, hidden=True)
-    @checks.is_owner()
-    async def cometracer(self, ctx, user : discord.Member):
-        """Toggles whether a person is a comet racer or not."""
-
-        if user.id in self.comet_racers:
-            self.comet_racers.remove(user.id)
-        else:
-            self.comet_racers.append(user.id)
+        self.custom_emojis[ctx.author.id] = emoji
 
         await ctx.send('👌')
 
     @commands.command(no_pm=True)
     async def race(self, ctx):
         """Enters you for a horse race."""
-        
+
         if ctx.channel.id in self.active_race_channels:
             return
 
@@ -65,7 +48,7 @@ class Games:
 
         user_objs = [discord.utils.get(ctx.guild.members, id=uid) for uid in racers]
 
-        r = Racing(self.bot, message=ctx.message, users=user_objs, car_people=self.car_racers, comet_people=self.comet_racers)
+        r = Racing(self.bot, message=ctx.message, users=user_objs, custom_emojis=self.custom_emojis)
 
         await r.start()
         self.active_race_channels.remove(ctx.channel.id)
