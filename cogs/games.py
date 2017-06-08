@@ -2,7 +2,6 @@ import discord
 
 from discord.ext import commands
 from .utils.racing import Racing
-from .utils import checks
 
 
 class Games:
@@ -10,7 +9,7 @@ class Games:
     def __init__(self, bot):
         self.bot = bot
 
-        self.min_racers = 3
+        self.min_racers = 1
 
         self.custom_emojis = {}
 
@@ -18,8 +17,14 @@ class Games:
         self.racers = {}
 
     @commands.command(no_pm=True)
-    async def myhorse(self, ctx, emoji: discord.Emoji):
+    async def myhorse(self, ctx, emoji):
         """Changes the emoji for your horse."""
+
+        if not len(emoji) == 1:
+            return
+
+        if emoji == '-':
+            return
 
         self.custom_emojis[ctx.author.id] = emoji
 
