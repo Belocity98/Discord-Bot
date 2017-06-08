@@ -9,7 +9,7 @@ class Games:
     def __init__(self, bot):
         self.bot = bot
 
-        self.min_racers = 1
+        self.min_racers = 3
 
         self.custom_emojis = {}
 
