@@ -45,12 +45,7 @@ class Games:
     @commands.command(no_pm=True)
     async def race(self, ctx):
         """Enters you for a horse race."""
-
-        try:
-            await ctx.message.delete()
-        except:
-            pass  # couldn't delete user's message
-
+        
         if ctx.channel.id in self.active_race_channels:
             return
 
