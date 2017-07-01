@@ -19,6 +19,10 @@ class Mod:
     @commands.command(no_pm=True)
     @commands.has_permissions(ban_members=True)
     async def softban(self, ctx, member : discord.Member, length : int, *, reason : str='No reason given.'):
+
+        if length > 10000:
+            return await ctx.send('Length of ban is too long.')
+
         guild = ctx.guild
         author = ctx.author
 
