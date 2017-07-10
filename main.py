@@ -80,7 +80,10 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, exc):
     e = getattr(exc, 'original', exc)
-    if isinstance(e, (commands.MissingRequiredArgument, commands.CommandOnCooldown, discord.Forbidden)):
+    if isinstance(e, (commands.CommandOnCooldown, discord.Forbidden)):
+        log.info(str(e))
+    elif isinstance(e, (commands.MissingRequiredArgument, commands.BadArgument)):
+        await ctx.invoke(bot.get_command('help'), ctx.command.name)
         log.info(str(e))
     elif isinstance(e, commands.CheckFailure):
         log.info('Permission denied.')
