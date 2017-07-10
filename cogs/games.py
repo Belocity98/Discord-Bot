@@ -21,7 +21,7 @@ class Games:
         self.channel_count = {}
         self.active_count_channels = []
 
-    @commands.command(no_pm=True)
+    @commands.command(no_pm=True, hidden=True)
     async def myhorse(self, ctx, emoji):
         """Changes the emoji for your horse."""
 
