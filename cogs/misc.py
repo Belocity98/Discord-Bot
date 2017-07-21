@@ -18,6 +18,13 @@ from datetime import datetime, timezone
 
 log = logging.getLogger(__name__)
 
+class ChannelOrMember(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            return await commands.TextChannelConverter().convert(ctx, argument)
+        except commands.BadArgument:
+            return await commands.MemberConverter().convert(ctx, argument)
+
 class Misc:
 
     def __init__(self, bot):
