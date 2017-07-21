@@ -1,6 +1,7 @@
 # Credit to Danny for the Google command. https://github.com/Rapptz/RoboDanny/blob/master/cogs/buttons.py#L78-L315
 
 import urbandict
+import markovify
 import discord
 import asyncio
 import logging
@@ -25,6 +26,46 @@ class Misc:
         self.session = bot.session
 
         self.quote_api = r"http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1"
+
+    async def get_text(self, destination):
+        message_list = []
+
+        if isinstance(destination, discord.Member):
+            for channel in destination.guild.text_channels:
+
+                perms = channel.permissions_for(destination)
+                if not perms.send_messages:
+                    continue
+
+                try:
+                    async for message in channel.history(limit=500):
+                        if message.content and message.author.id == destination.id:
+                            message_list.append(message.content)
+                except discord.Forbidden:
+                    continue # We can't access that channel.
+        else:
+            async for message in destination.history(limit=3000, reverse=True):
+                if message.content:
+                    message_list.append(message.content)
+
+        return '\n'.join(message_list)
+
+    @commands.command()
+    async def markov(self, ctx, destination : ChannelOrMember, sentence_count : int=2):
+        """Generates a markov chain for a channel or member."""
+        markov = await ctx.send(content='Generating markov chain...')
+        text = await self.get_text(destination)
+
+        text_model = markovify.NewlineText(text)
+
+        sentences = []
+        for i in range(sentence_count):
+            sentences.append(await self.bot.loop.run_in_executor(None, text_model.make_short_sentence, 140))
+
+        if None in sentences:
+            return await markov.edit(content='Not enough data to generate chain.')
+
+        await markov.edit(content=' '.join(sentences))
 
     @commands.command()
     async def echo(self, ctx, *, message : str):
