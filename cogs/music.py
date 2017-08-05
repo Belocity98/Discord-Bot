@@ -239,6 +239,19 @@ class Music:
 
         await ctx.send(embed=em)
 
+    @music.command(hidden=True)
+    async def info(self, ctx):
+        """Shows stats for nerds."""
+        voice = ctx.guild.voice_client
+        if not voice:
+            return
+
+        out = ''
+        out.append(f'**Session ID:** {voice.session_id}\n')
+        out.append(f'**Endpoint:** {voice.endpoint}\n')
+
+        await ctx.send(out)
+
 # I put all the ugly code down here. It's really gross, just warning you.
 
 
