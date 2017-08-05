@@ -9,11 +9,11 @@ import xkcd
 import sys
 import os
 
-from lxml import etree
-from html2text import html2text
-from discord.ext import commands
-from urllib.parse import parse_qs
 from datetime import datetime, timezone
+from urllib.parse import parse_qs
+from discord.ext import commands
+from html2text import html2text
+from lxml import etree
 
 
 
