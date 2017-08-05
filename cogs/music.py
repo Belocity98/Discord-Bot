@@ -1,4 +1,5 @@
 import os
+import re
 import math
 import shutil
 import asyncio
@@ -260,6 +261,17 @@ class Music:
         if voice.is_playing():
             src = voice.source.original
             audio_bytes = src.read()
+
+            transformations = {
+                res.esacpe(c): '\\' + c
+                for c in ('*', '`', '_', '~', '\\', '<')
+            }
+
+            def replace(obj):
+                return transformations.get(re.escape(obj.group(0)), '')
+            pattern = re.compile('|'.join(transformations.keys()))
+            audio_bytes = pattern.sub(replace, audio_bytes)
+
             bytes_per_ms = math.ceil(len(audio_bytes) / 20)
             em.add_field(name='PCM Bytes (sliced to 1 ms)', value=f'{audio_bytes[:bytes_per_ms]}\n\n')
 
