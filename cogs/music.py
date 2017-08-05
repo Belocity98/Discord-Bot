@@ -253,7 +253,7 @@ class Music:
         em.add_field(name='Views', value=data['views'])
         em.add_field(name='Likes', value=data['likes'])
         em.add_field(name='Dislikes', value=data['dislikes'])
-        em.add_field(name='Duration', value=f'{m}:{s}')
+        em.add_field(name='Duration', value=f'{m:0>2}:{s:0>2}')
         em.url = r'https://www.youtube.com/watch?v={}'.format(data['id'])
         try:
             em.set_image(url=data['info']['thumbnails'][0]['url'])
