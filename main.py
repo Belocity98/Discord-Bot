@@ -2,38 +2,16 @@ import traceback
 import datetime
 import discord
 import aiohttp
-import logging
 import sys
 import os
 
 
 
+from logbook import Logger, StreamHandler
 from discord.ext import commands
 from cogs.utils import config
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-log_file = os.path.join(app_path, 'bot_log.log')
-fh = logging.FileHandler(filename=log_file, encoding='utf-8', mode='w')
-fh.setLevel(logging.INFO)
-
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
-
-formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s","%Y-%m-%d %H:%M:%S")
-
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-
-logger.addHandler(fh)
-logger.addHandler(ch)
-
 description = "General purpose Discord chat bot. Includes moderation and fun commands."
-
-log = logging.getLogger(__name__)
-logging.getLogger('discord.http').setLevel(logging.CRITICAL)
 
 # Yes, I took RoboDanny's file structure.
 
@@ -54,9 +32,7 @@ startup_extensions = [
     'cogs.games'
 ]
 
-app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-data = os.path.join(app_path, 'data.json')
-data_base = config.Config(data)
+data_base = config.Config('data.json')
 
 def get_prefix(bot, message):
     server_data = data_base.get(message.guild.id, {})
@@ -66,14 +42,17 @@ bot = commands.Bot(command_prefix=get_prefix, description=description)
 bot.db = data_base
 bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent' : 'Wumpus Bot'})
 
+StreamHandler(sys.stdout).push_application()
+bot.log = Logger('Wumpus Bot')
+
 @bot.event
 async def on_ready():
     await bot.change_presence(game=discord.Game(name=">help | >invite"))
-    print('Logged in as')
-    print(f'Name: {bot.user.name}')
-    print(f'ID: {bot.user.id}')
-    print(f'Lib Ver: {discord.__version__}')
-    print('------')
+    bot.log.info('Logged in as')
+    bot.log.info(f'Name: {bot.user.name}')
+    bot.log.info(f'ID: {bot.user.id}')
+    bot.log.info(f'Lib Ver: {discord.__version__}')
+    bot.log.info('------')
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.utcnow()
 
@@ -81,22 +60,22 @@ async def on_ready():
 async def on_command_error(ctx, exc):
     e = getattr(exc, 'original', exc)
     if isinstance(e, (commands.CommandOnCooldown, discord.Forbidden)):
-        log.info(str(e))
+        bot.log.info(str(e))
     elif isinstance(e, (commands.MissingRequiredArgument, commands.BadArgument)):
         await ctx.invoke(bot.get_command('help'), ctx.command.name)
-        log.info(str(e))
+        bot.log.info(str(e))
     elif isinstance(e, commands.CheckFailure):
-        log.info('Permission denied.')
+        bot.log.info('Permission denied.')
     else:
         tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-        print(tb)
+        bot.log.error(tb)
 
-bot.credentials = config.Config(os.path.join(app_path, 'credentials.json'))
+bot.credentials = config.Config('credentials.json')
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
             bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
-            log.info(f'Failed to load extension {extension}\n{exc}')
+            bot.log.info(f'Failed to load extension {extension}\n{exc}')
     bot.run(bot.credentials['token'])
