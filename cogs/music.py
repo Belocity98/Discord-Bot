@@ -23,7 +23,12 @@ class Music:
         self.volumes = {}
         self.now_playing = {}
 
-    @commands.command()
+    @commands.group(invoke_without_command=True)
+    async def music(self, ctx):
+        """Main command for all music-based commands."""
+        pass
+
+    @music.command()
     async def play(self, ctx, *, query: str):
         """Plays a URL from YouTube."""
         curr_voice = ctx.guild.voice_client
@@ -96,7 +101,7 @@ class Music:
         curr_voice.play(volume_src, after=end_music)
         self.now_playing[ctx.guild.id] = data
 
-    @commands.command(name='next')
+    @music.command(name='next')
     async def _next(self, ctx):
         """Plays the next song in the queue.
         """
@@ -109,7 +114,7 @@ class Music:
 
         voice.stop()
 
-    @commands.command()
+    @music.command()
     async def pause(self, ctx):
         """Pauses the music.
         """
@@ -123,7 +128,7 @@ class Music:
         if voice.is_playing():
             voice.pause()
 
-    @commands.command()
+    @music.command()
     async def resume(self, ctx):
         """Resumes the music.
         """
@@ -137,7 +142,7 @@ class Music:
         if voice.is_paused():
             voice.resume()
 
-    @commands.command()
+    @music.command()
     async def stop(self, ctx):
         """Stops playing music.
         """
@@ -150,7 +155,7 @@ class Music:
             voice.stop()
             self.now_playing[ctx.guild.id] = {}
 
-    @commands.command()
+    @music.command()
     async def volume(self, ctx, volume: int):
         """Sets the volume of the audio."""
         if not 1 <= volume <= 100:
@@ -165,7 +170,7 @@ class Music:
             src = voice.source
             src.volume = volume
 
-    @commands.command(aliases=['summon'])
+    @music.command(aliases=['summon'])
     async def join(self, ctx):
         """Joins a voice channel.
 
@@ -183,7 +188,7 @@ class Music:
 
         await channel.connect()
 
-    @commands.command(aliases=['dc', 'disconnect'])
+    @music.command(aliases=['dc', 'disconnect'])
     async def leave(self, ctx):
         """Leave the voice channel and disconnect from all voice.
         """
@@ -197,7 +202,7 @@ class Music:
         self.queues[ctx.guild.id] = []
         await curr_voice.disconnect()
 
-    @commands.command()
+    @music.command()
     async def queue(self, ctx):
         """Views the song queue."""
         queue = self.queues.get(ctx.guild.id, [])
@@ -215,7 +220,7 @@ class Music:
 
         await ctx.send(embed=em)
 
-    @commands.command()
+    @music.command()
     async def playing(self, ctx):
         """Shows the currently playing song."""
         voice = ctx.guild.voice_client
