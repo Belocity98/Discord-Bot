@@ -32,14 +32,14 @@ startup_extensions = [
     'cogs.mod'
 ]
 
-data_base = config.Config('data.json')
+db = config.Config('data.json')
 
 def get_prefix(bot, message):
-    server_data = data_base.get(message.guild.id, {})
+    server_data = db.get(message.guild.id, {})
     return server_data.get('prefix', '>')
 
 bot = commands.Bot(command_prefix=get_prefix, description=description)
-bot.db = data_base
+bot.db = db
 bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent' : 'Wumpus Bot'})
 
 StreamHandler(sys.stdout).push_application()
