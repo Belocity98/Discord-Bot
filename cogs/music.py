@@ -247,8 +247,13 @@ class Music:
             return
 
         out = ''
-        out.append(f'**Session ID:** {voice.session_id}\n')
-        out.append(f'**Endpoint:** {voice.endpoint}\n')
+
+        if voice.is_playing():
+            src = voice.source.original
+            out+= f'**PCM Bytes:** {src.source}\n\n'
+
+        out += f'**Session ID:** {voice.session_id}\n'
+        out += f'**Endpoint:** {voice.endpoint}'
 
         await ctx.send(out)
 
