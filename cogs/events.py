@@ -1,6 +1,8 @@
 import datetime
 import discord
 
+
+
 class Events:
 
     def __init__(self, bot):
@@ -159,7 +161,7 @@ class Events:
 
     async def on_voice_state_update(self, member, before, after):
         """Used for detecting whether a user joins/leaves a voice channel.
-        
+
             Useful for text voice channels."""
 
         if member.bot:
