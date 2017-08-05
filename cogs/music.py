@@ -21,6 +21,7 @@ class Music:
 
         self.queues = {}
         self.volumes = {}
+        self.now_playing = {}
 
     @commands.command()
     async def play(self, ctx, *, query: str):
@@ -49,8 +50,8 @@ class Music:
 
             queue = self.queues.get(ctx.guild.id, [])
             self.queues[ctx.guild.id] = queue
-            path = await self.get_song(data, ctx.guild)
-            queue.append(path)
+            data = await self.get_song(data, ctx.guild)
+            queue.append(data)
             return
 
         def end_music(e):
@@ -62,10 +63,15 @@ class Music:
                 return
             self.queues[ctx.guild.id] = queue
 
+            em = self.format_song_embed(next_song)
+            em.set_footer(text='Now playing.')
+            self.bot.loop.create_task(ctx.send(embed=em))
+
             vol = self.volumes.get(ctx.guild.id, 0.5)
-            audio_src = YoutubeSource(next_song)
+            audio_src = YoutubeSource(next_song['file'])
             volume_src = discord.PCMVolumeTransformer(audio_src, volume=vol)
             curr_voice.play(volume_src, after=end_music)
+            self.now_playing[ctx.guild.id] = next_song
 
         vol = self.volumes.get(ctx.guild.id, 0.5)
 
@@ -79,17 +85,16 @@ class Music:
         if data['duration'] > 600:
             return await ctx.send('Song is too long.')
 
-        url = data['url']
-
-        song = await self.get_song(data, ctx.guild)
+        data = await self.get_song(data, ctx.guild)
         em = self.format_song_embed(data)
         a_url = ctx.author.avatar_url_as(format='png', size=1024)
         em.set_footer(text=f'{ctx.author} started playing a song.', icon_url=a_url)
         await msg.edit(embed=em)
 
-        audio_src = YoutubeSource(song)
+        audio_src = YoutubeSource(data['file'])
         volume_src = discord.PCMVolumeTransformer(audio_src, volume=vol)
         curr_voice.play(volume_src, after=end_music)
+        self.now_playing[ctx.guild.id] = data
 
     @commands.command(name='next')
     async def _next(self, ctx):
@@ -100,8 +105,7 @@ class Music:
             return
 
         if not self.queues.get(ctx.guild.id, []):
-            await ctx.send('no songs are queued')
-            return
+            return await ctx.send('No songs are queued.')
 
         voice.stop()
 
@@ -144,6 +148,7 @@ class Music:
         if voice.is_playing():
             self.queues[ctx.guild.id] = []
             voice.stop()
+            self.now_playing[ctx.guild.id] = {}
 
     @commands.command()
     async def volume(self, ctx, volume: int):
@@ -189,8 +194,45 @@ class Music:
         if curr_voice.is_playing():
             curr_voice.stop()
 
+        self.queues[ctx.guild.id] = []
         await curr_voice.disconnect()
 
+    @commands.command()
+    async def queue(self, ctx):
+        """Views the song queue."""
+        queue = self.queues.get(ctx.guild.id, [])
+        em = discord.Embed()
+        em.color = discord.Colour.blurple()
+        if not queue:
+            em.description = 'No songs are in the queue.'
+            return await ctx.send(embed=em)
+
+        em.title = 'Song Queue'
+        lst = []
+        for i, data in enumerate(queue):
+            lst.append(f'**{i+1}.** {data["uploader"]} - {data["title"]}')
+        em.description = '\n'.join(lst)
+
+        await ctx.send(embed=em)
+
+    @commands.command()
+    async def playing(self, ctx):
+        """Shows the currently playing song."""
+        voice = ctx.guild.voice_client
+        if not voice:
+            return
+
+        if not voice.is_playing():
+             return await ctx.send('Not playing any songs.')
+
+        data = self.now_playing.get(ctx.guild.id, {})
+        if not data:
+            return
+
+        em = self.format_song_embed(data)
+        em.set_footer(text='Now playing.')
+
+        await ctx.send(embed=em)
 
 # I put all the ugly code down here. It's really gross, just warning you.
 
@@ -237,8 +279,8 @@ class Music:
                     with open('music_files/{}/{}.mp3'.format(guild.id, data['id']), 'wb') as fp:
                         fp.write(await resp.read())
 
-        file_ = 'music_files/{}/{}.mp3'.format(guild.id, data['id'])
-        return file_
+        data['file'] = 'music_files/{}/{}.mp3'.format(guild.id, data['id'])
+        return data
 
     def format_song_embed(self, data):
         """Formats a nice embed for song data.
@@ -267,6 +309,7 @@ class Music:
         me = guild.me
         if not after.channel and member.id == me.id:
             self.queues[guild.id] = [] # clear queue when we leave the channel
+            self.now_playing[guild.id] = {} # clear now playing
             await asyncio.sleep(3)
             shutil.rmtree(f'music_files/{guild.id}')
 
