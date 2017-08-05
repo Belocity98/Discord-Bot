@@ -263,7 +263,7 @@ class Music:
             audio_bytes = src.read()
 
             transformations = {
-                res.esacpe(c): '\\' + c
+                re.escape(c): '\\' + c
                 for c in ('*', '`', '_', '~', '\\', '<')
             }
 
