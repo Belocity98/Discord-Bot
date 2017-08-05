@@ -24,6 +24,7 @@ startup_extensions = [
     'cogs.events',
     'cogs.reddit',
     'cogs.admin',
+    'cogs.music',
     'cogs.games',
     'cogs.stats',
     'cogs.misc',
