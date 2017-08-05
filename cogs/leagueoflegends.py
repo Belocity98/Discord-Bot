@@ -2,6 +2,8 @@ import discord
 
 from discord.ext import commands
 
+
+
 class LeagueOfLegends:
 
     def __init__(self, bot):
