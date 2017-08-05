@@ -1,10 +1,9 @@
-import discord
-import os
-import sys
-import logging
-import json
-import inspect
 import datetime
+import discord
+import logging
+import inspect
+import sys
+import os
 
 from collections import Counter
 from discord.ext import commands
