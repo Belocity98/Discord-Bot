@@ -10,23 +10,12 @@ from collections import Counter
 from discord.ext import commands
 from .utils import checks
 
-log = logging.getLogger(__name__)
 
 
 class Admin:
 
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(hidden=True)
-    @checks.is_owner()
-    async def reloadconfig(self, ctx):
-        """Reloads the configuration."""
-        app_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-        tmp_file = os.path.join(app_path, 'config.json')
-        with open(tmp_file) as fp:
-            json.load(fp)
-        log.info('Configuration reloaded.')
 
     @commands.command(name='reload', hidden=True)
     @checks.is_owner()
@@ -44,7 +33,7 @@ class Admin:
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
-            log.info(f'{extension_name} reloaded.')
+            self.bot.log.info(f'{extension_name} reloaded.')
         except ImportError:
             await ctx.channel.send("Cog not found.")
             return
@@ -55,7 +44,7 @@ class Admin:
         """Loads an extension."""
         try:
             self.bot.load_extension(extension_name)
-            log.info(f'{extension_name} loaded.')
+            self.bot.log.info(f'{extension_name} loaded.')
         except (AttributeError, ImportError) as e:
             await ctx.channel.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
@@ -65,22 +54,14 @@ class Admin:
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
-        log.info(f'{extension_name} unloaded.')
+        self.bot.log.info(f'{extension_name} unloaded.')
 
     @commands.command(hidden=True, name='logout')
     @checks.is_owner()
     async def _logout(self):
         """Turns off the bot."""
-        log.info('Bot logging off.')
+        self.bot.log.info('Bot logging off.')
         await self.bot.logout()
-
-    @commands.command(hidden=True)
-    @checks.is_owner()
-    async def editprofile(self, ctx, element : str, setting : str):
-        if element == "name":
-            await self.bot.edit_profile(username=setting)
-        else:
-            return
 
     @commands.command(hidden=True)
     @checks.is_owner()
