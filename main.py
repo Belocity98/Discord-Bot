@@ -17,19 +17,19 @@ description = "General purpose Discord chat bot. Includes moderation and fun com
 
 # this specifies what extensions to load when the bot starts up
 startup_extensions = [
-    'cogs.mod',
-    'cogs.misc',
-    'cogs.stats',
-    'cogs.admin',
-    'cogs.reddit',
-    'cogs.logging',
-    'cogs.settings',
-    'cogs.events',
-    'cogs.nsfw',
-    'cogs.weather',
-    'cogs.vote',
     'cogs.leagueoflegends',
-    'cogs.games'
+    'cogs.settings',
+    'cogs.logging',
+    'cogs.weather',
+    'cogs.events',
+    'cogs.reddit',
+    'cogs.admin',
+    'cogs.games',
+    'cogs.stats',
+    'cogs.misc',
+    'cogs.nsfw',
+    'cogs.vote',
+    'cogs.mod'
 ]
 
 data_base = config.Config('data.json')
