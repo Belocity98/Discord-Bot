@@ -1,4 +1,5 @@
 import os
+import math
 import shutil
 import asyncio
 import aiohttp
@@ -156,8 +157,14 @@ class Music:
             self.now_playing[ctx.guild.id] = {}
 
     @music.command()
-    async def volume(self, ctx, volume: int):
+    async def volume(self, ctx, volume: int=None):
         """Sets the volume of the audio."""
+
+        if not volume:
+            vol = self.volumes.get(ctx.guild.id, 0.5)
+            prct = vol * 100
+            return await ctx.send(f'Current volume is set to **{prct}%**.')
+
         if not 1 <= volume <= 100:
             await ctx.send('Volume must be a number 1-100.')
             return
@@ -246,16 +253,23 @@ class Music:
         if not voice:
             return
 
-        out = ''
+        em = discord.Embed()
+        em.color = discord.Color.blurple()
+        em.title = 'Voice Connection Stats'
 
         if voice.is_playing():
             src = voice.source.original
-            out+= f'**PCM Bytes:** {src.source}\n\n'
+            audio_bytes = src.read()
+            bytes_per_ms = math.ceil(len(audio_bytes) / 20)
+            em.add_field(name='PCM Bytes (sliced to 1 ms)', value=f'{audio_bytes[:bytes_per_ms]}\n\n')
 
-        out += f'**Session ID:** {voice.session_id}\n'
-        out += f'**Endpoint:** {voice.endpoint}'
+        connected_guilds = [guild for guild in self.bot.guilds if guild.voice_client]
 
-        await ctx.send(out)
+        em.add_field(name='Session ID', value=f'{voice.session_id}\n')
+        em.add_field(name='Endpoint', value=f'{voice.endpoint}\n')
+        em.add_field(name='Connections', value=f'{len(connected_guilds)}')
+
+        await ctx.send(embed=em)
 
 # I put all the ugly code down here. It's really gross, just warning you.
 
