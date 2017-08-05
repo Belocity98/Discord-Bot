@@ -42,6 +42,7 @@ class Music:
                 return await ctx.send('Song is too long.')
 
             em = self.format_song_embed(data)
+            a_url = ctx.author.avatar_url_as(format='png', size=1024)
             em.set_footer(text=f'{ctx.author} added a song to the queue.', icon_url=a_url)
 
             await ctx.send(embed=em)
@@ -50,8 +51,6 @@ class Music:
             self.queues[ctx.guild.id] = queue
             path = await self.get_song(data, ctx.guild)
             queue.append(path)
-
-            a_url = ctx.author.avatar_url_as(format='png', size=1024)
             return
 
         def end_music(e):
@@ -59,10 +58,9 @@ class Music:
             try:
                 next_song = queue.pop(0)
             except IndexError:
+                self.bot.loop.create_task(curr_voice.disconnect())
                 return
             self.queues[ctx.guild.id] = queue
-
-
 
             vol = self.volumes.get(ctx.guild.id, 0.5)
             audio_src = YoutubeSource(next_song)
