@@ -33,7 +33,7 @@ class Games:
 
         self.custom_emojis[ctx.author.id] = emoji
 
-        await ctx.send('👌')
+        await ctx.message.add_reaction('👌')
 
     @commands.command(no_pm=True)
     async def race(self, ctx):
