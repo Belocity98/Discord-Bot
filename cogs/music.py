@@ -41,7 +41,10 @@ class Music:
             if data['duration'] > 600:
                 return await ctx.send('Song is too long.')
 
-            url = data['url']
+            em = self.format_song_embed(data)
+            em.set_footer(text=f'{ctx.author} added a song to the queue.', icon_url=a_url)
+
+            await ctx.send(embed=em)
 
             queue = self.queues.get(ctx.guild.id, [])
             self.queues[ctx.guild.id] = queue
@@ -49,10 +52,6 @@ class Music:
             queue.append(path)
 
             a_url = ctx.author.avatar_url_as(format='png', size=1024)
-            em = self.format_song_embed(data)
-            em.set_footer(text=f'{ctx.author} added a song to the queue.', icon_url=a_url)
-
-            await ctx.send(embed=em)
             return
 
         def end_music(e):
