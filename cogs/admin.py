@@ -1,6 +1,5 @@
 import datetime
 import discord
-import logging
 import inspect
 import sys
 import os
