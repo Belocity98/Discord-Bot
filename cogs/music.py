@@ -260,7 +260,7 @@ class Music:
 
         if voice.is_playing():
             src = voice.source.original
-            audio_bytes = src.read()
+            audio_bytes = str(src.read())
 
             transformations = {
                 re.escape(c): '\\' + c
