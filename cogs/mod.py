@@ -1,11 +1,10 @@
 import discord
 import asyncio
-import logging
 
 from discord.ext import commands
 from .utils import config, checks
 
-log = logging.getLogger(__name__)
+
 
 class Mod:
 
