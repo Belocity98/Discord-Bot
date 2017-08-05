@@ -4,7 +4,6 @@ import urbandict
 import markovify
 import discord
 import asyncio
-import logging
 import aiohttp
 import xkcd
 import sys
@@ -16,7 +15,7 @@ from discord.ext import commands
 from urllib.parse import parse_qs
 from datetime import datetime, timezone
 
-log = logging.getLogger(__name__)
+
 
 class ChannelOrMember(commands.Converter):
     async def convert(self, ctx, argument):
