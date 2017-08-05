@@ -14,8 +14,6 @@ class Mod:
 
         self.db = bot.db
 
-        self.active_bans = 0
-
     @commands.command(no_pm=True)
     @commands.has_permissions(ban_members=True)
     async def softban(self, ctx, member : discord.Member, length : int, *, reason : str='No reason given.'):
@@ -27,11 +25,13 @@ class Mod:
         guild = ctx.guild
         author = ctx.author
 
-        invitation = await guild.create_invite(max_uses=1)
+        try:
+            invitation = await guild.create_invite(max_uses=1)
+        except discord.HTTPException:
+            return # we couldn't create an invite, so don't ban.
 
         user_embed = discord.Embed()
         user_embed.color = 0xd60606
-
         user_embed.title = 'You have been banned!'
         user_embed.description = f'{author.name} has banned you.\n\nInvite: {invitation.url}\nAfter your ban time is up, ' \
                                 'click this link to rejoin the server.'
@@ -40,35 +40,41 @@ class Mod:
 
         public_embed = discord.Embed()
         public_embed.color = 0xd60606
-
         public_embed.title = f'{member.name} has been banned!'
         public_embed.description = f'This member was banned by {author.name}.'
         public_embed.add_field(name='Reason', value=reason)
         public_embed.add_field(name='Length', value=f'{length} seconds')
 
-        await ctx.send(embed=public_embed)
-        await member.send(embed=user_embed)
+        try:
+            await ctx.send(embed=public_embed)
+        except discord.HTTPException:
+            pass # couldn't send the public embed
+        try:
+            await member.send(embed=user_embed)
+        except discord.HTTPException:
+            return # couldn't send the private message, so don't ban
 
-        await member.ban(reason=reason, delete_message_days=0)
-        self.active_bans += 1
+        try:
+            await member.ban(reason=reason, delete_message_days=0)
+        except discord.HTTPException:
+            return # we couldn't ban them
 
         await asyncio.sleep(length)
 
-        self.active_bans -= 1
-        await member.unban(reason='Softban time expired.')
-
-    @commands.command()
-    @checks.is_owner()
-    async def activebans(self, ctx):
-        """Views the amount of active softbans."""
-        await ctx.send(self.active_bans)
+        try:
+            await member.unban(reason='Softban time expired.')
+        except discord.HTTPException:
+            pass # we couldn't unban them
 
     @commands.command(no_pm=True)
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member : discord.Member):
         """Kicks a member from the server."""
 
-        await member.kick()
+        try:
+            await member.kick()
+        except discord.HTTPException:
+            return # we couldn't kick them
 
     @commands.command(no_pm=True)
     @commands.has_permissions(manage_messages=True)
@@ -81,7 +87,10 @@ class Mod:
             await ctx.send('Invalid limit!')
             return
 
-        await ctx.channel.purge(limit=limit)
+        try:
+            await ctx.channel.purge(limit=limit)
+        except discord.HTTPException:
+            return # we couldn't purge the messages
 
 def setup(bot):
     bot.add_cog(Mod(bot))
