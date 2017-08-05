@@ -1,6 +1,8 @@
 import discord
+
 from discord.ext import commands
 from .utils.menu import Menu
+
 
 
 class Settings:
