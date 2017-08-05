@@ -56,7 +56,7 @@ class Admin:
 
     @commands.command(hidden=True, name='logout')
     @checks.is_owner()
-    async def _logout(self):
+    async def _logout(self, ctx):
         """Turns off the bot."""
         self.bot.log.info('Bot logging off.')
         await self.bot.logout()
