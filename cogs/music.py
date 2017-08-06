@@ -25,7 +25,7 @@ class Music:
         self.volumes = {}
         self.now_playing = {}
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(aliases=['m'], invoke_without_command=True)
     async def music(self, ctx):
         """Main command for all music-based commands."""
         pass
