@@ -184,15 +184,25 @@ class Music:
             src.volume = volume
 
     @music.command(aliases=['summon'])
-    async def join(self, ctx):
+    async def join(self, ctx, *, channel_name: str=None):
         """Joins a voice channel.
 
         If the bot is already in a voice channel, it will move the bot.
         """
-        voice = ctx.author.voice
-        if not voice:
-            return
-        channel = voice.channel
+        channel = None
+        if channel_name:
+            lower_names = [channel.name.lower() for channel in ctx.guild.voice_channels]
+            names = [channel.name for channel in ctx.guild.voice_channels]
+            name_dict = dict(zip(lower_names, names))
+            name = name_dict.get(channel_name, 'no channel')
+            channel = discord.utils.get(ctx.guild.voice_channels,
+                                            name=name)
+
+        if not channel:
+            voice = ctx.author.voice
+            if not voice:
+                return
+            channel = voice.channel
 
         curr_voice = ctx.guild.voice_client
         if curr_voice and channel.id != curr_voice.channel.id:
