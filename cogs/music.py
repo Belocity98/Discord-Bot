@@ -25,6 +25,8 @@ class Music:
         self.volumes = {}
         self.now_playing = {}
 
+        self.voting = []
+
     @commands.group(aliases=['m'], invoke_without_command=True)
     async def music(self, ctx):
         """Main command for all music-based commands."""
@@ -151,6 +153,9 @@ class Music:
         if not voice:
             return
 
+        if ctx.guild.id in self.voting:
+            return
+
         em = discord.Embed()
         em.color = discord.Color.blurple()
         em.description = 'Skip the currently playing song?'
@@ -158,7 +163,11 @@ class Music:
         await msg.add_reaction('✅')
         await msg.add_reaction('❌')
 
+        self.voting.append(ctx.guild.id)
+
         await asyncio.sleep(15)
+
+        self.voting.remove(ctx.guild.id)
 
         async for message in ctx.channel.history():
             if message.id == msg.id:
@@ -240,6 +249,9 @@ class Music:
         if not voice:
             return
 
+        if ctx.guild.id in self.voting:
+            return
+
         em = discord.Embed()
         em.color = discord.Color.blurple()
         em.description = 'Stop playing music?'
@@ -247,7 +259,11 @@ class Music:
         await msg.add_reaction('✅')
         await msg.add_reaction('❌')
 
+        self.voting.append(ctx.guild.id)
+
         await asyncio.sleep(15)
+
+        self.voting.remove(ctx.guild.id)
 
         async for message in ctx.channel.history():
             if message.id == msg.id:
