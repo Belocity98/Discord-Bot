@@ -94,6 +94,13 @@ class Music:
             return
 
         def end_music(e):
+            self.now_playing[ctx.guild.id] = {}
+            curr_voice = ctx.guild.voice_client
+            channel = curr_voice.channel
+            if len(channel.members) == 1: # we are the only one in the channel
+                self.queues[ctx.guild.id] = []
+                self.bot.loop.create_task(curr_voice.disconnect())
+
             queue = self.queues.get(ctx.guild.id, [])
             try:
                 next_song = queue.pop(0)
