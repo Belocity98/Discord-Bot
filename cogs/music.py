@@ -103,7 +103,7 @@ class Music:
         curr_voice.play(volume_src, after=end_music)
         self.now_playing[ctx.guild.id] = data
 
-    @music.command(name='next')
+    @music.command(name='next', aliases=['skip'])
     async def _next(self, ctx):
         """Plays the next song in the queue.
         """
