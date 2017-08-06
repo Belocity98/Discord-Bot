@@ -31,8 +31,11 @@ class Music:
         pass
 
     @music.command()
-    async def play(self, ctx, *, query: str):
+    async def play(self, ctx, *, query: str=None):
         """Plays a YouTube video from a URL or a search."""
+        if not query:
+            query = 'brain power'
+
         curr_voice = ctx.guild.voice_client
         user_voice = ctx.author.voice
         if not user_voice and not curr_voice:
