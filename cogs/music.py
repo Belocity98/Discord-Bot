@@ -45,6 +45,7 @@ class Music:
 
         if curr_voice.is_playing():
             data = await self.get_info_from_query(query=query)
+            data['ctx'] = ctx
 
             if data['duration'] > 600:
                 return await ctx.send('Song is too long.')
@@ -88,6 +89,7 @@ class Music:
         msg = await ctx.send(embed=em)
 
         data = await self.get_info_from_query(query=query)
+        data['ctx'] = ctx
 
         if data['duration'] > 600:
             return await ctx.send('Song is too long.')
@@ -345,6 +347,7 @@ class Music:
         em.add_field(name='Likes', value=data['likes'])
         em.add_field(name='Dislikes', value=data['dislikes'])
         em.add_field(name='Duration', value=f'{m:0>2}:{s:0>2}')
+        em.add_field(name='Requested By', value=str(data['ctx'].author))
         em.url = r'https://www.youtube.com/watch?v={}'.format(data['id'])
         try:
             em.set_image(url=data['info']['thumbnails'][0]['url'])
