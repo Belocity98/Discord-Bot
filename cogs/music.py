@@ -239,6 +239,12 @@ class Music:
         lst = []
         for i, data in enumerate(queue):
             lst.append(f'**{i+1}.** {data["uploader"]} - {data["title"]}')
+            if i+1 >= 10:
+                left = len(queue) - 10
+                if left > 0:
+                    lst.append(f'+ {left} more.')
+                break
+
         em.description = '\n'.join(lst)
 
         await ctx.send(embed=em)
