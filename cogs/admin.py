@@ -32,6 +32,7 @@ class Admin:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
             self.bot.log.info(f'{extension_name} reloaded.')
+            await ctx.message.add_reaction('👌')
         except ImportError:
             await ctx.channel.send("Cog not found.")
             return
@@ -43,6 +44,7 @@ class Admin:
         try:
             self.bot.load_extension(extension_name)
             self.bot.log.info(f'{extension_name} loaded.')
+            await ctx.message.add_reaction('👌')
         except (AttributeError, ImportError) as e:
             await ctx.channel.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
             return
@@ -53,6 +55,7 @@ class Admin:
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
         self.bot.log.info(f'{extension_name} unloaded.')
+        await ctx.message.add_reaction('👌')
 
     @commands.command(hidden=True, name='logout')
     @checks.is_owner()
