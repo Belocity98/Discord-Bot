@@ -30,6 +30,30 @@ class Music:
         """Main command for all music-based commands."""
         pass
 
+    @music.group(name='admin', aliases=['a'], invoke_without_command=True)
+    async def admin_(self, ctx):
+        """Main command for all music admin commands."""
+        pass
+
+    @admin_.command(name='next', aliases=['skip'])
+    async def a_next(self, ctx):
+        voice = ctx.guild.voice_client
+        if not voice:
+            return
+
+        voice.stop()
+
+    @admin_.command(name='stop')
+    async def a_stop(self, ctx):
+        voice = ctx.guild.voice_client
+        if not voice:
+            return
+
+        if voice.is_playing():
+            self.queues[ctx.guild.id] = []
+            voice.stop()
+            self.now_playing[ctx.guild.id] = {}
+
     @music.command()
     async def play(self, ctx, *, query: str=None):
         """Plays a YouTube video from a URL or a search."""
@@ -116,10 +140,56 @@ class Music:
         if not voice:
             return
 
-        if not self.queues.get(ctx.guild.id, []):
-            return await ctx.send('No songs are queued.')
+        em = discord.Embed()
+        em.color = discord.Color.blurple()
+        em.description = 'Skip the currently playing song?'
+        msg = await ctx.send(embed=em)
+        await msg.add_reaction('✅')
+        await msg.add_reaction('❌')
 
-        voice.stop()
+        await asyncio.sleep(15)
+
+        async for message in ctx.channel.history():
+            if message.id == msg.id:
+                vote = message
+                break
+
+        voice = ctx.guild.voice_client # re-fetch the voice client
+        if not voice:
+            return
+        if not voice.is_playing():
+            return # we're no longer playing music
+
+        yes_count = {}
+        no_count = {}
+
+        for reaction in vote.reactions:
+            if reaction.emoji == '✅':
+                yes_count['num'] = reaction.count
+                yes_count['users'] = await reaction.users().flatten()
+            elif reaction.emoji == '❌':
+                no_count['num'] = reaction.count
+                no_count['users'] = await reaction.users().flatten()
+
+        try:
+            await msg.delete()
+        except discord.HTTPException:
+            pass # couldn't delete
+
+        duplicates = len(set(yes_count['users']).intersection(no_count['users'])) # Fail-safe for duplicates
+
+        yes_count['num'] -= duplicates
+        no_count['num'] -= duplicates
+
+        total = yes_count['num'] + no_count['num']
+
+        if yes_count['num']/total > 0.5:
+            em.description = '✅ Vote passed.'
+            await ctx.send(embed=em)
+            voice.stop()
+        else:
+            em.description = '❌ Vote failed.'
+            await ctx.send(embed=em)
 
     @music.command()
     async def pause(self, ctx):
@@ -157,10 +227,58 @@ class Music:
         if not voice:
             return
 
-        if voice.is_playing():
+        em = discord.Embed()
+        em.color = discord.Color.blurple()
+        em.description = 'Stop playing music?'
+        msg = await ctx.send(embed=em)
+        await msg.add_reaction('✅')
+        await msg.add_reaction('❌')
+
+        await asyncio.sleep(15)
+
+        async for message in ctx.channel.history():
+            if message.id == msg.id:
+                vote = message
+                break
+
+        voice = ctx.guild.voice_client # re-fetch the voice client
+        if not voice:
+            return
+        if not voice.is_playing():
+            return # we're no longer playing music
+
+        yes_count = {}
+        no_count = {}
+
+        for reaction in vote.reactions:
+            if reaction.emoji == '✅':
+                yes_count['num'] = reaction.count
+                yes_count['users'] = await reaction.users().flatten()
+            elif reaction.emoji == '❌':
+                no_count['num'] = reaction.count
+                no_count['users'] = await reaction.users().flatten()
+
+        try:
+            await msg.delete()
+        except discord.HTTPException:
+            pass # couldn't delete
+
+        duplicates = len(set(yes_count['users']).intersection(no_count['users'])) # Fail-safe for duplicates
+
+        yes_count['num'] -= duplicates
+        no_count['num'] -= duplicates
+
+        total = yes_count['num'] + no_count['num']
+
+        if yes_count['num']/total > 0.5:
+            em.description = '✅ Vote passed.'
+            await ctx.send(embed=em)
             self.queues[ctx.guild.id] = []
             voice.stop()
             self.now_playing[ctx.guild.id] = {}
+        else:
+            em.description = '❌ Vote failed.'
+            await ctx.send(embed=em)
 
     @music.command()
     async def volume(self, ctx, volume: int=None):
