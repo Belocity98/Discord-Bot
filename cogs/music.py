@@ -61,7 +61,7 @@ class Music:
 
             queue = self.queues.get(ctx.guild.id, [])
             self.queues[ctx.guild.id] = queue
-            data = await self.get_song(data, ctx.guild)
+            data = await self.get_song(data)
             queue.append(data)
             return
 
@@ -97,7 +97,7 @@ class Music:
         if data['duration'] > 600:
             return await ctx.send('Song is too long.')
 
-        data = await self.get_song(data, ctx.guild)
+        data = await self.get_song(data)
         em = self.format_song_embed(data)
         a_url = ctx.author.avatar_url_as(format='png', size=1024)
         em.set_footer(text=f'{ctx.author} started playing a song.', icon_url=a_url)
@@ -330,14 +330,16 @@ class Music:
 
         return data
 
-    async def get_song(self, data, guild):
+    async def get_song(self, data):
         """Downloads a song with a URL.
         """
 
+        guild = data['ctx'].guild
         if not os.path.exists(f'music_files/{guild.id}'):
             os.mkdir(f'music_files/{guild.id}')
 
-        if data['id'] not in os.listdir(f'music_files/{guild.id}'):
+        file_name = f'{data["id"]}.mp3'
+        if file_name not in os.listdir(f'music_files/{guild.id}'):
             async with aiohttp.ClientSession() as s:
                 async with s.get(data['url']) as resp:
                     with open('music_files/{}/{}.mp3'.format(guild.id, data['id']), 'wb') as fp:
