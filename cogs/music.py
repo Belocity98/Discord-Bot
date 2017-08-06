@@ -36,7 +36,9 @@ class Music:
         pass
 
     @admin_.command(name='next', aliases=['skip'])
+    @commands.has_permissions(mute_members=True)
     async def a_next(self, ctx):
+        """Force next command for admins only."""
         voice = ctx.guild.voice_client
         if not voice:
             return
@@ -44,7 +46,9 @@ class Music:
         voice.stop()
 
     @admin_.command(name='stop')
+    @commands.has_permissions(mute_members=True)
     async def a_stop(self, ctx):
+        """Force stop command for admins only."""
         voice = ctx.guild.voice_client
         if not voice:
             return
@@ -192,6 +196,7 @@ class Music:
             await ctx.send(embed=em)
 
     @music.command()
+    @commands.has_permissions(mute_members=True)
     async def pause(self, ctx):
         """Pauses the music.
         """
@@ -206,6 +211,7 @@ class Music:
             voice.pause()
 
     @music.command()
+    @commands.has_permissions(mute_members=True)
     async def resume(self, ctx):
         """Resumes the music.
         """
