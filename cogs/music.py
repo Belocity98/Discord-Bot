@@ -69,7 +69,7 @@ class Music:
         if not query:
             query = 'brain power'
 
-        if len(self.queues.get(ctx.guild.id, {})) == self.max_queue_size:
+        if len(self.queues.get(ctx.guild.id, {})) >= self.max_queue_size:
             em = discord.Embed()
             em.color = discord.Color.blurple()
             em.description = 'Sorry, the max queue size has been reached.'
