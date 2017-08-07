@@ -36,6 +36,8 @@ startup_extensions = [
 db = config.Config('data.json')
 
 def get_prefix(bot, message):
+    if not message.guild:
+        return '>'
     server_data = db.get(message.guild.id, {})
     return server_data.get('prefix', '>')
 
