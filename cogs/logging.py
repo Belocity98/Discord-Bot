@@ -12,7 +12,8 @@ class Logging:
 
         self.db = bot.db
 
-    @commands.group(name='log', no_pm=True, invoke_without_command=True)
+    @commands.group(name='log', invoke_without_command=True)
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def _log(self, ctx):
@@ -34,8 +35,9 @@ class Logging:
 
         await ctx.send(embed=embed)
 
-    @_log.command(no_pm=True, name='mark')
+    @_log.command(name='mark')
     @commands.has_permissions(manage_guild=True)
+    @commands.guild_only()
     @checks.doing_logging()
     async def _mark(self, ctx):
         """Marks a channel as the logging channel."""
@@ -54,15 +56,18 @@ class Logging:
 
         await ctx.send(f'Logging channel set to {ctx.channel.name}.')
 
-    @_log.group(no_pm=True, name='messages', aliases=['message'])
+    @_log.group(name='messages', aliases=['message'])
+    @commands.guild_only()
     async def l_message(self, ctx):
         """Subcommand group for logging messages."""
 
-    @_log.group(no_pm=True, name='channels', aliases=['channel'])
+    @_log.group(name='channels', aliases=['channel'])
+    @commands.guild_only()
     async def l_channel(self, ctx):
         """Subcommand group for logging channels."""
 
-    @l_message.command(no_pm=True, name='deleted')
+    @l_message.command(name='deleted')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def m_deleted(self, ctx):
@@ -83,7 +88,8 @@ class Logging:
 
         await self.db.put(guild.id, server_db)
 
-    @l_message.command(no_pm=True, name='edited')
+    @l_message.command(name='edited')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def m_edited(self, ctx):
@@ -104,7 +110,8 @@ class Logging:
 
         await self.db.put(guild.id, server_db)
 
-    @l_channel.command(no_pm=True, name='deleted')
+    @l_channel.command(name='deleted')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def c_deleted(self, ctx):
@@ -125,7 +132,8 @@ class Logging:
 
         await self.db.put(guild.id, server_db)
 
-    @l_channel.command(no_pm=True, name='created')
+    @l_channel.command(name='created')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     @checks.doing_logging()
     async def c_created(self, ctx):
