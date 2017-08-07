@@ -67,7 +67,8 @@ class Weather:
             'Moderate or heavy rain in area with thunder'
         ]
 
-    @commands.group(no_pm=True, invoke_without_command=True, name='weather')
+    @commands.group(invoke_without_command=True, name='weather')
+    @commands.guild_only()
     async def _weather(self, ctx, *, location : str=None):
         """
         Shows the weather for the default location.
@@ -197,7 +198,8 @@ class Weather:
 
         await ctx.send(embed=embed)
 
-    @_weather.command(no_pm=True, name='default')
+    @_weather.command(name='default')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def w_default(self, ctx, *, location=None):
         """Sets a default location for the weather command."""
@@ -219,7 +221,8 @@ class Weather:
 
 
 
-    @_weather.command(no_pm=True, name='forecastdays', aliases=['fdays'])
+    @_weather.command(name='forecastdays', aliases=['fdays'])
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def w_fdays(self, ctx, days : int):
         """Set the amount of days to show forecasts for."""
