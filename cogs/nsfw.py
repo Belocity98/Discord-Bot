@@ -20,7 +20,8 @@ class NSFW:
 
         self.session = bot.session
 
-    @commands.group(invoke_without_command=True, no_pm=True)
+    @commands.group(invoke_without_command=True)
+    @commands.guild_only()
     @checks.is_nsfw()
     async def nsfw(self, ctx, *, tags : str=None):
         """Sends a random nsfw image. Tag(s) optional to reduce search."""
