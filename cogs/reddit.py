@@ -135,7 +135,8 @@ class Reddit:
 
         return embed
 
-    @commands.group(no_pm=True, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
+    @commands.guild_only()
     async def reddit(self, ctx):
         """
         Watch/unwatch new posts from subreddits.
@@ -178,7 +179,8 @@ class Reddit:
 
         await self.db.put('feeds', feeds)
 
-    @reddit.command(no_pm=True, name='watch', aliases=['follow'])
+    @reddit.command(name='watch', aliases=['follow'])
+    @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     async def r_watch(self, ctx, subreddit):
         """Enables or disables watching new posts from a subreddit."""
@@ -213,7 +215,8 @@ class Reddit:
         await self.db.put('feeds', feeds)
         await self.db.put(guild.id, server_db)
 
-    @reddit.command(no_pm=True, name='mark')
+    @reddit.command(name='mark')
+    @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     async def r_mark(self, ctx):
         """Marks a channel to be used for new subreddit posts."""
