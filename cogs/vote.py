@@ -94,7 +94,8 @@ class Vote:
             await message.remove_reaction(reaction.emoji, user)
 
 
-    @commands.group(no_pm=True, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
+    @commands.guild_only()
     async def vote(self, ctx):
         """Shows the currently available vote commands."""
 
@@ -119,7 +120,8 @@ class Vote:
 
         await ctx.send(embed=embed)
 
-    @vote.command(name='percent', no_pm=True)
+    @vote.command(name='percent')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def vote_percent(self, ctx, percent : int):
         """Sets the percent needed to pass a vote."""
@@ -140,7 +142,8 @@ class Vote:
         await self.db.put(ctx.guild.id, server_db)
         await ctx.send('👍')
 
-    @vote.command(name='time', no_pm=True)
+    @vote.command(name='time')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def vote_time(self, ctx, time : int):
         """Sets the time spent on each notion in seconds."""
@@ -161,7 +164,8 @@ class Vote:
         await self.db.put(ctx.guild.id, server_db)
         await ctx.send('👍')
 
-    @vote.command(name='min', no_pm=True, aliases=['minimum'])
+    @vote.command(name='min', aliases=['minimum'])
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def vote_min(self, ctx, minimum : int):
         """Sets the minimum number of votes needed for the vote to pass."""
@@ -178,11 +182,13 @@ class Vote:
         await self.db.put(ctx.guild.id, server_db)
         await ctx.send('👍')
 
-    @vote.group(no_pm=True, name='toggle')
+    @vote.group(name='toggle')
+    @commands.guild_only()
     async def vote_toggle(self, ctx):
         """Toggles a vote command."""
 
-    @vote_toggle.command(no_pm=True, name='kick')
+    @vote_toggle.command(name='kick')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def toggle_kick(self, ctx):
         """Toggles the vote kick command."""
@@ -202,7 +208,8 @@ class Vote:
         server_db['vote'] = vote_db
         await self.db.put(ctx.guild.id, server_db)
 
-    @vote_toggle.command(no_pm=True, name='mute')
+    @vote_toggle.command(name='mute')
+    @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
     async def toggle_mute(self, ctx):
         """Toggles the vote mute command."""
@@ -222,7 +229,8 @@ class Vote:
         server_db['vote'] = vote_db
         await self.db.put(ctx.guild.id, server_db)
 
-    @vote.command(no_pm=True, name='kick')
+    @vote.command(name='kick')
+    @commands.guild_only()
     @checks.vote_check()
     async def vote_kick(self, ctx, member : discord.Member):
         """Starts a vote kick for the specified member."""
@@ -246,7 +254,8 @@ class Vote:
             embed.description = 'Vote failed!'
             await ctx.send(embed=embed)
 
-    @vote.command(no_pm=True, name='mute')
+    @vote.command(name='mute')
+    @commands.guild_only()
     @checks.vote_check()
     async def vote_mute(self, ctx, member : discord.Member):
         """Starts a vote to mute the member in the current channel for 3 minutes."""
