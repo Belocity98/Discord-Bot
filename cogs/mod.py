@@ -13,7 +13,8 @@ class Mod:
 
         self.db = bot.db
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     @commands.has_permissions(ban_members=True)
     async def softban(self, ctx, member : discord.Member, length : int, *, reason : str='No reason given.'):
         """Temporarily bans a member for a specified amount of time."""
@@ -65,7 +66,8 @@ class Mod:
         except discord.HTTPException:
             pass # we couldn't unban them
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member : discord.Member):
         """Kicks a member from the server."""
@@ -75,7 +77,8 @@ class Mod:
         except discord.HTTPException:
             return # we couldn't kick them
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit : int=10):
         """Deletes messages from the channel."""
