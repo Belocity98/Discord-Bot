@@ -1,14 +1,6 @@
 from discord.ext import commands
 import discord.utils
 
-def is_owner_check(ctx):
-    try:
-        ctx.bot.db['owner']
-    except KeyError:
-        return True
-
-    return ctx.author.id == ctx.bot.db['owner']
-
 def is_nsfw_check(ctx):
     return isinstance(ctx.channel, discord.TextChannel) and ctx.channel.is_nsfw()
 
@@ -27,9 +19,6 @@ def do_vote_check(ctx):
         return False
 
     return ctx.command.name in vote_cmds
-
-def is_owner():
-    return commands.check(lambda ctx: is_owner_check(ctx))
 
 def is_nsfw():
     return commands.check(lambda ctx: is_nsfw_check(ctx))

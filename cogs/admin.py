@@ -16,7 +16,7 @@ class Admin:
         self.bot = bot
 
     @commands.command(name='reload', hidden=True)
-    @checks.is_owner()
+    @commands.is_owner()
     async def _reload(self, ctx, *, extension_name : str):
         """Reloads an extension."""
         if extension_name == "all":
@@ -38,7 +38,7 @@ class Admin:
             return
 
     @commands.command(hidden=True)
-    @checks.is_owner()
+    @commands.is_owner()
     async def load(self, ctx, *, extension_name : str):
         """Loads an extension."""
         try:
@@ -50,7 +50,7 @@ class Admin:
             return
 
     @commands.command(hidden=True)
-    @checks.is_owner()
+    @commands.is_owner()
     async def unload(self, ctx, *, extension_name : str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
@@ -58,14 +58,14 @@ class Admin:
         await ctx.message.add_reaction('👌')
 
     @commands.command(hidden=True, name='logout')
-    @checks.is_owner()
+    @commands.is_owner()
     async def _logout(self, ctx):
         """Turns off the bot."""
         self.bot.log.info('Bot logging off.')
         await self.bot.logout()
 
     @commands.command(hidden=True)
-    @checks.is_owner()
+    @commands.is_owner()
     async def debug(self, ctx, *, code: str):
         """Evaluates code."""
 
