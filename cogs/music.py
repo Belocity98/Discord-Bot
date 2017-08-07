@@ -21,6 +21,8 @@ class Music:
     def __init__(self, bot):
         self.bot = bot
 
+        self.max_queue_size = 25
+
         self.queues = {}
         self.volumes = {}
         self.now_playing = {}
@@ -66,6 +68,12 @@ class Music:
         """Plays a YouTube video from a URL or a search."""
         if not query:
             query = 'brain power'
+
+        if len(self.queues.get(ctx.guild.id, {})) == self.max_queue_size:
+            em = discord.Embed()
+            em.color = discord.Color.blurple()
+            em.description = 'Sorry, the max queue size has been reached.'
+            return await ctx.send(embed=em)
 
         curr_voice = ctx.guild.voice_client
         user_voice = ctx.author.voice
