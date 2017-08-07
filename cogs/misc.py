@@ -79,7 +79,8 @@ class Misc:
 
         await ctx.send(message.replace('@everyone', '@\u200beveryone').replace('@here', '@\u200bhere'))
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def avatar(self, ctx, member : discord.Member):
         """Sends the current avatar of the member."""
 
@@ -105,7 +106,8 @@ class Misc:
         difference = str(round(difference, 2))
         await x.edit(content=f'Pong! `{difference} ms.`')
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def quote(self, ctx, user : discord.Member, message_id : int=None):
         """Quotes a user. Quotes the last message the user sent in the current channel unless an ID is specified."""
 
