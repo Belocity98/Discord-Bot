@@ -23,7 +23,8 @@ class Stats:
     async def on_socket_response(self, msg):
         self.bot.socket_stats[msg.get('t')] += 1
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def serverinfo(self, ctx):
         """Shows info for the current server."""
 
