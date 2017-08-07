@@ -12,7 +12,8 @@ class Settings:
 
         self.db = bot.db
 
-    @commands.command(name='settings', no_pm=True)
+    @commands.command(name='settings')
+    @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def _settings(self, ctx):
         """Opens the settings menu.
