@@ -22,7 +22,8 @@ class Games:
         self.channel_count = {}
         self.active_count_channels = []
 
-    @commands.command(no_pm=True, hidden=True)
+    @commands.command(hidden=True)
+    @commands.guild_only()
     async def myhorse(self, ctx, emoji):
         """Changes the emoji for your horse."""
 
@@ -36,7 +37,8 @@ class Games:
 
         await ctx.message.add_reaction('👌')
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def race(self, ctx):
         """Enters you for a horse race."""
 
@@ -65,7 +67,8 @@ class Games:
         self.active_race_channels.remove(ctx.channel.id)
         self.racers[ctx.channel.id] = []
 
-    @commands.command(no_pm=True)
+    @commands.command()
+    @commands.guild_only()
     async def count(self, ctx):
         """Starts a counting game."""
 
