@@ -28,6 +28,7 @@ class Music:
         self.voting = []
 
     @commands.group(aliases=['m'], invoke_without_command=True)
+    @commands.guild_only()
     async def music(self, ctx):
         """Main command for all music-based commands."""
         pass
