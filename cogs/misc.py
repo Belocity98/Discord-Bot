@@ -1,13 +1,11 @@
 # Credit to Danny for the Google command. https://github.com/Rapptz/RoboDanny/blob/master/cogs/buttons.py#L78-L315
 
+import unicodedata
 import urbandict
 import markovify
 import discord
-import asyncio
 import aiohttp
 import xkcd
-import sys
-import os
 
 from datetime import datetime, timezone
 from urllib.parse import parse_qs
