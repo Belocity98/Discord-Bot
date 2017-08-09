@@ -3,7 +3,6 @@ import datetime
 import discord
 import aiohttp
 import sys
-import os
 
 
 
