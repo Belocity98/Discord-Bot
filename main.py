@@ -34,6 +34,7 @@ startup_extensions = [
 
 db = config.Config('data.json')
 
+
 def get_prefix(bot, message):
     if not message.guild:
         return '>'
@@ -47,6 +48,7 @@ bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent' : 'Wump
 StreamHandler(sys.stdout).push_application()
 bot.log = Logger('Wumpus Bot')
 
+
 @bot.event
 async def on_ready():
     await bot.change_presence(game=discord.Game(name=">help | >invite"))
@@ -57,6 +59,7 @@ async def on_ready():
     bot.log.info('------')
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.utcnow()
+
 
 @bot.event
 async def on_command_error(ctx, exc):
