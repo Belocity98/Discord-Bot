@@ -5,7 +5,6 @@ import aiohttp
 import sys
 
 
-
 from logbook import Logger, StreamHandler
 from discord.ext import commands
 from cogs.utils import config
