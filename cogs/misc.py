@@ -74,6 +74,23 @@ class Misc:
         await markov.edit(content=' '.join(sentences))
 
     @commands.command()
+    async def charinfo(self, ctx, *, characters: str):
+        """Shows you information about a number of characters.
+        
+        Only up to 25 characters at a time.
+        """
+
+        if len(characters) > 25:
+            return await ctx.send(f'Too many characters ({len(characters)}/25)')
+
+        def to_string(c):
+            digit = f'{ord(c):x}'
+            name = unicodedata.name(c, 'Name not found.')
+            return f'`\\U{digit:>08}`: {name} - {c} \N{EM DASH} <http://www.fileformat.info/info/unicode/char/{digit}>'
+
+        await ctx.send('\n'.join(map(to_string, characters)))
+
+    @commands.command()
     async def echo(self, ctx, *, message : str):
         """Echos a message."""
 
