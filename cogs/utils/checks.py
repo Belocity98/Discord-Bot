@@ -1,4 +1,5 @@
 from discord.ext import commands
+
 import discord.utils
 
 def is_nsfw_check(ctx):
@@ -20,11 +21,25 @@ def do_vote_check(ctx):
 
     return ctx.command.name in vote_cmds
 
+
 def is_nsfw():
     return commands.check(lambda ctx: is_nsfw_check(ctx))
+
 
 def doing_logging():
     return commands.check(lambda ctx: do_logging_check(ctx))
 
+
 def vote_check():
     return commands.check(lambda ctx: do_vote_check(ctx))
+
+
+def has_permissions_or_owner(**perms):
+    async def predicate(ctx):
+        ch = ctx.channel
+        permissions = ch.permissions_for(ctx.author)
+        has_perms = all(getattr(permissions, perm, None) == value for perm, value in perms.items())
+        owner = await ctx.bot.is_owner(ctx.author)
+        return has_perms or owner
+
+    return commands.check(predicate)

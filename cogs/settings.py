@@ -1,5 +1,6 @@
 import discord
 
+from .utils import checks
 from fuzzywuzzy import process
 from discord.ext import commands
 
@@ -13,7 +14,7 @@ class Settings:
 
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    @checks.has_permissions_or_owner(administrator=True)
     async def settings(self, ctx):
         """Main command for modifying settings.
 
@@ -38,6 +39,7 @@ class Settings:
             return
 
     @settings.command(name='prefix')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_prefix(self, ctx, *, prefix: str=None):
         """String. The prefix that the bot uses for the server."""
         server_db = self.db.get(ctx.guild.id, {})
@@ -53,6 +55,7 @@ class Settings:
         await ctx.message.add_reaction('👌')
 
     @settings.command(name='role_preserve')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_role_preserve(self, ctx, state: bool=None):
         """True/False. Whether or not the bot should preserve roles when users leave the server."""
         server_db = self.db.get(ctx.guild.id, {})
@@ -68,6 +71,7 @@ class Settings:
         await ctx.message.add_reaction('👌')
 
     @settings.command(name='logging')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_logging(self, ctx, state: bool=None):
         """True/False. Whether or not the bot should use the logging features."""
         server_db = self.db.get(ctx.guild.id, {})
@@ -85,6 +89,7 @@ class Settings:
         await ctx.message.add_reaction('👌')
 
     @settings.command(name='text_voicechannels')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_text_voicechannels(self, ctx, state: bool=None):
         """True/False. Whether or not the bot should enable text channels for voice channels."""
         server_db = self.db.get(ctx.guild.id, {})
@@ -100,6 +105,7 @@ class Settings:
         await ctx.message.add_reaction('👌')
 
     @settings.command(name='units_type')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_units_type(self, ctx, unit_type: str=None):
         """'metric'/'imperial'. The type of units the bot should use."""
         server_db = self.db.get(ctx.guild.id, {})
@@ -121,6 +127,7 @@ class Settings:
         await self.db.put(ctx.guild.id, server_db)
 
     @settings.command(name='autoassign_role')
+    @checks.has_permissions_or_owner(administrator=True)
     async def s_autoassign_role(self, ctx, role_name: str=None):
         """Role name. The role that should be assigned to new server members. Set to 'none' to disable."""
         server_db = self.db.get(ctx.guild.id, {})
