@@ -50,7 +50,7 @@ bot.log = Logger('Wumpus Bot')
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(game=discord.Game(name=">help | >invite"))
+    await bot.change_presence(game=discord.Game(type=0, name=">help | >invite"))
     bot.log.info('Logged in as')
     bot.log.info(f'Name: {bot.user.name}')
     bot.log.info(f'ID: {bot.user.id}')
