@@ -9,13 +9,12 @@ import functools
 import youtube_dl
 
 from discord.ext import commands
-from cogs.utils import config
-
 
 
 class YoutubeSource(discord.FFmpegPCMAudio):
     def __init__(self, path):
         super().__init__(path)
+
 
 class Music:
     def __init__(self, bot):
