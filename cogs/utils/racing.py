@@ -1,8 +1,8 @@
-import discord
-import asyncio
-import datetime
-
 from random import randint
+import datetime
+import asyncio
+
+import discord
 
 
 class Racing:

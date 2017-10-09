@@ -1,9 +1,7 @@
-import discord
 import asyncio
 
 from discord.ext import commands
-from .utils import config, checks
-
+import discord
 
 
 class Mod:

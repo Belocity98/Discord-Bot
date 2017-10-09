@@ -1,9 +1,8 @@
-import validators
 import asyncio
-import discord
 
 from discord.ext import commands
-
+import validators
+import discord
 
 
 class Reddit:

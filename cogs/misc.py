@@ -14,13 +14,13 @@ from html2text import html2text
 from lxml import etree
 
 
-
 class ChannelOrMember(commands.Converter):
     async def convert(self, ctx, argument):
         try:
             return await commands.TextChannelConverter().convert(ctx, argument)
         except commands.BadArgument:
             return await commands.MemberConverter().convert(ctx, argument)
+
 
 class Misc:
 

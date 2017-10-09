@@ -1,12 +1,6 @@
-import datetime
-import discord
 import inspect
-import sys
-import os
 
-from collections import Counter
 from discord.ext import commands
-
 
 
 class Admin:

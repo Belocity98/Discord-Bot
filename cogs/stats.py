@@ -2,11 +2,10 @@
 # Especially the uptime and socket stats information.
 
 import datetime
-import aiohttp
-import discord
 
 from discord.ext import commands
 from collections import Counter
+import discord
 
 
 

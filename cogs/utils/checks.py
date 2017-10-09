@@ -1,15 +1,17 @@
 from discord.ext import commands
-
 import discord.utils
+
 
 def is_nsfw_check(ctx):
     return isinstance(ctx.channel, discord.TextChannel) and ctx.channel.is_nsfw()
+
 
 def do_logging_check(ctx):
     server_db = ctx.bot.db.get(ctx.guild.id, {})
 
     logging_dict = server_db.get('logging', {})
     return logging_dict.get('status', False)
+
 
 def do_vote_check(ctx):
     server_db = ctx.bot.db.get(ctx.guild.id, {})

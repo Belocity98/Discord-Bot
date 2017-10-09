@@ -1,6 +1,6 @@
 import datetime
-import discord
 
+import discord
 
 
 class Events:

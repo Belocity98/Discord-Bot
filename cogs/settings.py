@@ -1,8 +1,8 @@
+from discord.ext import commands
+from fuzzywuzzy import process
 import discord
 
 from .utils import checks
-from fuzzywuzzy import process
-from discord.ext import commands
 
 
 class Settings:

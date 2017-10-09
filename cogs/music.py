@@ -1,14 +1,14 @@
+import asyncio
+import shutil
+import math
 import os
 import re
-import math
-import shutil
-import asyncio
-import aiohttp
-import discord
-import functools
-import youtube_dl
 
 from discord.ext import commands
+import youtube_dl
+import functools
+import aiohttp
+import discord
 
 
 class YoutubeSource(discord.FFmpegPCMAudio):

@@ -1,19 +1,16 @@
 import traceback
 import datetime
-import discord
-import aiohttp
 import sys
-
 
 from logbook import Logger, StreamHandler
 from discord.ext import commands
+import aiohttp
+import discord
+
 from cogs.utils import config
 
 description = "General purpose Discord chat bot. Includes moderation and fun commands."
 
-# Yes, I took RoboDanny's file structure.
-
-# this specifies what extensions to load when the bot starts up
 startup_extensions = [
     'cogs.leagueoflegends',
     'cogs.settings',
@@ -42,7 +39,7 @@ def get_prefix(bot, message):
 
 bot = commands.Bot(command_prefix=get_prefix, description=description)
 bot.db = db
-bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent' : 'Wumpus Bot'})
+bot.session = aiohttp.ClientSession(loop=bot.loop, headers={'User-Agent': 'Wumpus Bot'})
 
 StreamHandler(sys.stdout).push_application()
 bot.log = Logger('Wumpus Bot')
