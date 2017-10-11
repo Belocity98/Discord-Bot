@@ -1,3 +1,4 @@
+import functools
 import asyncio
 import shutil
 import math
@@ -6,7 +7,6 @@ import re
 
 from discord.ext import commands
 import youtube_dl
-import functools
 import aiohttp
 import discord
 
@@ -182,11 +182,11 @@ class Music:
                 vote = message
                 break
 
-        voice = ctx.guild.voice_client # re-fetch the voice client
+        voice = ctx.guild.voice_client  # re-fetch the voice client
         if not voice:
             return
         if not voice.is_playing():
-            return # we're no longer playing music
+            return  # we're no longer playing music
 
         yes_count = {}
         no_count = {}
@@ -202,9 +202,9 @@ class Music:
         try:
             await msg.delete()
         except discord.HTTPException:
-            pass # couldn't delete
+            pass  # couldn't delete
 
-        duplicates = len(set(yes_count['users']).intersection(no_count['users'])) # Fail-safe for duplicates
+        duplicates = len(set(yes_count['users']).intersection(no_count['users']))  # Fail-safe for duplicates
 
         yes_count['num'] -= duplicates
         no_count['num'] -= duplicates
@@ -278,11 +278,11 @@ class Music:
                 vote = message
                 break
 
-        voice = ctx.guild.voice_client # re-fetch the voice client
+        voice = ctx.guild.voice_client  # re-fetch the voice client
         if not voice:
             return
         if not voice.is_playing():
-            return # we're no longer playing music
+            return  # we're no longer playing music
 
         yes_count = {}
         no_count = {}
@@ -298,9 +298,9 @@ class Music:
         try:
             await msg.delete()
         except discord.HTTPException:
-            pass # couldn't delete
+            pass  # couldn't delete
 
-        duplicates = len(set(yes_count['users']).intersection(no_count['users'])) # Fail-safe for duplicates
+        duplicates = len(set(yes_count['users']).intersection(no_count['users']))  # Fail-safe for duplicates
 
         yes_count['num'] -= duplicates
         no_count['num'] -= duplicates
@@ -350,8 +350,7 @@ class Music:
             names = [channel.name for channel in ctx.guild.voice_channels]
             name_dict = dict(zip(lower_names, names))
             name = name_dict.get(channel_name, 'no channel')
-            channel = discord.utils.get(ctx.guild.voice_channels,
-                                            name=name)
+            channel = discord.utils.get(ctx.guild.voice_channels, name=name)
 
         if not channel:
             voice = ctx.author.voice
@@ -412,7 +411,7 @@ class Music:
             return
 
         if not voice.is_playing():
-             return await ctx.send('Not playing any songs.')
+            return await ctx.send('Not playing any songs.')
 
         data = self.now_playing.get(ctx.guild.id, {})
         if not data:
@@ -460,7 +459,6 @@ class Music:
         await ctx.send(embed=em)
 
 # I put all the ugly code down here. It's really gross, just warning you.
-
 
     async def get_info_from_query(self, *, query: str):
         """Takes a query and gets info, including a URL.
@@ -536,8 +534,8 @@ class Music:
         guild = member.guild
         me = guild.me
         if not after.channel and member.id == me.id:
-            self.queues[guild.id] = [] # clear queue when we leave the channel
-            self.now_playing[guild.id] = {} # clear now playing
+            self.queues[guild.id] = []  # clear queue when we leave the channel
+            self.now_playing[guild.id] = {}  # clear now playing
             await asyncio.sleep(3)
             shutil.rmtree(f'music_files/{guild.id}')
 
