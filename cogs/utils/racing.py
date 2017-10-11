@@ -7,7 +7,7 @@ import discord
 
 class Racing:
 
-    def __init__(self, bot, message : discord.Message, users: list, custom_emojis: dict={}):
+    def __init__(self, bot, message: discord.Message, users: list, custom_emojis: dict={}):
         self.bot = bot
 
         self.users = users
@@ -112,7 +112,7 @@ class Racing:
 
         return winners
 
-    async def end_racing(self, winners : list):
+    async def end_racing(self, winners: list):
         """End the race when somebody wins."""
 
         self.active = False
