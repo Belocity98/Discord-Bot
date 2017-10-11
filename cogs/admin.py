@@ -10,7 +10,7 @@ class Admin:
 
     @commands.command(name='reload', hidden=True)
     @commands.is_owner()
-    async def _reload(self, ctx, *, extension_name : str):
+    async def _reload(self, ctx, *, extension_name: str):
         """Reloads an extension."""
         if extension_name == "all":
             for cog in list(self.bot.cogs.keys()):
@@ -32,7 +32,7 @@ class Admin:
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def load(self, ctx, *, extension_name : str):
+    async def load(self, ctx, *, extension_name: str):
         """Loads an extension."""
         try:
             self.bot.load_extension(extension_name)
@@ -44,7 +44,7 @@ class Admin:
 
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def unload(self, ctx, *, extension_name : str):
+    async def unload(self, ctx, *, extension_name: str):
         """Unloads an extension."""
         self.bot.unload_extension(extension_name)
         self.bot.log.info(f'{extension_name} unloaded.')
@@ -64,7 +64,6 @@ class Admin:
 
         code = code.strip('` ')
         python = '```py\n{}\n```'
-        result = None
 
         env = {
             'bot': self.bot,
