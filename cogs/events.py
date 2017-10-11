@@ -27,9 +27,7 @@ class Events:
         autoassign_role = server_db.get('autoassign_role', None)
         autoassign_role = discord.utils.get(guild.roles, id=autoassign_role)
 
-        roles_to_add = []
-
-        roles_to_add.append(autoassign_role)
+        roles_to_add = [autoassign_role]
 
         if member.id in preserved_roles:
             role_ids = preserved_roles[member.id]
