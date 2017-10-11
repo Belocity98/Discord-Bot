@@ -46,7 +46,7 @@ class Misc:
                         if message.content and message.author.id == destination.id:
                             message_list.append(message.content)
                 except discord.Forbidden:
-                    continue # We can't access that channel.
+                    continue  # We can't access that channel.
         else:
             async for message in destination.history(limit=3000, reverse=True):
                 if message.content:
@@ -55,7 +55,7 @@ class Misc:
         return '\n'.join(message_list)
 
     @commands.command()
-    async def markov(self, ctx, destination : ChannelOrMember, sentence_count : int=2):
+    async def markov(self, ctx, destination: ChannelOrMember, sentence_count: int=2):
         """Generates a markov chain for a channel or member."""
         markov = await ctx.send(content='Generating markov chain...')
         text = await self.get_text(destination)
@@ -89,14 +89,14 @@ class Misc:
         await ctx.send('\n'.join(map(to_string, characters)))
 
     @commands.command()
-    async def echo(self, ctx, *, message : str):
+    async def echo(self, ctx, *, message: str):
         """Echos a message."""
 
         await ctx.send(message.replace('@everyone', '@\u200beveryone').replace('@here', '@\u200bhere'))
 
     @commands.command()
     @commands.guild_only()
-    async def avatar(self, ctx, member : discord.Member):
+    async def avatar(self, ctx, member: discord.Member):
         """Sends the current avatar of the member."""
 
         await ctx.channel.trigger_typing()
@@ -123,7 +123,7 @@ class Misc:
 
     @commands.command()
     @commands.guild_only()
-    async def quote(self, ctx, user : discord.Member, message_id : int=None):
+    async def quote(self, ctx, user: discord.Member, message_id: int=None):
         """Quotes a user. Quotes the last message the user sent in the current channel unless an ID is specified."""
 
         channel = ctx.channel
@@ -203,7 +203,7 @@ class Misc:
             pass
 
     @commands.command()
-    async def urban(self, ctx, *, word : str):
+    async def urban(self, ctx, *, word: str):
         """Sends the definition of a word from the UrbanDictionary."""
 
         word_list = urbandict.define(word)
@@ -443,7 +443,6 @@ class Misc:
                 #     entries.append((url, text.replace('...', '')))
 
         return card, entries
-
 
 
 def setup(bot):
