@@ -12,15 +12,6 @@ class Admin:
     @commands.is_owner()
     async def _reload(self, ctx, *, extension_name: str):
         """Reloads an extension."""
-        if extension_name == "all":
-            for cog in list(self.bot.cogs.keys()):
-                try:
-                    cog = "cogs." + cog.lower()
-                    self.bot.unload_extension(cog)
-                    self.bot.load_extension(cog)
-                except (AttributeError, ImportError) as e:
-                    await ctx.channel.send("```py\n{}: {}\n```".format(type(e).__name__, str(e)))
-            return
         try:
             self.bot.unload_extension(extension_name)
             self.bot.load_extension(extension_name)
