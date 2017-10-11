@@ -137,5 +137,6 @@ class Games:
 
         self.channel_count[channel.id] = int(message.content)
 
+
 def setup(bot):
     bot.add_cog(Games(bot))
