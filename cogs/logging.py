@@ -45,8 +45,6 @@ class Logging:
 
         server_db = self.db.get(guild.id, {})
         logging = server_db.get('logging', {})
-        channel = logging.get('channel', '')
-
         channel = ctx.channel.id
 
         logging['channel'] = channel
@@ -152,6 +150,7 @@ class Logging:
         server_db['logging'] = logging
 
         await self.db.put(guild.id, server_db)
+
 
 def setup(bot):
     bot.add_cog(Logging(bot))
