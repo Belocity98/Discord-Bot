@@ -6,7 +6,6 @@ import discord
 from .utils import checks
 
 
-
 class Vote:
 
     def __init__(self, bot):
@@ -53,7 +52,7 @@ class Vote:
                 no_count['num'] = reaction.count
                 no_count['users'] = await reaction.users().flatten()
 
-        duplicates = len(set(yes_count['users']).intersection(no_count['users'])) # Fail-safe for duplicates
+        duplicates = len(set(yes_count['users']).intersection(no_count['users']))  # Fail-safe for duplicates
 
         yes_count['num'] -= duplicates
         no_count['num'] -= duplicates
@@ -68,7 +67,6 @@ class Vote:
             return False
 
         return yes_count['num']/total >= vote_prct/100
-
 
     async def on_reaction_add(self, reaction, user):
         """Avoids duplicate votes."""
@@ -93,7 +91,6 @@ class Vote:
 
         if user in set(yes_users).intersection(no_users):
             await message.remove_reaction(reaction.emoji, user)
-
 
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
@@ -124,7 +121,7 @@ class Vote:
     @vote.command(name='percent')
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def vote_percent(self, ctx, percent : int):
+    async def vote_percent(self, ctx, percent: int):
         """Sets the percent needed to pass a vote."""
 
         if not 1 <= percent <= 100:
@@ -133,11 +130,8 @@ class Vote:
 
         server_db = self.db.get(ctx.guild.id, {})
         vote_db = server_db.get('vote', {})
-        vote_prct = vote_db.get('vote_prct', 50)
 
-        vote_prct = percent
-
-        vote_db['vote_prct'] = vote_prct
+        vote_db['vote_prct'] = percent
         server_db['vote'] = vote_db
 
         await self.db.put(ctx.guild.id, server_db)
@@ -146,7 +140,7 @@ class Vote:
     @vote.command(name='time')
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def vote_time(self, ctx, time : int):
+    async def vote_time(self, ctx, time: int):
         """Sets the time spent on each notion in seconds."""
 
         if not 5 <= time <= 180:
@@ -155,11 +149,8 @@ class Vote:
 
         server_db = self.db.get(ctx.guild.id, {})
         vote_db = server_db.get('vote', {})
-        vote_time = vote_db.get('vote_time', 60)
 
-        vote_time = time
-
-        vote_db['vote_time'] = vote_time
+        vote_db['vote_time'] = time
         server_db['vote'] = vote_db
 
         await self.db.put(ctx.guild.id, server_db)
@@ -168,16 +159,13 @@ class Vote:
     @vote.command(name='min', aliases=['minimum'])
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def vote_min(self, ctx, minimum : int):
+    async def vote_min(self, ctx, minimum: int):
         """Sets the minimum number of votes needed for the vote to pass."""
 
         server_db = self.db.get(ctx.guild.id, {})
         vote_db = server_db.get('vote', {})
-        vote_min = vote_db.get('vote_min', 2)
 
-        vote_min = minimum
-
-        vote_db['vote_min'] = vote_min
+        vote_db['vote_min'] = minimum
         server_db['vote'] = vote_db
 
         await self.db.put(ctx.guild.id, server_db)
@@ -233,7 +221,7 @@ class Vote:
     @vote.command(name='kick')
     @commands.guild_only()
     @checks.vote_check()
-    async def vote_kick(self, ctx, member : discord.Member):
+    async def vote_kick(self, ctx, member: discord.Member):
         """Starts a vote kick for the specified member."""
 
         if member.bot:
@@ -244,12 +232,12 @@ class Vote:
         embed = discord.Embed()
         embed.color = 0x4286f4
 
-        embed.description = f'{author.name}#{author.discriminator} called a vote to kick {member.name}#{member.discriminator}.'
+        embed.description = f'{author.name}#{author.discriminator} called a vote to kick {member}.'
 
         if await self.call_vote(ctx, embed):
             await member.kick()
 
-            embed.description = f'Vote to kick {member.name}#{member.discriminator} passed. Kicking...'
+            embed.description = f'Vote to kick {member} passed. Kicking...'
             await ctx.send(embed=embed)
         else:
             embed.description = 'Vote failed!'
@@ -258,7 +246,7 @@ class Vote:
     @vote.command(name='mute')
     @commands.guild_only()
     @checks.vote_check()
-    async def vote_mute(self, ctx, member : discord.Member):
+    async def vote_mute(self, ctx, member: discord.Member):
         """Starts a vote to mute the member in the current channel for 3 minutes."""
 
         if member.bot:
@@ -270,15 +258,15 @@ class Vote:
         embed = discord.Embed()
         embed.color = 0x4286f4
 
-        embed.description = f'{author.name}#{author.discriminator} called a vote to mute {member.name}#{member.discriminator}.'
+        embed.description = f'{author} called a vote to mute {member}.'
 
         if await self.call_vote(ctx, embed):
 
             overwrite = discord.PermissionOverwrite()
-            overwrite.send_messages=False
-            overwrite.read_messages=False
+            overwrite.send_messages = False
+            overwrite.read_messages = False
 
-            embed.description = f'Vote passed to mute {member.name}. Muting...'
+            embed.description = f'Vote passed to mute {member}. Muting...'
             await ctx.send(embed=embed)
 
             await channel.set_permissions(member, overwrite=overwrite)
@@ -287,6 +275,7 @@ class Vote:
         else:
             embed.description = 'Vote failed!'
             await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Vote(bot))

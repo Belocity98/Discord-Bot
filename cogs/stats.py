@@ -1,12 +1,11 @@
 # Thanks to Danny (Rapptz on GitHub) for most of this cog.
 # Especially the uptime and socket stats information.
 
+from collections import Counter
 import datetime
 
 from discord.ext import commands
-from collections import Counter
 import discord
-
 
 
 class Stats:
@@ -94,7 +93,7 @@ class Stats:
         embed = discord.Embed()
         embed.title = 'Official Bot Server Invite'
         embed.url = 'https://discord.gg/xbBmYcq'
-        embed.colour = 0x1BE118 # lucio green
+        embed.colour = 0x1BE118  # lucio green
 
         owner_id = self.bot.db.get('owner', 183389299524239361)
 
@@ -112,7 +111,7 @@ class Stats:
         embed.add_field(name='Uptime', value=self.get_bot_uptime(brief=True))
         embed.set_footer(text='Made with discord.py', icon_url='http://i.imgur.com/5BFecvA.png')
 
-        embed.add_field(name='Servers', value=len(self.bot.guilds))
+        embed.add_field(name='Servers', value=str(len(self.bot.guilds)))
         embed.add_field(name='Commands Run', value=sum(self.bot.commands_used.values()))
 
         await ctx.channel.send(embed=embed)
@@ -129,6 +128,7 @@ class Stats:
         embed.colour = 0x9600ad
         embed.description = '[Invitation Link](http://wumpusbot.me/invite)'
         await ctx.author.send(embed=embed)
+
 
 def setup(bot):
     bot.commands_used = Counter()

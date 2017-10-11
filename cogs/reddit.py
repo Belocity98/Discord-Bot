@@ -51,14 +51,14 @@ class Reddit:
                 subdata = resp['data']['children'][0]['data']
 
                 subdata_dict = {
-                    'subreddit' : subdata['subreddit_name_prefixed'].replace('\\', ''),
-                    'name' : subdata['name'],
-                    'title' : subdata['title'],
-                    'url' : subdata['url'].replace('\\', ''),
-                    'permalink' : self.reddit_url + subdata['permalink'].replace('\\', ''),
-                    'author' : subdata['author'],
-                    'nsfw' : subdata['over_18'],
-                    'is_self' : subdata['is_self']
+                    'subreddit': subdata['subreddit_name_prefixed'].replace('\\', ''),
+                    'name': subdata['name'],
+                    'title': subdata['title'],
+                    'url': subdata['url'].replace('\\', ''),
+                    'permalink': self.reddit_url + subdata['permalink'].replace('\\', ''),
+                    'author': subdata['author'],
+                    'nsfw': subdata['over_18'],
+                    'is_self': subdata['is_self']
                 }
                 if subdata['is_self']:
                     subdata_dict['selftext'] = subdata['selftext'][:250]
@@ -100,7 +100,7 @@ class Reddit:
             for sub in self.feed_data:
                 self.old_feed[sub] = self.feed_data[sub]
 
-    def get_card_embed(self, subdata : dict):
+    def get_card_embed(self, subdata: dict):
         embed = discord.Embed()
         embed.color = 0xe21fd9
 
@@ -237,6 +237,7 @@ class Reddit:
 
         async with self.session.get(url) as rawdata:
             return await rawdata.json()
+
 
 def setup(bot):
     bot.add_cog(Reddit(bot))

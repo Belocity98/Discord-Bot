@@ -68,7 +68,7 @@ class Weather:
 
     @commands.group(invoke_without_command=True, name='weather')
     @commands.guild_only()
-    async def _weather(self, ctx, *, location : str=None):
+    async def _weather(self, ctx, *, location: str=None):
         """
         Shows the weather for the default location.
 
@@ -76,7 +76,7 @@ class Weather:
         """
 
         embed = discord.Embed()
-        embed.color = 0xf7ff0f # nice yellow
+        embed.color = 0xf7ff0f  # nice yellow
 
         server_db = self.db.get(ctx.guild.id, {})
         weather = server_db.get('weather', {})
@@ -87,8 +87,8 @@ class Weather:
         location = location.replace(' ', '%20')
 
         terms = {
-            'days' : forecast_days,
-            'q' : f'\"{location}\"'
+            'days': forecast_days,
+            'q': f'\"{location}\"'
         }
         resp = await self.api_call(version='v1', call='forecast', terms=terms)
         if resp.get('error'):
@@ -170,8 +170,9 @@ class Weather:
             elif condition == 'Freezing fog':
                 emoji = '\N{FOGGY}\N{SNOWFLAKE}'
             elif condition == 'Patchy light drizzle':
-                emoji= '\N{WHITE SUN BEHIND CLOUD WITH RAIN}'
-            elif condition == 'Patchy light snow in area with thunder' or condition == 'Moderate or heavy snow in area with thunder':
+                emoji = '\N{WHITE SUN BEHIND CLOUD WITH RAIN}'
+            elif condition == 'Patchy light snow in area with thunder' or condition == 'Moderate or heavy' \
+                                                                                       ' snow in area with thunder':
                 emoji = '\N{THUNDER CLOUD AND RAIN}\N{SNOWFLAKE}'
             elif condition in self.freezing_rain_conditions:
                 emoji = '\N{CLOUD WITH RAIN}\N{SNOWFLAKE}'
@@ -205,11 +206,8 @@ class Weather:
 
         server_db = self.db.get(ctx.guild.id, {})
         weather = server_db.get('weather', {})
-        default_loc = weather.get('default_loc')
 
-        default_loc = location
-
-        weather['default_loc'] = default_loc
+        weather['default_loc'] = location
         if not location:
             del weather['default_loc']
 
@@ -218,30 +216,24 @@ class Weather:
 
         await ctx.send('👍')
 
-
-
     @_weather.command(name='forecastdays', aliases=['fdays'])
     @commands.guild_only()
     @commands.has_permissions(manage_guild=True)
-    async def w_fdays(self, ctx, days : int):
+    async def w_fdays(self, ctx, days: int):
         """Set the amount of days to show forecasts for."""
 
         server_db = self.db.get(ctx.guild.id, {})
         weather = server_db.get('weather', {})
-        db_days = weather.get('forecast_days', 1)
 
         if days < 1 or days > 5:
             await ctx.send('Forecast days cannot exceed 5 days or be under 1 day.')
             return
 
-        db_days = days
-        weather['forecast_days'] = db_days
+        weather['forecast_days'] = days
         server_db['weather'] = weather
         await self.db.put(ctx.guild.id, server_db)
 
         await ctx.send('👍')
-
-
 
     async def api_call(self, version, call, terms):
 

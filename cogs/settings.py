@@ -140,7 +140,7 @@ class Settings:
                 if role is None:
                     em.description = 'autoassign_role = `NOT SET`'
                 else:
-                  em.description = f'autoassign_role = {role.name}'
+                    em.description = f'autoassign_role = {role.name}'
             elif role_id is None:
                 em.description = 'autoassign_role = `NOT SET`'
             return await ctx.send(embed=em)
