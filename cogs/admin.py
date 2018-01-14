@@ -1,6 +1,7 @@
 import inspect
 
 from discord.ext import commands
+from cogs.utils import config
 
 
 class Admin:
@@ -76,6 +77,13 @@ class Admin:
             return
 
         await ctx.send(python.format(result))
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def updatecfg(self, ctx):
+        """Updates the configuration."""
+
+        self.bot.db = config.Config("credentials.json")
 
 
 def setup(bot):
