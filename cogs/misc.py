@@ -3,11 +3,13 @@
 import unicodedata
 import urbandict
 import markovify
+import asyncio
 import discord
 import aiohttp
+import json
 import xkcd
 
-from datetime import datetime, timezone
+from datetime import datetime
 from urllib.parse import parse_qs
 from discord.ext import commands
 from html2text import html2text
@@ -443,6 +445,17 @@ class Misc:
                 #     entries.append((url, text.replace('...', '')))
 
         return card, entries
+
+    async def update_botlist(self):
+        while True:
+            url = f"https://bots.discord.pw/api/bots/{self.bot.user.id}/stats"
+            payload = {"server_count": len(self.bot.guilds)}
+            headers = {"Authorization": self.bot.db.get("dbots"), "content-type": "application/json"}
+
+            async with self.bot.session.post(url, data=json.dumps(payload), headers=headers) as resp:
+                print("Updating botlist: response was: {}".format(await resp.json()))
+
+            await asyncio.sleep(1800)
 
 
 def setup(bot):
