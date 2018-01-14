@@ -33,6 +33,8 @@ class Misc:
 
         self.quote_api = r"http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1"
 
+        bot.loop.create_task(self.update_botlist())
+
     async def get_text(self, destination):
         message_list = []
 
