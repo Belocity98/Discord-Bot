@@ -10,6 +10,8 @@ import youtube_dl
 import aiohttp
 import discord
 
+from .utils import checks
+
 
 class YoutubeSource(discord.FFmpegPCMAudio):
     def __init__(self, path):
@@ -34,13 +36,13 @@ class Music:
         """Main command for all music-based commands."""
         pass
 
-    @music.group(name='admin', aliases=['a'], invoke_without_command=True)
-    async def admin_(self, ctx):
+    @music.group(aliases=['a'], invoke_without_command=True)
+    async def admin(self, ctx):
         """Main command for all music admin commands."""
         pass
 
-    @admin_.command(name='next', aliases=['skip'])
-    @commands.has_permissions(mute_members=True)
+    @admin.command(name='next', aliases=['skip'])
+    @checks.has_permissions_or_owner(mute_members=True)
     async def a_next(self, ctx):
         """Force next command for admins only."""
         voice = ctx.guild.voice_client
@@ -49,8 +51,8 @@ class Music:
 
         voice.stop()
 
-    @admin_.command(name='stop')
-    @commands.has_permissions(mute_members=True)
+    @admin.command(name='stop')
+    @checks.has_permissions_or_owner(mute_members=True)
     async def a_stop(self, ctx):
         """Force stop command for admins only."""
         voice = ctx.guild.voice_client
