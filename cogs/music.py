@@ -519,10 +519,10 @@ class Music:
 
         em.add_field(name='Views', value=pretty_views)
         em.add_field(name='Duration', value=f'{m:0>2}:{s:0>2}')
-        em.add_field(name='Requested By', value=str(data['ctx'].author))
+        em.add_field(name='Requested By', value=str(data['ctx'].author.mention))
         em.url = r'https://www.youtube.com/watch?v={}'.format(data['id'])
         try:
-            em.set_image(url=data['info']['thumbnails'][0]['url'])
+            em.set_thumbnail(url=data['info']['thumbnails'][0]['url'])
         except KeyError:
             pass
 
