@@ -515,8 +515,9 @@ class Music:
         em.title = '{} - {}'.format(data['title'], data['uploader'])
 
         m, s = divmod(data['duration'], 60)
+        pretty_views = "{0:,d}".format(data['views'])
 
-        em.add_field(name='Views', value=data['views'])
+        em.add_field(name='Views', value=pretty_views)
         em.add_field(name='Duration', value=f'{m:0>2}:{s:0>2}')
         em.add_field(name='Requested By', value=str(data['ctx'].author))
         em.url = r'https://www.youtube.com/watch?v={}'.format(data['id'])
