@@ -480,12 +480,9 @@ class Music:
         data = {}
         data['url'] = info['url']
         data['views'] = info.get('view_count')
-        data['likes'] = info.get('like_count')
-        data['dislikes'] = info.get('dislike_count')
         data['duration'] = info.get('duration')
         data['uploader'] = info.get('uploader')
         data['title'] = info.get('title')
-        data['description'] = info.get('description')
         data['id'] = info.get('id')
         data['info'] = info
 
@@ -520,8 +517,6 @@ class Music:
         m, s = divmod(data['duration'], 60)
 
         em.add_field(name='Views', value=data['views'])
-        em.add_field(name='Likes', value=data['likes'])
-        em.add_field(name='Dislikes', value=data['dislikes'])
         em.add_field(name='Duration', value=f'{m:0>2}:{s:0>2}')
         em.add_field(name='Requested By', value=str(data['ctx'].author))
         em.url = r'https://www.youtube.com/watch?v={}'.format(data['id'])
