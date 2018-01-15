@@ -90,7 +90,7 @@ class Music:
             data = await self.get_info_from_query(query=query)
             data['ctx'] = ctx
 
-            if data['duration'] > 600:
+            if data['duration'] > 1800:
                 return await ctx.send('Song is too long.')
 
             em = self.format_song_embed(data)
