@@ -12,7 +12,6 @@ from cogs.utils import config
 description = "General purpose Discord chat bot. Includes moderation and fun commands."
 
 startup_extensions = [
-    'cogs.leagueoflegends',
     'cogs.settings',
     'cogs.logging',
     'cogs.weather',
